@@ -45,6 +45,13 @@ When evidence conflicts, preserve the distinction, identify the affected decisio
 
 ## Verification and handoff
 
+Follow [the shared testing policy](docs/testing-policy.md) before creating, changing, auditing, removing, or selecting tests. This applies to every agent and future implementation task; it does not authorize executable tests in the current documentation phase.
+
+- Before adding a test, identify the changed/required behavior and its authority, credible failure, existing protection, lowest reliable layer, and remaining gap. **Zero new tests is valid** when existing evidence is sufficient.
+- Protect observable contracts and scientific meaning. Do not mirror implementation, assert constants against themselves, or add tests merely to increase counts/coverage.
+- Investigate failures. Never weaken assertions, widen scientific tolerances, regenerate reference values, or skip/delete checks merely to get a green result. An audit reports findings without changing the suite.
+- Start with affected checks; include shared consumers and mandatory gates. Unknown impact broadens selection. Report actual outcomes, omissions, and limits; do not invent commands or successful runs.
+
 There are no install/build/test/run scripts in the current repository. For documentation edits, verify local links, consistent status labels, proposal traceability, readable diagrams, template syntax, absence of executable artifacts, and a clean diff. Record what was actually checked.
 
 Update project state or the current handoff when the task changes them. Finish with the outcome, changed paths, evidence, and remaining decisions. Detailed workflow: `docs/agent-workflow.md`.

@@ -8,6 +8,7 @@ Updated: **13 November 2026**. This is the concise starting point for the team a
 - Repository: **emanhthangngot/lunarsight**, created as private.
 - Current user instruction: prepare the initial repository, agent context, system design, and complete documentation; keep data proposals uncommitted and prepare no scripts or application implementation.
 - The team's proposal is preserved as a [historical reference](reference/proposal-v2.md). It informs requirements; it is not proof of a backend or validated science in this repo.
+- On 13 November 2026 the owner requested a setup review and agent-neutral rules for generating tests. The [shared testing policy](testing-policy.md) is now repository guidance; the [review](repository-review.md) records findings and recommendations. This request does not select a stack/data product or authorize runtime implementation.
 
 ## Current scope
 

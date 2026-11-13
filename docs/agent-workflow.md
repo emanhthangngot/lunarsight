@@ -33,6 +33,8 @@ Check relative links, requirement/decision references, status labels, source URL
 
 There are no runtime, build, test, acquisition, or deployment commands in this repository. Do not invent a successful test run or add scripts just to satisfy a generic checklist. Future implementation will add meaningful validation for its actual behavior.
 
+Before any test creation, modification, audit, retirement, or selection, follow the [shared testing policy](testing-policy.md). Record its five-question decision in the existing task/PR: behavior and authority, credible failure, existing evidence, lowest reliable layer, and remaining gap. Reusing sufficient tests or adding none is a valid result. Audit-only work reports findings without changing tests; an authorized implementation uses the smallest adequate checks plus mandatory gates. The future verification catalog is not a bulk test-generation checklist.
+
 ## Handoff and memory
 
 Update [current handoff](handoffs/current.md) with what changed, evidence, remaining questions, and the next useful action. Keep the state summary concise; link to detailed documents instead of duplicating them.

@@ -4,6 +4,8 @@
 
 The plan follows [requirements.md](requirements.md) and the historical findings in the [original proposal](reference/proposal-v2.md). Passing a repository-content check is separate from demonstrating model accuracy or usable application behavior.
 
+**Selection rule:** apply the [shared testing policy](testing-policy.md) before turning a case below into a test. This is a catalog of future risks, not a requirement to generate every case for every change. Use accepted behavior, existing evidence, and the lowest reliable layer to select only the checks needed; no framework or executable suite is authorized by this plan.
+
 ## What can be reviewed now
 
 | Documentation check | Expected evidence |

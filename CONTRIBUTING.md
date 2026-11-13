@@ -24,3 +24,7 @@ Assign separate file ownership when agents work in parallel, then integrate and 
 - The change includes evidence of the checks actually performed and an updated handoff when needed.
 
 No runtime installation or test suite is configured. Future implementation tasks will define their own relevant checks in the [verification plan](docs/verification-plan.md).
+
+## Test changes in a later implementation phase
+
+Follow the [shared testing policy](docs/testing-policy.md). A contribution explains the protected behavior, existing evidence and remaining gap before adding tests; zero additions is valid when sufficient protection already exists. Audit requests report findings only. Test maintenance must preserve accepted contracts and explain any removed protection. Measure optimization on comparable runs and keep unrun/blocked/skipped evidence distinct from passes.

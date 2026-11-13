@@ -26,6 +26,8 @@ Describe the planned steps and assumptions that materially affect the result. Us
 
 List observable acceptance criteria and checks appropriate to this phase. Do not prescribe nonexistent build or test commands.
 
+For test-related or later implementation work, record the [testing policy](../testing-policy.md) admission decision: behavior/authority; credible failure; existing evidence; lowest reliable layer; remaining gap and add/extend/reuse/none choice. Include affected consumers, selected checks and relevant omissions. Documentation-only tasks can mark runtime tests not applicable.
+
 ## Handoff
 
 Record changed files, executed checks, unresolved points, and the next useful action.

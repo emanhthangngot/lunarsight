@@ -1,12 +1,14 @@
 # Current handoff
 
 - Date: **13 November 2026**
-- Workstream: documentation and agent-ready repository bootstrap.
-- Current authority: the user's clarification that the team has not finalized data scope/quantities and wants no scripts or implementation yet.
+- Workstream: repository setup review and shared agent testing policy.
+- Current authority: the owner's 13 November request to assess setup and add generic test-generation rules for the NASA Challenge project; the existing documentation-only boundary remains in effect.
 
 ## Outcome
 
-The project is named LunarSight and has a private GitHub repository. The current source tree has been reorganized into documentation, candidate data research, proposed system design, agent instructions, and contribution templates.
+The project remains a private documentation foundation. The [setup review](../repository-review.md) assesses baseline `fa4acfb89174d891d2abc43e836255f8440910b1`: sound context/traceability and scientific boundaries, with demo scope and numerical evidence still unresolved.
+
+Added [shared testing policy](../testing-policy.md) with a five-question admission gate, zero-new-test option, domain risk mapping, offline fixtures, conservative impact selection, read-only audits, and safeguards for maintenance/failures. Root instructions, workflow, verification plan, contribution guidance, documentation index, task brief and PR template point to it. Project state records the owner's request. No test runner, CI, code, datasets or dependencies were added.
 
 Previously introduced processing scripts, dependency requirements, prepared-data examples, release descriptors, and readiness reports have been removed from the active tree. The earlier commit remains historical; it must not be interpreted as current team approval or current repository capability.
 
@@ -18,7 +20,9 @@ The original proposal is retained under `docs/reference/` with a historical-stat
 
 ## Verification scope
 
-Documentation checks cover UTF-8/newlines, relative links, balanced fenced blocks, adapter/template frontmatter, requirement and status consistency, and absence of runnable code or acquired-data artifacts. Final local and GitHub tree checks are recorded in the completion report. No application test, scientific benchmark, data download, or deployment is claimed.
+Performed local UTF-8/newline, relative-file-link, balanced-fence, vendor-neutral wording and artifact-inventory checks, plus `git diff --check`. Reviewed changed policy links, requirement/finding IDs, phase consistency and unchanged adapter frontmatter. No diagram or adapter configuration changed. These checks validate repository documentation only; they do not establish loading in agent clients, runtime behavior, scientific accuracy or CI speed.
+
+Research used the supplied testing material and primary Google/NASA/JPL references. The official challenge summary was available in search, but direct retrieval of its full page returned HTTP 502; no unverified competition rules were adopted. See the policy's source notes. No application test, scientific benchmark, data download, or deployment was performed.
 
 ## Open decisions and next action
 
