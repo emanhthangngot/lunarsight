@@ -1,6 +1,6 @@
 # Pilot data-mining inventory
 
-Status: **research proposal, checked 14 November 2026**. This inventory narrows the accepted feature scope in [ADR 0002](decisions/0002-data-mining-feature-scope.md). It is not approval for bulk raster acquisition. Three small ROI shapefile bundles were downloaded temporarily to inspect their geometry. Twelve 9×9 pixel windows and exploratory 20 km horizon-profile windows were read through HTTP byte ranges; all four centers were additionally profiled to 25 km at both scales, and Site01/Site11/Site23 were profiled to 50 km at 80 m. All requested profile-circle cells were valid, and no full raster was saved. The profile runs transferred about 249.2 MB in total, including repeated tile reads from retries and overlapping windows. The temporary ROI bundles and Rasterio reader are outside the repository.
+Status: **research proposal, checked 14 November 2026**. This inventory narrows the accepted feature scope in [ADR 0002](decisions/0002-data-mining-feature-scope.md). It is not approval for bulk raster acquisition. Three small ROI shapefile bundles were downloaded temporarily to inspect their geometry. Twelve 9×9 pixel windows and exploratory 20 km horizon-profile windows were read through HTTP byte ranges; all four centers were additionally profiled to 25 km at both scales, and all four were profiled to 131.8 km at 80 m for an illustrative 5 km-relief case. All completed profile-circle reads were valid, and no full raster was saved. The profile runs transferred about 414.4 MB in total, including overlapping/repeated tile ranges and an interrupted read. The temporary ROI bundles and Rasterio reader are outside the repository.
 
 ## Recommended pilot sites for coverage review
 
@@ -23,7 +23,7 @@ If schedule or local-product volume is restrictive, compare Site04 and Site11 as
 | --- | --- | --- | --- | --- | --- |
 | Site catalog — P0 | NASA PGDA 78 site/ROI metadata; NASA mission records and USGS/IAU nomenclature for independent identity checks | Site ID, name, point/ROI geometry, elevation source, mission status, citations | PGDA 78 includes Site04, Site11, Site23 and additional site regions; a named feature is not itself a landing coordinate | Tiny metadata table (KB-scale, estimate) | Confirm the 2–3 sites, representative analysis points, and naming policy |
 | Local high-resolution terrain — P0/P1 | NASA PGDA 78 | Nominal LDEM, slope, LDEC, elevation and slope RMS uncertainty; a small clone subset for P1 | 5 m/pixel GeoTIFFs in south polar stereographic X/Y metres, MOON_ME frame with DE421; PGDA reports about 90% interpolated 5 m pixels. Site01, Site04, Site11 and Site23 are listed in the archive. | HTTP HEAD returned exact sizes for five core TIFFs per candidate, shown below. One 9×9 LDEM window at each reference center was read; no full raster was saved. All 100 clones and XYZI point clouds are excluded. | Choose locations/layers/clones; check the actual selected analysis points and ROI polygons before selecting |
-| Surrounding terrain — P0 | NASA PGDA 90; compare 80S 80MPP and 80S 20MPP | LDEM, LDEC, elevation error, slope and slope error for horizon context | COG GeoTIFFs in south polar stereographic X/Y metres, MOON_ME / DE421. Nominal pixel scale is not effective resolution; evaluate the published effective-resolution layer separately if useful. | HTTP HEAD totals for the five full rasters are **1,051,288,835 bytes** at 80 m and **15,617,598,506 bytes** at 20 m. Four 9×9 point windows and 20 km/25 km profiles were read at both scales; three centers were extended to 50 km at 80 m. | Determine full horizon extent and compare profiles against an accepted angular tolerance before selecting a scale |
+| Surrounding terrain — P0 | NASA PGDA 90; compare 80S 80MPP and 80S 20MPP | LDEM, LDEC, elevation error, slope and slope error for horizon context | COG GeoTIFFs in south polar stereographic X/Y metres, MOON_ME / DE421. Nominal pixel scale is not effective resolution; evaluate the published effective-resolution layer separately if useful. | HTTP HEAD totals for the five full rasters are **1,051,288,835 bytes** at 80 m and **15,617,598,506 bytes** at 20 m. Four 9×9 point windows and 20 km/25 km profiles were read at both scales; all four centers were then profiled to 131.8 km at 80 m in a provisional relief scenario. | Determine full horizon extent and compare profiles against an accepted angular tolerance before selecting a scale |
 | Sun/Earth ephemeris — P0 | JPL Horizons API; Astroquery is a possible client library, not a selected dependency | Time-tagged Sun and Earth geometry for each selected lunar observer/site; preserve query settings and returned metadata | `Resource.docx` suggests Sun target 10, Earth target 399, and a lunar-centered observer (301) with site coordinates. Treat these as candidate query settings to validate. Horizons geometry does not include terrain obstruction. | Small per site/date response; estimate after choosing cadence and scenario count | Validate CENTER/observer coordinates, coordinate convention, UTC/time scale, reference frame, aberration/refraction settings and cadence with a saved sample response |
 | Horizon and mission-window summaries — P0 | Derived from selected terrain + ephemeris | Azimuth/elevation, local terrain horizon, visibility state, interval durations, longest dark interval and simultaneous Sun/Earth visibility | Horizons altitude is relative to the local horizontal. The terrain horizon must be calculated separately from DEM. Model the Moon without atmospheric refraction and account for lunar curvature and observer height. | Small tables/arrays compared with raster inputs; size depends on cadence and retained trials | Choose cadence and transition refinement; establish reference cases before calling results verified |
 | DEM uncertainty analysis — P1 | PGDA 78 uncertainty layers and limited DEM clone sample | Recompute terrain horizons/illumination against nominal DEM and selected alternatives | Clones represent modeled DEM alternatives, not independent observations or different landing coordinates | Unquantified until clone count and local file sizes are checked | Select clone sample and summary statistic; compare with published method and independent reference evidence |
@@ -139,7 +139,47 @@ The 80 m profiles at Site01, Site11, and Site23 were further extended to 50 km. 
 
 This 50 km extension used only the 80 m LDEM; the 20 m comparison remains bounded to 25 km. The 80 m profiles are still window-limited and do not establish the far-field horizon or whether Site23's 80S edge truncates it.
 
-**Interpretation:** 80 m and 20 m produce materially different near/mid-field profiles, especially at Site01, Site11, and Site23. Extending the common comparison to 25 km did not remove the 80 m window limitation at Site01 and Site11, and the 80 m-only extension to 50 km still has outer-window maxima at all three tested centers. These results do not justify calling 80 m sufficient or selecting 20 m for the full region: the common 80 m/20 m comparison reaches only 25 km, the 20 m stack is about 14.9 times larger, and no acceptable angular error has been agreed. The 50 km 80 m extensions transferred 21,762,904 bytes in successful HTTP 206 ranges; including the earlier comparisons and repeated reads, the profile runs transferred about 249,187,493 bytes in total. No full raster was retained.
+#### Relief-to-horizon scenario check
+
+For a spherical Moon and an idealized isolated obstacle, `d ≈ sqrt(2 R h)` with `R = 1,737.4 km` gives these candidate distances. They are planning scenarios, not claims about observed terrain or selected team requirements.
+
+| Relative obstacle height (km) | Approximate horizon distance (km) |
+| ---: | ---: |
+| 0.5 | 41.7 |
+| 1 | 58.9 |
+| 2 | 83.4 |
+| 5 | 131.8 |
+| 10 | 186.4 |
+| 20 | 263.6 |
+
+The estimated outward 80S margin is about 182.5 km at Site23, versus 264–297 km at the other reference centers. A 5 km-relief horizon is about 50.7 km inside the Site23 margin. A 10 km-relief horizon is about 3.9 km beyond it; a 20 km-relief horizon approaches the margin at Site11 and exceeds it at Site23. This geometric comparison flags where coverage could matter but does not demonstrate an actual obstructing ridge or horizon ray.
+
+#### 80 m profiles at the 5 km-relief distance
+
+As an explicitly provisional sensitivity case, the 80 m profiles were extended to 131.8 km at all four reference centers. Every cell inside each circle was valid. The profiles were computed in one-degree azimuth bins with the same lunar-curvature correction as the shorter profiles.
+
+| Site | 80 m horizon range (°) | Peak distance min / median / max (km) | Maxima in outer 10% (of 360 bins) |
+| --- | ---: | ---: | ---: |
+| Site01 | −3.806 to 1.796 | 0.039 / 36.991 / 131.799 | 32 |
+| Site04 | 0.131 to 32.103 | 0.080 / 4.849 / 19.384 | 0 |
+| Site11 | −4.211 to 3.349 | 0.001 / 55.305 / 131.797 | 52 |
+| Site23 | −4.746 to 5.206 | 0.028 / 2.371 / 131.796 | 56 |
+
+The circle windows were valid through 131.8 km, so these reads did not reach the 80S edge. Site04's profile maximum stayed at 19.384 km. Site01, Site11, and Site23 still have maxima in the outer ~13.2 km for 32, 52, and 56 azimuths, respectively. Their profiles therefore remain radius-limited even under the provisional 5 km-relief case; this does not prove that real terrain has those distant obstructions. A broader attempt timed out during the Site04 read; targeted chunked reads completed for Site04, Site11 and Site23. Successful HTTP 206 ranges across the broad attempt and retries transferred 165,216,982 bytes for this 131.8 km step, including repeated ranges. Across all profile experiments the transferred total is about 414,404,475 bytes. No raster was retained.
+
+#### Illustrative angular-threshold sensitivity
+
+The 25 km comparison's 95th-percentile absolute differences are Site01 6.609°, Site04 1.076°, Site11 7.065° and Site23 6.524°. To make the pending tolerance choice concrete, the table shows which profiles would meet hypothetical 95th-percentile screening thresholds. These are examples only; a 20 m DEM is not ground truth, and a percentile threshold does not constrain the worst-case tail.
+
+| Hypothetical 95th-percentile threshold | Profiles at or below threshold |
+| ---: | --- |
+| 1° | None |
+| 2° | Site04 |
+| 5° | Site04 |
+| 7° | Site01, Site04, Site23 |
+| 8° | All four |
+
+**Interpretation:** 80 m and 20 m produce materially different near/mid-field profiles, especially at Site01, Site11, and Site23. The common comparison is bounded to 25 km; 80 m-only profiles to 131.8 km remain window-limited at three centers. These results do not justify calling 80 m sufficient or selecting 20 m for the full region. No observer point, acceptable angular tolerance, relief scenario, or horizon radius has been accepted. Across the profile experiments the range transfers include repeated/overlapping reads and an interrupted attempt; no full raster was retained.
 
 ### Other resources and physical interpretation limits
 
@@ -179,7 +219,7 @@ Keep metadata tables and file-level manifests separate from raster pixels. Do no
 ## Recommended next sequence
 
 1. Compare Site01, Site04, Site11 and Site23 against the team use case. Reference-center coverage is verified at all three tested terrain scales. Resolve Site23's missing ROI and repeat coverage checks for any team-selected analysis points and ROI polygons.
-2. The 80 m/20 m profiles are compared at all four reference centers to 25 km; 80 m-only profiles at Site01, Site11 and Site23 extend to 50 km but remain window-limited. Before choosing a scale, agree an angular tolerance, observer points and the relief/horizon distance to cover. Then extend the 80 m far-field profiles within the accepted coverage scenario and determine whether the 80S edge limits Site23. Consider a 60S layer only if a relevant ray reaches the 80S valid-data edge.
+2. The 80 m/20 m comparison reaches 25 km and the provisional 5 km-relief 80 m profiles reach 131.8 km; Site01, Site11 and Site23 remain radius-limited. Agree an angular tolerance, observer points and relief/horizon distance before any larger regional read. Then extend profiles within the accepted coverage scenario and determine whether the 80S edge limits Site23. Consider a 60S layer only if a relevant ray reaches the 80S valid-data edge.
 3. Keep the Horizons response header with each ephemeris sample and confirm its lunar `Target pole/equ` model. The official manual resolves the apparent DE441 trajectory / DE421 lunar-frame discrepancy for current dates; revisit only if the model, interval, or observer definition changes.
 4. Submit the proposed sites, selected layers, exact footprint, total bytes and open validation questions for team decision.
 5. Only after that decision and a separate explicit acquisition/processing request, create the asset manifest and begin raster data handling.

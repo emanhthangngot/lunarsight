@@ -9,7 +9,7 @@ Updated: **14 November 2026**. This is the concise starting point for the team a
 - Current user instruction: keep work reviewable through a new branch and PR. The initial data-mining feature priorities are now recorded in [ADR 0002](decisions/0002-data-mining-feature-scope.md); exact data products, coverage, versions, and acquisition remain undecided.
 - The team's proposal is preserved as a [historical reference](reference/proposal-v2.md). It informs requirements; it is not proof of a backend or validated science in this repo.
 - The [shared testing policy](testing-policy.md) governs agent test creation, selection and maintenance. It does not select a stack/data product or authorize runtime implementation.
-- Initial source validation found that NASA Data Book reference centers do not fall inside the inspected PGDA 78 ROI polygons; they are not substitutes for ROI or landing-point geometry. Small reads verified valid pixels at all four centers in the local 5 m LDEMs and PGDA 90 80 m/20 m LDEMs. Exploratory 80 m/20 m horizon profiles at 20 km and 25 km show material angular differences at Site01, Site11 and Site23. 80 m-only profiles to 50 km still peak in the outer 10% for 93/94/35 azimuths at Site01/11/23. JPL documents the current high-precision Horizons lunar surface frame as DE421 `MOON_ME`, despite the DE441 ephemeris provenance. Site selection, ROI coverage, horizon extent, and acceptable angular error remain undecided.
+- Initial source validation found that NASA Data Book reference centers do not fall inside the inspected PGDA 78 ROI polygons; they are not substitutes for ROI or landing-point geometry. Small reads verified valid pixels at all four centers in local 5 m and PGDA 90 80 m/20 m LDEMs. 80 m profiles to 131.8 km under a provisional 5 km-relief scenario remain radius-limited at Site01, Site11 and Site23; Site04's maximum stays near 19.4 km. JPL documents the current high-precision Horizons lunar surface frame as DE421 `MOON_ME`, despite the DE441 ephemeris provenance. Site selection, ROI coverage, horizon extent, relief scenario and acceptable angular difference remain undecided.
 
 ## Current scope
 
@@ -29,7 +29,7 @@ The approximately **56.2 GB** acquisition scenario is an unapproved example from
 
 ## Next useful work
 
-Resolve exact pilot sites, data products/footprints, time cadence, and validation references against the accepted scope in ADR 0002. Agree an angular tolerance, observer points and horizon/relief scenario, then extend the 80 m profiles to that distance and determine whether Site23's 80S edge limits the result. Obtain a verified Site23 ROI if available. Bulk dataset acquisition and application implementation have not started; a later explicit request is required for those steps.
+Resolve exact pilot sites, data products/footprints, time cadence, and validation references against the accepted scope in ADR 0002. Agree observer points, a 95th-percentile angular-difference threshold, and relief/horizon distance before additional regional reads. Then extend the 80 m profiles within the accepted scenario and determine whether Site23's 80S edge limits the result. Obtain a verified Site23 ROI if available. Bulk dataset acquisition and application implementation have not started; a later explicit request is required for those steps.
 
 ## Status vocabulary
 
