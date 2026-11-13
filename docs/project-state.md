@@ -9,6 +9,7 @@ Updated: **13 November 2026**. This is the concise starting point for the team a
 - Current user instruction: keep work reviewable through a new branch and PR. The initial data-mining feature priorities are now recorded in [ADR 0002](decisions/0002-data-mining-feature-scope.md); exact data products, coverage, versions, and acquisition remain undecided.
 - The team's proposal is preserved as a [historical reference](reference/proposal-v2.md). It informs requirements; it is not proof of a backend or validated science in this repo.
 - The [shared testing policy](testing-policy.md) governs agent test creation, selection and maintenance. It does not select a stack/data product or authorize runtime implementation.
+- Initial source validation found that NASA Data Book reference centers do not fall inside the inspected PGDA 78 ROI polygons; they are not substitutes for ROI or landing-point geometry. JPL documents the current high-precision Horizons lunar surface frame as DE421 `MOON_ME`, despite the DE441 ephemeris provenance. A real PGDA 90 COG window and local-raster valid-coverage check remain outstanding.
 
 ## Current scope
 
@@ -28,7 +29,7 @@ The approximately **56.2 GB** acquisition scenario is an unapproved example from
 
 ## Next useful work
 
-Resolve exact pilot sites, data products/footprints, time cadence, and validation references against the accepted scope in ADR 0002. Data acquisition and implementation have not started; a later explicit request is required for those steps.
+Resolve exact pilot sites, data products/footprints, time cadence, and validation references against the accepted scope in ADR 0002. Next, inspect the local GeoTIFF bounds/masks, obtain a verified Site23 ROI if available, and test a PGDA 90 spatial window with a COG-aware reader. Data acquisition and implementation have not started; a later explicit request is required for those steps.
 
 ## Status vocabulary
 

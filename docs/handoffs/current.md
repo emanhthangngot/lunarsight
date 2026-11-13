@@ -16,7 +16,9 @@ The documentation and shared agent-guidance foundation is complete. ADR 0002 rec
 
 ## Next useful decision
 
-Five-layer byte sizes are recorded for Site01/04/11/23; ROI geometry was parsed for Site01/04/11, while the expected Site23 ROI path returned a not-found page. NASA reference centers are documented, and a small Sun/Earth Horizons query returned three hourly rows each. PGDA 90 full-file totals are recorded for 80 m and 20 m, and the server returns HTTP 206 for one-byte Range requests. Next reconcile ROI CRS/analysis points with raster coverage, find a verified Site23 ROI, test a real COG spatial-window read, and confirm body-fixed orientation compatibility between PGDA MOON_ME/DE421 and Horizons MEAN_ME/DE441. Exact sites, footprints, cadence and validation references remain undecided.
+The NASA Data Book reference centers were projected into the ROI `.prj` south-polar stereographic CRS and compared with the available Site01/04/11 polygons. None of those centers lies inside an ROI polygon; Site01 lies only inside the union bounding box. This confirms that reference centers and ROIs represent different things, and does not verify each local raster's valid-data coverage. Site23 raster products are listed by PGDA, but its ROI archive is unavailable at the expected path.
+
+The apparent Horizons DE441 versus PGDA DE421 frame conflict is resolved at the model level: JPL documents Horizons' high-precision lunar surface frame as the DE421 mean-Earth frame for 1550–2650, while DE441 supplies major-body trajectories. Keep the response header and confirm its lunar `Target pole/equ` label on each saved query. The major remaining technical check is an actual PGDA 90 COG spatial-window read. The current environment has no GDAL/Rasterio/TIFF reader, and direct shell access to the NASA endpoint failed DNS resolution; prior one-byte Range requests only establish server Range support. Use an available COG-aware reader in a network-enabled environment, then compare local GeoTIFF bounds/masks with the proposed analysis points. Exact sites, footprints, cadence and validation references remain undecided.
 
 ## Verification and limits
 
