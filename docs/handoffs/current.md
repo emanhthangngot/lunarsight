@@ -4,7 +4,7 @@ Updated: **13 November 2026**.
 
 ## Current state
 
-The documentation and shared agent-guidance foundation is complete. ADR 0002 now records the accepted initial data-mining feature priorities. Application implementation, dataset acquisition, scientific validation and deployment have not started in this repository. Exact sites/products/footprints, cadence, validation targets, stack, and deployment remain open.
+The documentation and shared agent-guidance foundation is complete. ADR 0002 records the accepted initial data-mining feature priorities; [the pilot inventory](../data-mining-plan.md) proposes Site04, Site11 and Site23 for coverage review, but does not select them for acquisition. Application implementation, dataset acquisition, scientific validation and deployment have not started in this repository. Exact sites/products/footprints, cadence, validation targets, stack, and deployment remain open.
 
 ## Start the next task
 
@@ -16,7 +16,7 @@ The documentation and shared agent-guidance foundation is complete. ADR 0002 now
 
 ## Next useful decision
 
-Resolve the exact pilot sites and products/footprints against [ADR 0002](../decisions/0002-data-mining-feature-scope.md), then settle time/coordinate conventions and independent reference cases. Data acquisition or implementation requires a later explicit request; record its changed scope.
+Review product 78 archive sizes/ROIs for the candidate sites, verify the product 90 surrounding-terrain overlap and test a documented Horizons query. Then decide exact footprints, cadence and validation references. Acquisition or processing requires a later explicit request.
 
 ## Verification and limits
 
