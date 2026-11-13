@@ -37,7 +37,6 @@ Read [project state](project-state.md) first. Documents labeled **proposed** des
 | [Open decisions](open-decisions.md) | Questions to resolve, options, consequences, and required evidence. |
 | [Decision register](decisions/README.md) | Accepted decisions and an ADR template. |
 | [Agent workflow](agent-workflow.md) | Context loading, task boundaries, parallel work, verification, and handoff. |
-| [Repository setup review](repository-review.md) | Baseline assessment, addressed testing-policy gap, and remaining decisions for a bounded challenge demo. |
 | [Task brief template](templates/task-brief.md) | Objective, authority, owned paths, inputs, and completion criteria. |
 | [Handoff template](templates/handoff.md) | Concise continuation notes with evidence and remaining questions. |
 | [Current handoff](handoffs/current.md) | Current continuation point; update instead of relying on hidden chat history. |

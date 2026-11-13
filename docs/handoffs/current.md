@@ -1,31 +1,23 @@
 # Current handoff
 
-- Date: **13 November 2026**
-- Workstream: repository setup review and shared agent testing policy.
-- Current authority: the owner's 13 November request to assess setup and add generic test-generation rules for the NASA Challenge project; the existing documentation-only boundary remains in effect.
+Updated: **13 November 2026**.
 
-## Outcome
+## Current state
 
-The project remains a private documentation foundation. The [setup review](../repository-review.md) assesses baseline `fa4acfb89174d891d2abc43e836255f8440910b1`: sound context/traceability and scientific boundaries, with demo scope and numerical evidence still unresolved.
+The documentation and shared agent-guidance foundation is complete for the current setup scope. Application implementation, dataset acquisition, scientific validation and deployment have not started in this repository. Data scope, stack, model fidelity and delivery priorities remain open decisions.
 
-Added [shared testing policy](../testing-policy.md) with a five-question admission gate, zero-new-test option, domain risk mapping, offline fixtures, conservative impact selection, read-only audits, and safeguards for maintenance/failures. Root instructions, workflow, verification plan, contribution guidance, documentation index, task brief and PR template point to it. Project state records the owner's request. No test runner, CI, code, datasets or dependencies were added.
+## Start the next task
 
-Previously introduced processing scripts, dependency requirements, prepared-data examples, release descriptors, and readiness reports have been removed from the active tree. The earlier commit remains historical; it must not be interpreted as current team approval or current repository capability.
+1. Read [AGENTS.md](../../AGENTS.md), [project state](../project-state.md) and the [documentation index](../README.md).
+2. Select only the requirements, decisions and references relevant to the task.
+3. Define the outcome, owned paths and observable completion criteria using the [task brief](../templates/task-brief.md) when useful.
+4. Follow the [agent workflow](../agent-workflow.md) and [shared testing policy](../testing-policy.md). Documentation work needs content checks; future implementation needs justified checks for its accepted behavior.
+5. Record actual evidence and remaining decisions. Update this handoff when the continuation point changes.
 
-## Context prepared
+## Next useful decision
 
-Product and traceable requirements; architecture, domain and API proposals; data candidates and quality criteria; operations and verification plans; open decisions and ADR 0001; task/handoff templates; brief/visual intake folders; root agent guidance and thin tool adapters.
+Choose a bounded demonstration and its minimum scientific evidence through [open decisions](../open-decisions.md): audience and scenario, pilot area/products, time and coordinate conventions, reference cases and tolerances, then technology choices. A later explicit implementation request can authorize a bounded coding task; record the changed scope.
 
-The original proposal is retained under `docs/reference/` with a historical-status notice. Prototype observations and demo values are not adopted as implemented behavior or validated science.
+## Verification and limits
 
-## Verification scope
-
-Performed local UTF-8/newline, relative-file-link, balanced-fence, vendor-neutral wording and artifact-inventory checks, plus `git diff --check`. Reviewed changed policy links, requirement/finding IDs, phase consistency and unchanged adapter frontmatter. No diagram or adapter configuration changed. These checks validate repository documentation only; they do not establish loading in agent clients, runtime behavior, scientific accuracy or CI speed.
-
-Research used the supplied testing material and primary Google/NASA/JPL references. The official challenge summary was available in search, but direct retrieval of its full page returned HTTP 502; no unverified competition rules were adopted. See the policy's source notes. No application test, scientific benchmark, data download, or deployment was performed.
-
-## Open decisions and next action
-
-Start with `docs/open-decisions.md`: first audience/demo, geographic area, evidence needed, then data and technology choices. Continue documentation work within the assigned scope. Implementation should follow a later explicit request with the relevant decisions recorded.
-
-Before another agent edits, read `AGENTS.md`, `docs/project-state.md`, and the relevant specification. Keep this handoff short and update it when the actual continuation point changes.
+The setup has been checked for internal file links, status consistency, instruction/template references and clean diffs. The temporary setup-review report has been removed; enduring rules remain in the workflow and testing policy. No executable tests, CI jobs, datasets or dependencies were introduced. Agent-client loading and application/scientific behavior remain unverified.
