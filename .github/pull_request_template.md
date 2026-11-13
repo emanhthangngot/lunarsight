@@ -1,11 +1,15 @@
-## Problem and resulting behavior
+## Goal and resulting change
 
-Explain the concrete problem, the change, and what users or data consumers can do afterward.
+What user need, requirement ID, or open decision does this address?
 
-## Evidence
+## Scope and decision status
 
-List relevant verification and its limits. For scientific changes, include source/product versions, units, coordinate conventions, native resolution, and missing-data behavior.
+Which paths changed? Which statements are proposals, established facts, or accepted decisions? If a decision changed, link its authority and record.
 
-## Data and scope
+## Verification evidence
 
-State any new downloads, generated artifacts, assumptions, or roadmap items completed. Keep large datasets out of Git and link their manifests.
+Describe the checks actually performed. For documentation, include links, status consistency, source traceability, and diagram/template review. There is no application test suite in the current phase.
+
+## Handoff
+
+State remaining questions and the next useful step. Update project state or the handoff if affected. Confirm that no unrequested implementation, dataset acquisition, or deployment was introduced.

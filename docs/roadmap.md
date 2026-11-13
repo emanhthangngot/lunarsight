@@ -1,81 +1,74 @@
-# Development roadmap
+# Roadmap and open decisions
 
-LunarSight connects a lunar location, a mission configuration, and the evidence behind a preliminary site comparison. Preserve the prototype's discovery, terrain, horizon, timeline, comparison, sensitivity, dossier, reporting, and bilingual goals while building one consistent calculation path.
+Status: **13 November 2026 — documentation-only foundation**.
 
-**Baseline as of 13 November 2026:** a six-site data pack and source-reproduction scripts have been prepared. Core sources for a wider collection have been identified. Full-hemisphere acquisition, arbitrary-coordinate processing, and a fully integrated application remain future work. See [data sources and scope](data-sources.md).
+LunarSight's proposed purpose is to help users connect a lunar location, a mission configuration, and evidence for a preliminary site comparison. This repository currently records that direction, candidate data sources, proposed system design, open decisions, and quality expectations. Data acquisition, processing scripts, application implementation, provisioning, and final technology selection are outside the current scope. Conceptual architecture and API documentation are part of the current work.
 
-## Stage 1 — Inventory and reproducible acquisition
+Earlier experiments or prototype behavior do not establish team approval of a dataset, calculation method, or implementation. Future stages below are proposals. A later explicit task may authorize one or several implementation stages; do not repeatedly request permission for work that instruction already covers. Record only decisions actually made.
 
-Build a file-level manifest for the selected 0–90°S baseline, 60–90°S regional, and 80–90°S detailed products. Start with terrain and quality layers, then thermal products and selected imagery. Keep large rasters, raw tables, kernels, and generated outputs outside ordinary Git history.
+## Current stage — Prepare a reviewable project definition
 
-**Acceptance criteria**
+Maintain concise documentation that the team can discuss and revise.
 
-- Every selected file has a stable product identifier, source URL, archive/version, spatial footprint, variable definitions, units, format, expected size when available, and acquisition status.
-- Downloaded bytes are checked against an archive checksum when provided; otherwise a local SHA-256 records integrity and is labeled as locally computed.
-- Downloads can resume or retry without accepting an incomplete file as complete. Existing verified files can be reused.
-- A summary distinguishes discovered, downloaded, validated, failed, and intentionally deferred files. Planned source size is never reported as downloaded size.
-- A small real region exercises the entire path before the complete selected collection is processed.
+- Describe the intended audience, scientific questions, and proposed user journeys.
+- Maintain the [candidate data register](data-sources.md) with no implied selection or acquisition.
+- Record the [data-quality specification](data-quality.md), known ambiguities, and evidence needed for future acceptance.
+- Keep implementation status explicit. Documented features and acceptance criteria are not completed capabilities.
 
-## Stage 2 — Harmonization and indexed storage
+## Decisions for the team
 
-Create consistent metadata and spatial indexing while retaining the source data and its native information content. Process data by windows or tiles so full rasters need not fit into RAM.
+| Decision | Options or questions to resolve |
+| --- | --- |
+| First-version purpose | Education, location exploration, scientific comparison, or mission-oriented screening? Which outcomes matter most? |
+| Geographic domain | Selected locations, 60–90°S, 80–90°S, the whole southern hemisphere, or another agreed area? |
+| Data products | Which terrain, imagery, thermal, shadow, resource, and ephemeris candidates are necessary? Which can be deferred? |
+| Resolution and uncertainty | What detail is justified by the question and available evidence? Which uncertainty must be shown? |
+| Time interpretation | Long-term context, seasonal comparisons, or calculations for a particular UTC window? What cadence would be defensible? |
+| Site catalog | Which coordinates are authoritative? How should disputed names such as C/Faustini be resolved? |
+| Analysis meaning | Which outputs are descriptive, modeled, or threshold-based? Which engineering questions remain outside scope? |
+| Resource constraints | What source volume, working storage, computation, and maintenance can the team support? |
+| Implementation choices | Architecture, language/frameworks, storage, deployment, and service boundaries remain undecided. |
 
-**Acceptance criteria**
+**Completion criterion for this documentation stage:** the project has a navigable product/system specification, source options, open-decision register, agent workflow, and explicit current status. The team's selections can remain open when the documentation bootstrap is complete; completing the documents does not resolve those decisions.
 
-- Longitude conventions, lunar reference frames, projection, height datum, scale/offset, and nodata interpretation are explicit and checked.
-- Categorical masks use an appropriate resampling method; continuous fields have documented interpolation. Effective resolution and uncertainty survive conversion.
-- Thermal variables with different physical meanings remain separate. Regridding does not claim improved observation resolution.
-- Tiles or indexed tables can answer a location query with values, units, native resolution, coverage, and provenance.
-- A few independent samples agree with source values within documented conversion tolerances, including near a boundary and a missing-data region.
+## Proposed later stage A — Specify the chosen data work
 
-## Stage 3 — Coverage, catalog, and scientific quality
+If the team selects products and explicitly requests implementation, define a bounded acquisition and preparation plan before building it.
 
-Make data availability visible before ranking locations. Correct the catalog's naming problems and keep mission thresholds separate from observations.
+**Proposed acceptance criteria**
 
-**Acceptance criteria**
+- A product/file inventory identifies exact versions, footprints, variables, units, volume estimates, and attribution.
+- The plan distinguishes source originals, metadata, derived products, and temporary files, with an agreed retention policy.
+- Integrity checks, missing-data handling, coordinate conventions, and independent sample comparisons are specified.
+- A small representative area is proposed for evaluation before wider processing is considered.
+- The plan states which work is requested now and which work remains optional.
 
-- Each layer has a coverage/validity representation and exposes missing or uncertain values with reasons.
-- Site C's Faustini label is resolved by an explicit catalog change; coordinates are never silently moved to match a name. Other rim, ridge, massif, and mission-association labels are reviewed.
-- Demo elevation, illumination, thermal, and resource values cannot become fallback scientific data.
-- `water_ice_wt_pct` and annual surface minimum temperature remain unavailable unless a suitable, traceable source or model is added.
-- Lunar Prospector data is labeled correctly. A LEND label is enabled only after a selected LEND product is ingested and its variable meaning is documented.
-- Terrain screening reports its sampling scale and uncertainty. Passing a slope threshold is not presented as proof of lander-scale safety.
+## Proposed later stage B — Evaluate data suitability
 
-## Stage 4 — Geometry and scenarios at arbitrary coordinates
+If requested, evaluate the selected products against the documented scientific questions and quality criteria. Acquisition success alone would not establish suitability.
 
-Generalize the existing six-site calculations. Compute terrain horizons for a selected coordinate and mast height, combine them with versioned ephemerides, and cache results by all relevant inputs. Extend time coverage deliberately when a request falls outside the existing December 2025–February 2030 cache.
+**Proposed acceptance criteria**
 
-**Acceptance criteria**
+- Coverage, valid-observation masks, native resolution, uncertainty, time definitions, and variable semantics are documented.
+- Coordinate/name conflicts receive an explicit resolution. No location is moved silently to fit a name.
+- Any derived field has a documented method, assumptions, and comparison evidence appropriate to the field.
+- Missing ice abundance, annual surface minimum temperature, or other unsupported quantities remain unavailable.
+- A team review determines whether to accept the products, change the scope, or investigate alternatives.
 
-- A calculation identity includes coordinates, elevation source, mast height, start/end UTC, cadence, terrain/version, kernels/frames, visibility convention, and mission thresholds.
-- All scenario intervals use `[start, end)` and explicit calendar-month handling. Unsupported coordinates, dates, and missing terrain produce useful statuses.
-- Sun/Earth geometry is checked against documented reference cases; horizon and occlusion accuracy are evaluated separately. A geometry benchmark does not validate terrain shadowing.
-- Horizon radius and azimuth sampling are documented and checked for convergence on representative candidates before tighter precision is claimed.
-- Sun visibility, Earth visibility, their intersection, darkness runs, and blackout runs come from the same time-indexed result.
-- Cases starting in shadow, having no transition, crossing a time boundary, or lying at 0°/360° longitude behave consistently. Near-pole coordinate handling is explicit.
-- Transition precision follows the calculation cadence. Any finer event refinement is implemented and verified before finer times are displayed.
-- Full-disk occlusion, eclipses, power, batteries, ground stations, and radio link budgets are separate extensions. Results state which models are included.
+## Proposed later stage C — Refine and accept the calculation and system design
 
-## Stage 5 — Application integration and reproducible reports
+The current [architecture](architecture.md), [domain model](domain-model.md), and [API design](api-design.md) are proposals. Before implementing their relevant parts, resolve the decisions needed by the authorized task and refine the design against the chosen data and intended workflows.
 
-Connect the map, local horizon, timeline, profile assessment, scenario comparison, sensitivity controls, and report to the same scenario/result objects. Retain English and Vietnamese support.
+**Proposed acceptance criteria**
 
-**Acceptance criteria**
+- Scenario inputs, output meanings, source/model provenance, and temporal conventions are specified before numerical claims are made.
+- Terrain horizons, ephemeris geometry, illumination, Earth visibility, and any engineering models have separately stated validation needs.
+- Map, timeline, comparison, sensitivity, and report designs refer to consistent scenario results.
+- Unsupported coordinates, dates, missing data, loading, and failure states are defined.
+- Any advisor feature is grounded in identified results and distinguishes missing evidence from an answer.
 
-- Users can select a prepared site or a covered custom coordinate, inspect source availability, run a scenario, and compare results.
-- Changing coordinates, observer height, dates, or thresholds recomputes or retrieves the matching result; a stale six-site cache is never reused for another location.
-- Catalog long-term fractions are labeled separately from mission-window availability. Map display thresholds and mission thresholds are distinguishable.
-- Scores are explained as constraint checks or explicit ranking criteria, not mission-success probabilities. Missing data does not silently improve a score.
-- JSON export and printed reports preserve inputs, outputs, units, provenance, model limitations, and validation status.
-- Loading, missing data, request failure, and long-running processing have usable states. Bilingual labels, keyboard access, contrast, and non-color status cues receive focused checks.
-- The AI advisor explains the identified deterministic results, cites the evidence it receives, and handles service failure without blocking numerical analysis. Engineering advice requires its relevant inputs.
+## Proposed later stage D — Implement and assess an agreed version
 
-## Stage 6 — Wider comparison and targeted extensions
+Only after an explicit request, implement the agreed scope and assess it against the accepted specification. Wider geographic coverage, finer resolution, rover routing, thermal simulation, power budgets, radio links, and collaboration remain optional extensions.
 
-After the preceding stages are demonstrated, expand regional screening and candidate ranking. Benchmark tile processing, record storage/runtime costs, and choose where higher resolution materially improves a decision.
-
-Potential extensions include uncertainty-aware ranking, more detailed thermal models, modeled resource evidence, rover routing, energy budgets, and ground-station communication. Each needs a defined input set and acceptance criteria before it becomes a promised capability. Persistent projects and collaboration can be added when needed by the team.
-
-## Release evidence
-
-A release should include its acquisition summary, coverage report, data/model versions, representative validation results, reproducible scenarios, and known limitations. The acceptance criteria above are planned gates; they are not claims that the full application currently passes them.
+A future release would need evidence appropriate to its claims: a source inventory, coverage and quality report, documented calculations, representative comparisons, reproducible reports, and clear limitations. None of these proposed gates is represented as already passed by this repository.

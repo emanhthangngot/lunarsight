@@ -24,8 +24,9 @@ coverage/
 *.pem
 *.key
 
-# Downloaded and generated data; small examples live under examples/
-data/
+# Downloaded and generated data; no dataset is selected in this phase
+/data/*
+!/data/README.md
 metadata/
 raw/
 processed/
@@ -54,3 +55,10 @@ LunarSight_Data_Pack_v1/
 Thumbs.db
 .idea/
 .vscode/
+
+# Personal context and local agent configuration
+CLAUDE.local.md
+.claude/settings.local.json
+context/private/
+assets/private/
+docs/handoffs/local/

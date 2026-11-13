@@ -1,9 +1,0 @@
-numpy==2.3.5
-scipy==1.17.0
-pandas==2.2.3
-rasterio==1.5.2
-pyproj==3.8.0
-pyarrow==26.0.1
-spiceypy==8.4.0
-Pillow==13.0.0
-matplotlib==3.10.8
