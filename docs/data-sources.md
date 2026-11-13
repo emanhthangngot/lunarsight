@@ -1,10 +1,25 @@
 # Candidate data sources
 
-Status: **13 November 2026 — proposals for team review only**.
+Status: **13 November 2026 — feature priorities accepted; candidate products remain unselected**. See [ADR 0002](decisions/0002-data-mining-feature-scope.md).
 
-This repository currently provides a documentation foundation. The team has not selected data products, geographic coverage, resolutions, quantities, or a storage budget. Every candidate below has the status **not selected / not acquired for this repository**. Earlier exploratory work does not establish team approval or an implementation baseline.
+This repository currently provides a documentation foundation. The accepted feature scope prioritizes bounded south-polar site screening and terrain-uncertainty analysis. The team has not selected exact sites/coordinates, product versions, geographic footprints, resolutions, time cadence, quantities, or a storage budget. Every candidate below has the status **not selected / not acquired for this repository**. Earlier exploratory work does not establish team approval or an implementation baseline.
 
 Archive descriptions and approximate sizes help compare options. They do not commit the team to downloading, processing, or using those products. Selection would require a recorded team decision and a subsequent implementation request.
+
+## Accepted feature-to-data priorities
+
+This mapping records the categories needed for the accepted features. It is not a file-level selection or an acquisition request.
+
+| Priority | Feature | Evidence category to evaluate | Candidate access path | Still to decide |
+| --- | --- | --- | --- | --- |
+| P0 | Candidate and custom site selection/comparison | Small provenance-rich site catalog; coordinate frame, elevation, mission/site status | Official mission and nomenclature records; NASA PGDA coverage metadata | Exact 2–3 pilot footprints, coordinates, names, and inclusion criteria |
+| P0 | Terrain, slope, and local horizon | Local high-resolution elevation plus coarser surrounding terrain; slope, uncertainty, observation/count support | [PGDA product 78](https://pgda.gsfc.nasa.gov/products/78), [product 90](https://pgda.gsfc.nasa.gov/products/90); Quickmap/Moon Trek for discovery and visual inspection | Product/version per site, near/far footprint, effective resolution, and coverage |
+| P0 | Time-varying Sun/Earth geometry | Ephemeris, lunar orientation, time-scale and frame metadata | [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/); SPICE only if offline or reproducibility needs justify it | Observer definition, time range/cadence, frame, and retrieval/cache policy |
+| P0 | Illumination, geometric Earth visibility, and scenario comparison | Derived time series and terrain horizon profiles tied to the selected inputs | Calculated from selected terrain and ephemeris; not a separate archive product | Sampling/refinement method, interval definitions, event precision, and acceptance references |
+| P1 | Confidence/stability of site-screening results | A limited sample of DEM alternatives/clones plus uncertainty/count layers | PGDA product 78 where available; product 90 for regional context | Which clones/sites, propagation method, and report statistic |
+| P2 | Resource, thermal, and imagery context | PSR boundaries; separately labeled hydrogen/neutron products; historical Diviner layers; selected LROC tiles | PGDA products 69/90, Diviner PDS, LROC archives | Include only after P0/P1; select exact variables and footprints individually |
+
+Energy-system performance, battery sufficiency, and radio-link performance are outside the initial data scope. Those features need mission hardware and operational assumptions not established by the challenge resources or the current repository.
 
 ## Geographic options to discuss
 

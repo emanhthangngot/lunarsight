@@ -4,7 +4,7 @@ Updated: **13 November 2026**.
 
 ## Current state
 
-The documentation and shared agent-guidance foundation is complete for the current setup scope. Application implementation, dataset acquisition, scientific validation and deployment have not started in this repository. Data scope, stack, model fidelity and delivery priorities remain open decisions.
+The documentation and shared agent-guidance foundation is complete. ADR 0002 now records the accepted initial data-mining feature priorities. Application implementation, dataset acquisition, scientific validation and deployment have not started in this repository. Exact sites/products/footprints, cadence, validation targets, stack, and deployment remain open.
 
 ## Start the next task
 
@@ -16,7 +16,7 @@ The documentation and shared agent-guidance foundation is complete for the curre
 
 ## Next useful decision
 
-Choose a bounded demonstration and its minimum scientific evidence through [open decisions](../open-decisions.md): audience and scenario, pilot area/products, time and coordinate conventions, reference cases and tolerances, then technology choices. A later explicit implementation request can authorize a bounded coding task; record the changed scope.
+Resolve the exact pilot sites and products/footprints against [ADR 0002](../decisions/0002-data-mining-feature-scope.md), then settle time/coordinate conventions and independent reference cases. Data acquisition or implementation requires a later explicit request; record its changed scope.
 
 ## Verification and limits
 
