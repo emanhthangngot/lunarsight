@@ -29,7 +29,7 @@ The approximately **56.2 GB** acquisition scenario is an unapproved example from
 
 ## Next useful work
 
-Resolve exact pilot sites, data products/footprints, time cadence, and validation references against the accepted scope in ADR 0002. Next, obtain a verified Site23 ROI if available, check any team-selected points/ROIs, and determine the terrain extent and resolution needed for horizon work. Bulk dataset acquisition and application implementation have not started; a later explicit request is required for those steps.
+Resolve exact pilot sites, data products/footprints, time cadence, and validation references against the accepted scope in ADR 0002. The 80S edge-distance estimate makes Site23 the limiting candidate; compare 80 m and 20 m terrain horizons over a bounded common footprint, check valid-data edges, and obtain a verified Site23 ROI if available. Bulk dataset acquisition and application implementation have not started; a later explicit request is required for those steps.
 
 ## Status vocabulary
 
