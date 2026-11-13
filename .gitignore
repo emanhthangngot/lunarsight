@@ -1,0 +1,56 @@
+# Local Python environments and tooling
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Future application build outputs
+node_modules/
+.next/
+dist/
+build/
+coverage/
+
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Downloaded and generated data; small examples live under examples/
+data/
+metadata/
+raw/
+processed/
+cache/
+artifacts/
+lunarsight_dataset_work/
+LunarSight_Data_Pack_v1/
+**/dataset_manifest.json
+**/checksums.sha256
+*.part
+*.tif
+*.TIF
+*.tiff
+*.img
+*.IMG
+*.jp2
+*.parquet
+*.bsp
+*.bpc
+*.zip
+*.tar
+*.gz
+
+# Local editors and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

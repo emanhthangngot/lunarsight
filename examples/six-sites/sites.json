@@ -1,0 +1,56 @@
+[
+  {
+    "site_id": "A",
+    "proposal_name": "Site A — Shackleton Rim",
+    "lat_deg": -89.24,
+    "lon_deg_east": 32.4,
+    "coordinate_status": "proposal_input_unverified_name",
+    "coordinate_frame_assumption": "MOON_ME_DE421",
+    "proposal_source": "LunarSight V2 Product Proposal, 2026-11-05, section 5.1"
+  },
+  {
+    "site_id": "B",
+    "proposal_name": "Site B — Shackleton–de Gerlache Connecting Ridge",
+    "lat_deg": -88.82,
+    "lon_deg_east": 12.1,
+    "coordinate_status": "proposal_input_unverified_name",
+    "coordinate_frame_assumption": "MOON_ME_DE421",
+    "proposal_source": "LunarSight V2 Product Proposal, 2026-11-05, section 5.1"
+  },
+  {
+    "site_id": "C",
+    "proposal_name": "Site C — Faustini Crater Floor",
+    "lat_deg": -89.62,
+    "lon_deg_east": 178.3,
+    "coordinate_status": "proposal_input_unverified_name",
+    "coordinate_frame_assumption": "MOON_ME_DE421",
+    "proposal_source": "LunarSight V2 Product Proposal, 2026-11-05, section 5.1"
+  },
+  {
+    "site_id": "D",
+    "proposal_name": "Site D — Malapert Mountain Massif",
+    "lat_deg": -85.91,
+    "lon_deg_east": 12.92,
+    "coordinate_status": "proposal_input_unverified_name",
+    "coordinate_frame_assumption": "MOON_ME_DE421",
+    "proposal_source": "LunarSight V2 Product Proposal, 2026-11-05, section 5.1"
+  },
+  {
+    "site_id": "E",
+    "proposal_name": "Site E — Nobile Crater Rim",
+    "lat_deg": -85.22,
+    "lon_deg_east": 36.12,
+    "coordinate_status": "proposal_input_unverified_name",
+    "coordinate_frame_assumption": "MOON_ME_DE421",
+    "proposal_source": "LunarSight V2 Product Proposal, 2026-11-05, section 5.1"
+  },
+  {
+    "site_id": "SHIV",
+    "proposal_name": "Shiv Shakti — Chandrayaan-3 landing point",
+    "lat_deg": -69.37,
+    "lon_deg_east": 32.32,
+    "coordinate_status": "proposal_input_unverified_name",
+    "coordinate_frame_assumption": "MOON_ME_DE421",
+    "proposal_source": "LunarSight V2 Product Proposal, 2026-11-05, section 5.1"
+  }
+]

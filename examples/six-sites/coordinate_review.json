@@ -1,0 +1,36 @@
+{
+  "no_coordinates_modified": true,
+  "method": "Great-circle center distances on a sphere of radius 1737.4 km; names and diameters from downloaded USGS/IAU gazetteer snapshot. Centers and diameters do not define precise rim polygons.",
+  "findings": [
+    {
+      "site_id": "A",
+      "status": "needs_geographic_review",
+      "note": "26.277 km from Shackleton center; catalog crater diameter 20.925 km. Proposed rim label is not substantiated at this coordinate."
+    },
+    {
+      "site_id": "B",
+      "status": "needs_geographic_review",
+      "note": "Connecting ridge is not a named polygon in this gazetteer. Distances to crater centers are 41.390 km (Shackleton) and 63.141 km (de Gerlache); use a source map to verify the ridge label."
+    },
+    {
+      "site_id": "C",
+      "status": "name_coordinate_mismatch",
+      "note": "86.979 km from Faustini center; catalog diameter 42.485 km. This coordinate is inconsistent with a Faustini crater-floor label. The data pack intentionally evaluates the proposal coordinate."
+    },
+    {
+      "site_id": "D",
+      "status": "needs_geographic_review",
+      "note": "Compare with Mons Malapert (mountain) as well as Malapert (crater); do not equate their centers. Massif membership is not confirmed by a center-point catalog."
+    },
+    {
+      "site_id": "E",
+      "status": "needs_geographic_review",
+      "note": "42.964 km from Nobile center, catalog diameter 79.272 km. A western rim association may be plausible but is not confirmed by this point catalog."
+    },
+    {
+      "site_id": "SHIV",
+      "status": "rounded_coordinate_match",
+      "note": "Proposal agrees with Statio Shiv Shakti when rounded to 0.01 degree; 0.103 km center displacement reflects rounded input. Exact gazetteer coordinate is retained separately, not silently substituted."
+    }
+  ]
+}
