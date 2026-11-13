@@ -1,6 +1,6 @@
 # Pilot data-mining inventory
 
-Status: **research proposal, checked 13 November 2026**. This inventory narrows the accepted feature scope in [ADR 0002](decisions/0002-data-mining-feature-scope.md). It is not approval to acquire raster data. Three small ROI shapefile bundles were downloaded temporarily to inspect their geometry; no raster files or pixel windows were acquired. One byte from each of two PGDA 90 COGs was read only to confirm HTTP Range behavior. The ROI bundles are not stored in the repository.
+Status: **research proposal, checked 13 November 2026**. This inventory narrows the accepted feature scope in [ADR 0002](decisions/0002-data-mining-feature-scope.md). It is not approval for bulk raster acquisition. Three small ROI shapefile bundles were downloaded temporarily to inspect their geometry. Twelve 9×9 pixel windows were read through HTTP byte ranges: one at each candidate reference center from the local PGDA 78 5 m LDEM, plus PGDA 90 80 m and 20 m LDEMs. All windows had valid pixels; no full raster was saved. The temporary ROI bundles and Rasterio reader are outside the repository.
 
 ## Recommended pilot sites for coverage review
 
@@ -22,7 +22,7 @@ If schedule or local-product volume is restrictive, compare Site04 and Site11 as
 | Feature / priority | Candidate product or service | Required contents | Known conventions / coverage | Planning volume | Decision still needed |
 | --- | --- | --- | --- | --- | --- |
 | Site catalog — P0 | NASA PGDA 78 site/ROI metadata; NASA mission records and USGS/IAU nomenclature for independent identity checks | Site ID, name, point/ROI geometry, elevation source, mission status, citations | PGDA 78 includes Site04, Site11, Site23 and additional site regions; a named feature is not itself a landing coordinate | Tiny metadata table (KB-scale, estimate) | Confirm the 2–3 sites, representative analysis points, and naming policy |
-| Local high-resolution terrain — P0/P1 | NASA PGDA 78 | Nominal LDEM, slope, LDEC, elevation and slope RMS uncertainty; a small clone subset for P1 | 5 m/pixel GeoTIFFs in south polar stereographic X/Y metres, MOON_ME frame with DE421; PGDA reports about 90% interpolated 5 m pixels. Site01, Site04, Site11 and Site23 are listed in the archive. | HTTP HEAD returned exact sizes for five core TIFFs per candidate, shown below; no full raster or pixel window was downloaded. All 100 clones and XYZI point clouds are excluded. | Which locations/layers/clones; still inspect exact ROI and analysis-point coverage before selecting |
+| Local high-resolution terrain — P0/P1 | NASA PGDA 78 | Nominal LDEM, slope, LDEC, elevation and slope RMS uncertainty; a small clone subset for P1 | 5 m/pixel GeoTIFFs in south polar stereographic X/Y metres, MOON_ME frame with DE421; PGDA reports about 90% interpolated 5 m pixels. Site01, Site04, Site11 and Site23 are listed in the archive. | HTTP HEAD returned exact sizes for five core TIFFs per candidate, shown below. One 9×9 LDEM window at each reference center was read; no full raster was saved. All 100 clones and XYZI point clouds are excluded. | Choose locations/layers/clones; check the actual selected analysis points and ROI polygons before selecting |
 | Surrounding terrain — P0 | NASA PGDA 90; compare 80S 80MPP and 80S 20MPP | LDEM, LDEC, elevation error, slope and slope error for horizon context | COG GeoTIFFs in south polar stereographic X/Y metres, MOON_ME / DE421. Nominal pixel scale is not effective resolution; evaluate the published effective-resolution layer separately if useful. | HTTP HEAD totals for the five full rasters are **1,051,288,835 bytes** at 80 m and **15,617,598,506 bytes** at 20 m. Effective-resolution rasters are excluded. Both endpoints support byte ranges; actual COG spatial-window reads remain untested. The PGDA page describes the 80S products as covering 80–90°S, which includes the four reference-center latitudes, but this is not a data-mask or pixel-window check. | Test windowed reads with a COG-aware client; determine needed horizon extent and whether 80 m terrain is sufficient before choosing a scale |
 | Sun/Earth ephemeris — P0 | JPL Horizons API; Astroquery is a possible client library, not a selected dependency | Time-tagged Sun and Earth geometry for each selected lunar observer/site; preserve query settings and returned metadata | `Resource.docx` suggests Sun target 10, Earth target 399, and a lunar-centered observer (301) with site coordinates. Treat these as candidate query settings to validate. Horizons geometry does not include terrain obstruction. | Small per site/date response; estimate after choosing cadence and scenario count | Validate CENTER/observer coordinates, coordinate convention, UTC/time scale, reference frame, aberration/refraction settings and cadence with a saved sample response |
 | Horizon and mission-window summaries — P0 | Derived from selected terrain + ephemeris | Azimuth/elevation, local terrain horizon, visibility state, interval durations, longest dark interval and simultaneous Sun/Earth visibility | Horizons altitude is relative to the local horizontal. The terrain horizon must be calculated separately from DEM. Model the Moon without atmospheric refraction and account for lunar curvature and observer height. | Small tables/arrays compared with raster inputs; size depends on cadence and retained trials | Choose cadence and transition refinement; establish reference cases before calling results verified |
@@ -31,7 +31,7 @@ If schedule or local-product volume is restrictive, compare Site04 and Site11 as
 
 ### Planning-volume conclusion
 
-The current full-file comparison is **1,051,288,835 bytes (~1.051 GB)** at 80 m versus **15,617,598,506 bytes (~15.618 GB)** at 20 m for five PGDA 90 terrain layers. These totals exclude effective-resolution rasters, local PGDA 78 files, derived outputs, and storage overhead. Byte-range support is confirmed, but useful COG windowed transfer has not been tested. `Resource.docx` also gives illustrative uncompressed float32 sizes per layer: 20 × 20 km at 20 m/pixel ≈4 MB; 20 × 20 km at 5 m/pixel ≈64 MB; 100 × 100 km at 5 m/pixel ≈1.6 GB. These are arithmetic examples, not archive sizes or selected footprints. A cutout must capture the terrain that controls the horizon. Do not add these figures to the earlier 56.2 GB example, which remains unapproved and differently scoped.
+The current full-file comparison is **1,051,288,835 bytes (~1.051 GB)** at 80 m versus **15,617,598,506 bytes (~15.618 GB)** at 20 m for five PGDA 90 terrain layers. These totals exclude effective-resolution rasters, local PGDA 78 files, derived outputs, and storage overhead. A small `/vsicurl` spatial-window read from each LDEM succeeded at both resolutions; exact byte-range counts are recorded below. `Resource.docx` also gives illustrative uncompressed float32 sizes per layer: 20 × 20 km at 20 m/pixel ≈4 MB; 20 × 20 km at 5 m/pixel ≈64 MB; 100 × 100 km at 5 m/pixel ≈1.6 GB. These are arithmetic examples, not archive sizes or selected footprints. A cutout must capture the terrain that controls the horizon. Do not add these figures to the earlier 56.2 GB example, which remains unapproved and differently scoped.
 
 ### PGDA 78 exact sizes for five core rasters
 
@@ -71,7 +71,27 @@ The four NASA Data Book reference centers were transformed from longitude/latitu
 | Site11 | −37,000.510 / 15,000.207 | Outside the union bounding box and all four polygons |
 | Site23 | −499.990 / 121,499.535 | No usable ROI archive to compare |
 
-This result means the Data Book reference centers are not interchangeable with the PGDA ROI polygons. ROI polygons are analysis areas within the product, not verified raster bounds or authoritative landing points. Therefore this check does **not** establish whether the centers fall inside each local GeoTIFF's valid-data footprint; inspect each raster's CRS, transform, bounds, and nodata mask before claiming point coverage.
+This result means the Data Book reference centers are not interchangeable with the PGDA ROI polygons. ROI polygons are analysis areas within the product, not verified raster bounds or authoritative landing points. The polygon comparison alone did not establish raster coverage; the small reference-center pixel reads below subsequently verified center coverage in the inspected local and regional LDEMs. Coverage for any different, team-selected point or ROI still needs its own check.
+
+### Raster point-coverage and COG window reads
+
+Rasterio 1.5.2 was installed temporarily outside the repository and used through GDAL `/vsicurl`. Each read requested a 9×9 pixel window centered on the projected NASA reference point. At all four sites, all 81 pixels were valid in the local PGDA 78 5 m LDEM and in each PGDA 90 regional LDEM at 80 m and 20 m. These checks verify coverage at the reference centers only; they do not select those centers as landing/analysis points or verify the ROI polygons.
+
+| Site | PGDA 78 5 m bounds (Xmin, Ymin, Xmax, Ymax; m) | 5 m row/col; window elevation range (m) | 80 m row/col; range (m) | 20 m row/col; range (m) |
+| --- | --- | --- | --- | --- |
+| Site01 | −19,000, −20,000, −3,000, −4,000 | 1599 / 1600; 1941.240–1946.973 | 3949 / 3662; 1881–1956 | 15799 / 14650; 1933–1950 |
+| Site04 | −9,000, −15,000, 7,000, 1,000 | 1600 / 1599; 758.054–785.745 | 3887 / 3787; 558–982 | 15550 / 15149; 723–832 |
+| Site11 | −45,000, 7,000, −29,000, 23,000 | 1599 / 1599; 1792.609–1794.521 | 3612 / 3337; 1729–1807 | 14449 / 13349; 1782–1800 |
+| Site23 | −11,000, 111,000, 10,000, 132,000 | 2100 / 2100; 4782.270–4785.751 | 2281 / 3793; 4743–4820 | 9125 / 15175; 4776–4792 |
+
+Raster row/column indices are zero-based. Every listed window contained 81/81 valid cells. The range values are surface elevation in metres; the 9×9 windows cover different ground areas at 5 m, 20 m, and 80 m, so their min/max values are not a direct resolution comparison. The local 5 m GeoTIFFs use 3,200×3,200 pixels for Site01/04/11 and 4,200×4,200 for Site23, with bounds shown above. The PGDA 90 80 m raster is 7,600×7,600 pixels; the 20 m raster is 30,400×30,400; both report bounds X/Y ±304,000 m.
+
+| PGDA 90 product | Full LDEM size | Range data transferred for four windows | Window result |
+| --- | ---: | ---: | --- |
+| `LDEM_80S_80MPP_ADJ.TIF` | 189,158,392 bytes | 2,048,000 bytes (about 1.08%) | Four 9×9 windows, all valid |
+| `LDEM_80S_20MPP_ADJ.TIF` | 2,696,082,051 bytes | 3,112,960 bytes (about 0.12%) | Four 9×9 windows, all valid |
+
+Transferred-byte counts sum the successful HTTP 206 `Content-Range` responses for the metadata and required raster blocks; failed/empty requests and HTTP headers are not counted. No full raster was retained. The PGDA 90 GeoTIFF WKT identifies the 1,737,400 m lunar sphere and south-polar stereographic IAU 30135 map CRS; the PGDA product description separately declares the surface-reference frame as `MOON_ME` / DE421. Preserve both map-CRS metadata and the product's frame provenance in any later asset manifest.
 
 ### Other resources and physical interpretation limits
 
@@ -110,8 +130,8 @@ Keep metadata tables and file-level manifests separate from raster pixels. Do no
 
 ## Recommended next sequence
 
-1. Compare Site01, Site04, Site11 and Site23 against the team use case. Core-raster byte sizes, three ROI bundles, NASA reference centers and the coordinate-to-ROI check are inventoried above. Resolve Site23's missing ROI and inspect actual local GeoTIFF bounds/valid-data masks for every proposed analysis point.
-2. Compare PGDA 90 80S 80MPP and 20MPP coverage and byte sizes. Test an actual spatial window with a COG-aware reader; the one-byte HTTP Range check only proves that the server supports byte ranges. Determine the terrain extent needed for horizons.
+1. Compare Site01, Site04, Site11 and Site23 against the team use case. Reference-center coverage is verified at all three tested terrain scales. Resolve Site23's missing ROI and repeat coverage checks for any team-selected analysis points and ROI polygons.
+2. Compare PGDA 90 80S 80MPP and 20MPP. A COG-aware read succeeded at all four centers for both scales; now determine the terrain extent needed for horizons and whether 80 m is sufficient before choosing a scale.
 3. Keep the Horizons response header with each ephemeris sample and confirm its lunar `Target pole/equ` model. The official manual resolves the apparent DE441 trajectory / DE421 lunar-frame discrepancy for current dates; revisit only if the model, interval, or observer definition changes.
 4. Submit the proposed sites, selected layers, exact footprint, total bytes and open validation questions for team decision.
 5. Only after that decision and a separate explicit acquisition/processing request, create the asset manifest and begin raster data handling.
