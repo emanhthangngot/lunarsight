@@ -4,7 +4,7 @@ Updated: **13 November 2026**.
 
 ## Current state
 
-The documentation and shared agent-guidance foundation is complete. ADR 0002 records the accepted initial data-mining feature priorities; [the pilot inventory](../data-mining-plan.md) proposes Site04, Site11 and Site23 for coverage review, but does not select them for acquisition. Application implementation, dataset acquisition, scientific validation and deployment have not started in this repository. Exact sites/products/footprints, cadence, validation targets, stack, and deployment remain open.
+The documentation and shared agent-guidance foundation is complete. ADR 0002 records the accepted initial data-mining feature priorities; [the pilot inventory](../data-mining-plan.md) now compares Site01, Site04, Site11 and Site23 as coverage candidates, based on the team Resource.docx and NASA PGDA listings. No site or product is selected for acquisition. Application implementation, dataset acquisition, scientific validation and deployment have not started in this repository. Exact sites/products/footprints, cadence, validation targets, stack, and deployment remain open.
 
 ## Start the next task
 
@@ -16,7 +16,7 @@ The documentation and shared agent-guidance foundation is complete. ADR 0002 rec
 
 ## Next useful decision
 
-Review product 78 archive sizes/ROIs for the candidate sites, verify the product 90 surrounding-terrain overlap and test a documented Horizons query. Then decide exact footprints, cadence and validation references. Acquisition or processing requires a later explicit request.
+Compare the four product 78 site candidates and exact ROI sizes; compare PGDA 90 80 m and 20 m coverage/file sizes plus COG window access; and validate a documented Horizons query (targets 10/399, lunar observer center/coordinates, angle and time conventions). Then decide exact footprints, cadence and validation references. Acquisition or processing requires a later explicit request.
 
 ## Verification and limits
 
