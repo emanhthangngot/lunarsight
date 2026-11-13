@@ -1,10 +1,19 @@
 # Pilot data-mining inventory
 
-Status: **research proposal, checked 13 November 2026**. This inventory narrows the accepted feature scope in [ADR 0002](decisions/0002-data-mining-feature-scope.md). It is not approval to acquire data. No files have been downloaded for this plan.
+Status: **research proposal, checked 13 November 2026**. This inventory narrows the accepted feature scope in [ADR 0002](decisions/0002-data-mining-feature-scope.md). It is not approval to acquire raster data. Three small ROI shapefile bundles were downloaded temporarily to inspect their geometry; no raster files or pixel windows were acquired. One byte from each of two PGDA 90 COGs was read only to confirm HTTP Range behavior. The ROI bundles are not stored in the repository.
 
 ## Recommended pilot sites for coverage review
 
 The current research shortlist is **Site04 (Shackleton rim), Site11 (de Gerlache rim), and Site23 (Malapert massif)**. NASA PGDA product 78 lists 5 m/pixel products for these site regions, including LDEM, slope, LDEC count, elevation/slope uncertainty and DEM clones. The team-provided `Resource.docx` also names **Site01 (Connecting ridge)** as a candidate example. Compare Site01 with the current three before fixing the pilot list; its inclusion here does not select it. These are data-coverage candidates, not validated landing coordinates: inspect each archive ROI and coordinate record, verify naming and frame, and do not substitute a feature center for a proposed landing point.
+
+NASA's 2025 Lunar Surface Data Book provides reference centers generated from the PGDA DEM polygons (the source reports 5–10 m center-point accuracy). Use these only as reproducible metadata/test points until the team chooses analysis points; a polygon center is not a landing authorization or a selected landing coordinate.
+
+| Candidate | Reference center (latitude, longitude; degrees) |
+| --- | --- |
+| Site01 — Connecting Ridge | −89.4632, −137.49 |
+| Site04 — Shackleton Rim | −89.7668, −171.87 |
+| Site11 — de Gerlache Rim 1 | −88.6834, −67.9321 |
+| Site23 — Malapert Massif | −85.9948, −0.23578 |
 
 If schedule or local-product volume is restrictive, compare Site04 and Site11 as the initial pair, with Site01 as the resource-document alternative; add Site23 only after checking its exact ROI overlap and file sizes. This is a review order, not an approved site selection. Mission associations remain proposals until reviewed against authoritative coordinates and nomenclature.
 
@@ -13,8 +22,8 @@ If schedule or local-product volume is restrictive, compare Site04 and Site11 as
 | Feature / priority | Candidate product or service | Required contents | Known conventions / coverage | Planning volume | Decision still needed |
 | --- | --- | --- | --- | --- | --- |
 | Site catalog — P0 | NASA PGDA 78 site/ROI metadata; NASA mission records and USGS/IAU nomenclature for independent identity checks | Site ID, name, point/ROI geometry, elevation source, mission status, citations | PGDA 78 includes Site04, Site11, Site23 and additional site regions; a named feature is not itself a landing coordinate | Tiny metadata table (KB-scale, estimate) | Confirm the 2–3 sites, representative analysis points, and naming policy |
-| Local high-resolution terrain — P0/P1 | NASA PGDA 78 | Nominal LDEM, slope, LDEC, elevation and slope RMS uncertainty; a small clone subset for P1 | 5 m/pixel GeoTIFFs in south polar stereographic X/Y metres, MOON_ME frame with DE421; PGDA reports about 90% interpolated 5 m pixels. Site01, Site04, Site11 and Site23 are listed in the archive. | Per-file sizes for the selected site/ROI bundles remain to be recorded. All 100 clones are out of the first pilot; select a small subset only if P1 uncertainty propagation is approved. | Which locations/layers/clones; confirm effective resolution, ROI and exact archive byte sizes |
-| Surrounding terrain — P0 | NASA PGDA 90; compare 80S 80MPP and 80S 20MPP | LDEM, LDEC, elevation error, slope and slope error for horizon context | COG GeoTIFFs in south polar stereographic X/Y metres, MOON_ME / DE421. Nominal pixel scale is not effective resolution; evaluate the published effective-resolution layer separately if useful. | Five full 80 m rasters total about **1,006 MB** (181 + 111 + 244 + 231 + 239 MB). The corresponding five full 20 m rasters total about **14.9 GB** (1.3 + 2.6 + 3.7 + 3.6 + 3.7 GB). Effective-resolution rasters are excluded. These are source-file totals, not clipped pilot sizes or range-request bytes. | Compare full-file and COG window/cutout access; determine needed horizon extent and whether 80 m terrain is sufficient before choosing a scale |
+| Local high-resolution terrain — P0/P1 | NASA PGDA 78 | Nominal LDEM, slope, LDEC, elevation and slope RMS uncertainty; a small clone subset for P1 | 5 m/pixel GeoTIFFs in south polar stereographic X/Y metres, MOON_ME frame with DE421; PGDA reports about 90% interpolated 5 m pixels. Site01, Site04, Site11 and Site23 are listed in the archive. | HTTP HEAD returned exact sizes for five core TIFFs per candidate, shown below; no full raster or pixel window was downloaded. All 100 clones and XYZI point clouds are excluded. | Which locations/layers/clones; still inspect exact ROI and analysis-point coverage before selecting |
+| Surrounding terrain — P0 | NASA PGDA 90; compare 80S 80MPP and 80S 20MPP | LDEM, LDEC, elevation error, slope and slope error for horizon context | COG GeoTIFFs in south polar stereographic X/Y metres, MOON_ME / DE421. Nominal pixel scale is not effective resolution; evaluate the published effective-resolution layer separately if useful. | HTTP HEAD totals for the five full rasters are **1,051,288,835 bytes** at 80 m and **15,617,598,506 bytes** at 20 m. Effective-resolution rasters are excluded. Both endpoints support byte ranges; actual COG spatial-window reads remain untested. | Test windowed reads with a COG-aware client; determine needed horizon extent and whether 80 m terrain is sufficient before choosing a scale |
 | Sun/Earth ephemeris — P0 | JPL Horizons API; Astroquery is a possible client library, not a selected dependency | Time-tagged Sun and Earth geometry for each selected lunar observer/site; preserve query settings and returned metadata | `Resource.docx` suggests Sun target 10, Earth target 399, and a lunar-centered observer (301) with site coordinates. Treat these as candidate query settings to validate. Horizons geometry does not include terrain obstruction. | Small per site/date response; estimate after choosing cadence and scenario count | Validate CENTER/observer coordinates, coordinate convention, UTC/time scale, reference frame, aberration/refraction settings and cadence with a saved sample response |
 | Horizon and mission-window summaries — P0 | Derived from selected terrain + ephemeris | Azimuth/elevation, local terrain horizon, visibility state, interval durations, longest dark interval and simultaneous Sun/Earth visibility | Horizons altitude is relative to the local horizontal. The terrain horizon must be calculated separately from DEM. Model the Moon without atmospheric refraction and account for lunar curvature and observer height. | Small tables/arrays compared with raster inputs; size depends on cadence and retained trials | Choose cadence and transition refinement; establish reference cases before calling results verified |
 | DEM uncertainty analysis — P1 | PGDA 78 uncertainty layers and limited DEM clone sample | Recompute terrain horizons/illumination against nominal DEM and selected alternatives | Clones represent modeled DEM alternatives, not independent observations or different landing coordinates | Unquantified until clone count and local file sizes are checked | Select clone sample and summary statistic; compare with published method and independent reference evidence |
@@ -22,7 +31,34 @@ If schedule or local-product volume is restrictive, compare Site04 and Site11 as
 
 ### Planning-volume conclusion
 
-The current full-file comparison is about **1,006 MB at 80 m** versus **14.9 GB at 20 m** for the five listed PGDA 90 terrain layers. These totals do not include local PGDA 78 files, derived outputs, or storage overhead; range/window access may reduce bytes transferred but must be demonstrated against the actual archive. `Resource.docx` also gives illustrative uncompressed float32 sizes per layer: 20 × 20 km at 20 m/pixel ≈4 MB; 20 × 20 km at 5 m/pixel ≈64 MB; 100 × 100 km at 5 m/pixel ≈1.6 GB. They are arithmetic planning examples, not source-file sizes or footprints. A cutout must be large enough to capture terrain controlling the horizon. Do not add these figures to the earlier 56.2 GB example, which remains unapproved and differently scoped.
+The current full-file comparison is **1,051,288,835 bytes (~1.051 GB)** at 80 m versus **15,617,598,506 bytes (~15.618 GB)** at 20 m for five PGDA 90 terrain layers. These totals exclude effective-resolution rasters, local PGDA 78 files, derived outputs, and storage overhead. Byte-range support is confirmed, but useful COG windowed transfer has not been tested. `Resource.docx` also gives illustrative uncompressed float32 sizes per layer: 20 × 20 km at 20 m/pixel ≈4 MB; 20 × 20 km at 5 m/pixel ≈64 MB; 100 × 100 km at 5 m/pixel ≈1.6 GB. These are arithmetic examples, not archive sizes or selected footprints. A cutout must capture the terrain that controls the horizon. Do not add these figures to the earlier 56.2 GB example, which remains unapproved and differently scoped.
+
+### PGDA 78 exact sizes for five core rasters
+
+Sizes are the NASA endpoint `Content-Length` values read with HTTP HEAD on 13 November 2026. Columns are LDEM surface, LDEC count, slope, total-Z RMS error, and slope RMS error. The totals exclude ROI archives, clones, and XYZI point clouds.
+
+| Site | LDEM (bytes) | LDEC (bytes) | Slope (bytes) | Z error (bytes) | Slope error (bytes) | Five-layer total (bytes) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Site01 — Connecting ridge | 40,980,810 | 40,980,744 | 40,980,776 | 40,980,810 | 40,980,810 | 204,903,950 |
+| Site04 — Shackleton rim | 40,980,806 | 40,980,740 | 40,980,772 | 40,980,808 | 40,980,806 | 204,903,932 |
+| Site11 — de Gerlache rim | 40,980,806 | 40,980,742 | 40,980,774 | 40,980,810 | 40,980,808 | 204,903,940 |
+| Site23 — Malapert massif | 70,586,804 | 70,586,742 | 70,586,810 | 70,586,811 | 70,586,809 | 352,933,976 |
+| **All four candidates** |  |  |  |  |  | **967,645,798** |
+
+These are file-transfer totals, not evidence that the site footprints are spatially comparable or sufficient for horizon work. The exact analysis points and ROI geometries still need inspection against each raster's coverage. No raster pixel values were read.
+
+### ROI geometry inspection
+
+Three compressed ROI bundles were retrieved temporarily from the PGDA 78 site paths and parsed for vector geometry. Bounding boxes below are in projected X/Y metres from the bundled shapefile; they describe the union envelope of the ROI polygons, not the full raster extent or a landing-point coordinate. The `.prj` files specify south polar stereographic projection on a 1,737,400 m lunar sphere, while the shapefile CRS identifiers are labeled `unknown`; reconcile them with each raster's GeoTIFF CRS/frame before combining coordinates.
+
+| Site | ROI bundle status/size | Polygon count | Union bbox X/Y (m) | Approx. envelope |
+| --- | --- | ---: | --- | --- |
+| Site01 — Connecting ridge | Valid TGZ, 2,934 bytes | 7 | X −11,657.5 to −10,167.5; Y −12,637.5 to −11,492.5 | 1,490 × 1,145 m |
+| Site04 — Shackleton rim | Valid TGZ, 1,712 bytes | 4 | X −2,842.5 to −2,627.5; Y −6,802.5 to −5,902.5 | 215 × 900 m |
+| Site11 — de Gerlache rim | Valid TGZ, 1,719 bytes | 4 | X −37,672.5 to −36,477.5; Y 14,312.5 to 14,927.5 | 1,195 × 615 m |
+| Site23 — Malapert massif | No valid TGZ at the expected `Site23/Site23_ROIs.tgz` path; request returned an HTML not-found page | Unknown | Not available from that bundle | Needs a verified ROI definition or raster-derived coverage check |
+
+The Site01/04/11 archive DBF records expose projected X/Y attributes, but their semantic role is not sufficiently documented to call them approved analysis points. Site23 therefore remains in the candidate list, but it cannot pass the same ROI-point coverage check yet. Its NASA Data Book reference center is available above; exact ROI polygons or raster coverage still need to be verified. The temporary ROI bundles remain outside the repository and are not part of the project data store.
 
 ### Other resources and physical interpretation limits
 
@@ -41,20 +77,37 @@ The current full-file comparison is about **1,006 MB at 80 m** versus **14.9 GB 
 
 For Horizons, preserve the target identifier (candidate Sun `10` or Earth `399`), observer center/coordinates (candidate lunar center `301` plus site coordinates), and whether reported altitude is geometric/apparent. Keep terrain-horizon altitude as a distinct derived field. For any later power/link calculation, record the device, station, and mission assumptions separately from geometric visibility/illumination.
 
+### Horizons feasibility query run
+
+A small observer-ephemeris query was run against the JPL API for both targets using the Site04 reference center and an assumed observer height of 1 m. The UTC interval was 2026-11-14 00:00–02:00 at one-hour steps, with airless apparent azimuth/elevation requested. Both targets returned three rows. This confirms the candidate API shape works; it is not a chosen mission interval or a scientific validation case.
+
+| Setting | Value used |
+| --- | --- |
+| Target | Sun `10`, then Earth `399` |
+| Center | user coordinates on Moon `301`, `coord@301` |
+| Geodetic site coordinates | Site04 reference center: east longitude equivalent `188.13°`, latitude `−89.7668°`, height `0.001 km`; submitted longitude `−171.87°` was normalized by Horizons |
+| Time | 2026-11-14 00:00–02:00 `UT`; `STEP_SIZE=1h`; output labeled UTC |
+| Output | Observer table quantity `4` (airless apparent azimuth/elevation) |
+| Returned lunar center frame/source | `MEAN_ME (high precision)`, DE441 |
+| Terrain source frame/source | PGDA 78/90 identify `MOON_ME`, DE421 |
+
+**Frame alignment remains an important open check:** the sample Horizons header reports DE441 while the selected PGDA rasters use MOON_ME / DE421. Confirm the body-fixed frame/orientation compatibility or apply a documented transform before combining azimuth/elevation with a terrain horizon. The sample query does not resolve that difference.
+
 Keep metadata tables and file-level manifests separate from raster pixels. Do not populate illustrative coordinates, mission assumptions, or missing science fields with demo values.
 
 ## Recommended next sequence
 
-1. Compare Site01 (Connecting ridge), Site04, Site11 and Site23 against the team-proposed use case. Inspect the exact PGDA 78 ROI files, coordinates, availability and byte sizes before selecting pilot locations.
-2. Compare PGDA 90 80S 80MPP and 20MPP coverage, file sizes and COG window/cutout access. Determine the surrounding extent needed for terrain horizons; do not equate the landing-site ROI to a sufficient horizon footprint.
-3. Perform one documented Horizons feasibility query for Sun and Earth using a reviewed lunar observer location; validate target/center settings, angle conventions, time/frame fields, no-atmosphere treatment and response size.
+1. Compare Site01, Site04, Site11 and Site23 against the team use case. Core-raster byte sizes, three ROI bundles and NASA reference centers are inventoried above; resolve the missing Site23 ROI geometry and confirm point coverage/CRS for every proposed analysis point.
+2. Compare PGDA 90 80S 80MPP and 20MPP coverage and byte sizes. Test an actual spatial window with a COG-aware reader; the one-byte HTTP Range check only proves that the server supports byte ranges. Determine the terrain extent needed for horizons.
+3. Reconcile PGDA MOON_ME/DE421 with the Horizons MEAN_ME/DE441 output before joining terrain and ephemeris. The documented Sun/Earth query succeeded as a feasibility check; repeat only if the observer point/frame changes.
 4. Submit the proposed sites, selected layers, exact footprint, total bytes and open validation questions for team decision.
-5. Only after that decision and a separate explicit acquisition/processing request, create the asset manifest and begin data handling.
+5. Only after that decision and a separate explicit acquisition/processing request, create the asset manifest and begin raster data handling.
 
 ## Sources checked
 
 - [NASA PGDA product 78 — High-Resolution LOLA Topography for Lunar South Pole Sites](https://pgda.gsfc.nasa.gov/products/78)
 - [NASA PGDA product 90 — A New View of the Lunar South Pole from LOLA](https://pgda.gsfc.nasa.gov/products/90)
+- [NASA Lunar Surface Data Book Baseline (2025)](https://ntrs.nasa.gov/api/citations/20250002845/downloads/M2M-30044%20Lunar%20Surface%20Data%20Book%20Baseline_Final.pdf)
 - [JPL Horizons API documentation](https://ssd-api.jpl.nasa.gov/doc/horizons.html)
 - [NASA Space Apps Lunar Landing Site Navigator resources](https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/?tab=resources)
 - Team-provided [Resource.docx planning document](https://docs.google.com/document/d/1aNnEIbrAzsKJm3FffKX9eGWTH9oUM-_W7JUQlNdLkc8/edit?tab=t.unv6tu6eviha) (reviewed 13 November 2026; estimates remain proposals)

@@ -16,7 +16,7 @@ The documentation and shared agent-guidance foundation is complete. ADR 0002 rec
 
 ## Next useful decision
 
-Compare the four product 78 site candidates and exact ROI sizes; compare PGDA 90 80 m and 20 m coverage/file sizes plus COG window access; and validate a documented Horizons query (targets 10/399, lunar observer center/coordinates, angle and time conventions). Then decide exact footprints, cadence and validation references. Acquisition or processing requires a later explicit request.
+Five-layer byte sizes are recorded for Site01/04/11/23; ROI geometry was parsed for Site01/04/11, while the expected Site23 ROI path returned a not-found page. NASA reference centers are documented, and a small Sun/Earth Horizons query returned three hourly rows each. PGDA 90 full-file totals are recorded for 80 m and 20 m, and the server returns HTTP 206 for one-byte Range requests. Next reconcile ROI CRS/analysis points with raster coverage, find a verified Site23 ROI, test a real COG spatial-window read, and resolve the PGDA DE421 versus Horizons DE441 lunar-frame alignment. Exact sites, footprints, cadence and validation references remain undecided.
 
 ## Verification and limits
 
