@@ -16,7 +16,7 @@ The documentation and shared agent-guidance foundation is complete. ADR 0002 rec
 
 ## Next useful decision
 
-Five-layer byte sizes are recorded for Site01/04/11/23; ROI geometry was parsed for Site01/04/11, while the expected Site23 ROI path returned a not-found page. NASA reference centers are documented, and a small Sun/Earth Horizons query returned three hourly rows each. PGDA 90 full-file totals are recorded for 80 m and 20 m, and the server returns HTTP 206 for one-byte Range requests. Next reconcile ROI CRS/analysis points with raster coverage, find a verified Site23 ROI, test a real COG spatial-window read, and resolve the PGDA DE421 versus Horizons DE441 lunar-frame alignment. Exact sites, footprints, cadence and validation references remain undecided.
+Five-layer byte sizes are recorded for Site01/04/11/23; ROI geometry was parsed for Site01/04/11, while the expected Site23 ROI path returned a not-found page. NASA reference centers are documented, and a small Sun/Earth Horizons query returned three hourly rows each. PGDA 90 full-file totals are recorded for 80 m and 20 m, and the server returns HTTP 206 for one-byte Range requests. Next reconcile ROI CRS/analysis points with raster coverage, find a verified Site23 ROI, test a real COG spatial-window read, and confirm body-fixed orientation compatibility between PGDA MOON_ME/DE421 and Horizons MEAN_ME/DE441. Exact sites, footprints, cadence and validation references remain undecided.
 
 ## Verification and limits
 

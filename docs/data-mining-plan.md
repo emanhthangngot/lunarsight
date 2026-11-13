@@ -91,7 +91,7 @@ A small observer-ephemeris query was run against the JPL API for both targets us
 | Returned lunar center frame/source | `MEAN_ME (high precision)`, DE441 |
 | Terrain source frame/source | PGDA 78/90 identify `MOON_ME`, DE421 |
 
-**Frame alignment remains an important open check:** the sample Horizons header reports DE441 while the selected PGDA rasters use MOON_ME / DE421. Confirm the body-fixed frame/orientation compatibility or apply a documented transform before combining azimuth/elevation with a terrain horizon. The sample query does not resolve that difference.
+**Reference/orientation compatibility remains an important open check:** the sample Horizons header reports `MEAN_ME (high precision)` / DE441 while the selected PGDA rasters are labeled `MOON_ME` / DE421. Do not assume the naming and ephemeris provenance are interchangeable; confirm their body-fixed orientation compatibility or apply a documented transform before combining azimuth/elevation with a terrain horizon. The sample query does not resolve this.
 
 Keep metadata tables and file-level manifests separate from raster pixels. Do not populate illustrative coordinates, mission assumptions, or missing science fields with demo values.
 
@@ -99,7 +99,7 @@ Keep metadata tables and file-level manifests separate from raster pixels. Do no
 
 1. Compare Site01, Site04, Site11 and Site23 against the team use case. Core-raster byte sizes, three ROI bundles and NASA reference centers are inventoried above; resolve the missing Site23 ROI geometry and confirm point coverage/CRS for every proposed analysis point.
 2. Compare PGDA 90 80S 80MPP and 20MPP coverage and byte sizes. Test an actual spatial window with a COG-aware reader; the one-byte HTTP Range check only proves that the server supports byte ranges. Determine the terrain extent needed for horizons.
-3. Reconcile PGDA MOON_ME/DE421 with the Horizons MEAN_ME/DE441 output before joining terrain and ephemeris. The documented Sun/Earth query succeeded as a feasibility check; repeat only if the observer point/frame changes.
+3. Confirm PGDA MOON_ME/DE421 and Horizons MEAN_ME/DE441 body-fixed orientation compatibility before joining terrain and ephemeris. The documented Sun/Earth query succeeded as a feasibility check; repeat only if the observer point/frame changes.
 4. Submit the proposed sites, selected layers, exact footprint, total bytes and open validation questions for team decision.
 5. Only after that decision and a separate explicit acquisition/processing request, create the asset manifest and begin raster data handling.
 
