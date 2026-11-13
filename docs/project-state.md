@@ -9,7 +9,7 @@ Updated: **13 November 2026**. This is the concise starting point for the team a
 - Current user instruction: keep work reviewable through a new branch and PR. The initial data-mining feature priorities are now recorded in [ADR 0002](decisions/0002-data-mining-feature-scope.md); exact data products, coverage, versions, and acquisition remain undecided.
 - The team's proposal is preserved as a [historical reference](reference/proposal-v2.md). It informs requirements; it is not proof of a backend or validated science in this repo.
 - The [shared testing policy](testing-policy.md) governs agent test creation, selection and maintenance. It does not select a stack/data product or authorize runtime implementation.
-- Initial source validation found that NASA Data Book reference centers do not fall inside the inspected PGDA 78 ROI polygons; they are not substitutes for ROI or landing-point geometry. Small 9×9 reads verified valid pixels at all four centers in the local 5 m LDEMs and PGDA 90 80 m/20 m LDEMs. JPL documents the current high-precision Horizons lunar surface frame as DE421 `MOON_ME`, despite the DE441 ephemeris provenance. Site selection, ROI coverage, and horizon extent remain undecided.
+- Initial source validation found that NASA Data Book reference centers do not fall inside the inspected PGDA 78 ROI polygons; they are not substitutes for ROI or landing-point geometry. Small reads verified valid pixels at all four centers in the local 5 m LDEMs and PGDA 90 80 m/20 m LDEMs. An exploratory 20 km 80 m/20 m horizon comparison showed material angular differences at three centers; a 25 km Site04 extension stabilized before its outer window edge. JPL documents the current high-precision Horizons lunar surface frame as DE421 `MOON_ME`, despite the DE441 ephemeris provenance. Site selection, ROI coverage, horizon extent, and acceptable angular error remain undecided.
 
 ## Current scope
 
@@ -29,7 +29,7 @@ The approximately **56.2 GB** acquisition scenario is an unapproved example from
 
 ## Next useful work
 
-Resolve exact pilot sites, data products/footprints, time cadence, and validation references against the accepted scope in ADR 0002. The 80S edge-distance estimate makes Site23 the limiting candidate; compare 80 m and 20 m terrain horizons over a bounded common footprint, check valid-data edges, and obtain a verified Site23 ROI if available. Bulk dataset acquisition and application implementation have not started; a later explicit request is required for those steps.
+Resolve exact pilot sites, data products/footprints, time cadence, and validation references against the accepted scope in ADR 0002. Agree an angular tolerance, extend the window-limited Site01/Site11 profiles, check Site23 against the 80S far-field boundary, and obtain a verified Site23 ROI if available. Bulk dataset acquisition and application implementation have not started; a later explicit request is required for those steps.
 
 ## Status vocabulary
 
