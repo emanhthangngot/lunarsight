@@ -10,6 +10,8 @@
 
 The user requested documentation and initial project setup only. Do not create application code, processing/download scripts, executable tests, package/lock files, infrastructure manifests, or CI jobs in this phase. Do not acquire datasets, provision services, or deploy.
 
+Explicit current exception: the user authorized a pre-decision terrain notebook, small bounded DEM preview reads, a comparison packet and decision worksheet. Keep preview caches outside Git; retain source/window metadata and rendered figures for review. This does not authorize full dataset acquisition, production ingestion or application changes.
+
 Dataset products, geographic extent, resolution, volume, stack, hosting, and AI provider remain proposals unless a decision with authority is recorded. The 56.2 GB scenario is illustrative and unapproved. Historical prototype observations or prior exploratory artifacts do not establish repository readiness or team approval.
 
 A later explicit user instruction can authorize a particular implementation step. Update the state and affected decisions when that happens; do not turn this phase rule into a permanent prohibition or repeatedly request permission for work already authorized.

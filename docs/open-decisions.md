@@ -17,6 +17,8 @@ Status: **proposals awaiting team discussion**. None of the options below is sel
 | OD-11 | Where will the application and data live? | Local demonstration; a chosen deployment provider; independently hosted data/compute where needed. | Budget, data access patterns, execution duration, identity/secrets needs, and operational ownership. |
 | OD-12 | What licenses and review/release conventions apply? | Team-selected code license and contribution/release process. | Ownership, source data acknowledgements, intended sharing, and collaborators' agreement. |
 
+Use the [pre-decision worksheet](predecision-review.md) to record roster, point/ROI, observer height, time interval, quality needs, budgets and owners while viewing the real-terrain notebook. Blank entries remain undecided; no review checkbox selects a product automatically.
+
 ## Terrain-horizon comparison decision packet
 
 The following inputs are proposals for team discussion, not approved values. The [pilot inventory](data-mining-plan.md#bounded-80-m--20-m-horizon-profile-comparison) records an unresolved inconsistency between profile runs and missing per-bin reproduction evidence. Discuss roster and mission needs now, but do not use the current p95/profile summaries to select a threshold, resolution or horizon radius until that evidence is resolved.
