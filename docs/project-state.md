@@ -29,7 +29,7 @@ The approximately **56.2 GB** acquisition scenario is an unapproved example from
 
 ## Next useful work
 
-Resolve exact pilot sites, data products/footprints, time cadence, and validation references against the accepted scope in ADR 0002. Agree observer points, a 95th-percentile angular-difference threshold, and relief/horizon distance before additional regional reads. Then extend the 80 m profiles within the accepted scenario and determine whether Site23's 80S edge limits the result. Obtain a verified Site23 ROI if available. Bulk dataset acquisition and application implementation have not started; a later explicit request is required for those steps.
+The next decision is documented in the [terrain-horizon comparison packet](open-decisions.md#terrain-horizon-comparison-decision-packet): the team must confirm observer points/ROI, a p95 angular-difference threshold, and the relief or maximum-ray-distance scenario. Three pre-acquisition parts remain: team decision; final coverage/resolution/footprint analysis; and asset manifest plus transfer/storage estimate with an acquisition request. Acquisition, processing and validation are a separate later phase requiring explicit scope. No final data choice has been made.
 
 ## Status vocabulary
 

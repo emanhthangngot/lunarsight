@@ -1,6 +1,6 @@
 # Current handoff
 
-Updated: **13 November 2026**.
+Updated: **14 November 2026**.
 
 ## Current state
 
@@ -21,6 +21,10 @@ The NASA Data Book reference centers were projected into the ROI `.prj` south-po
 The apparent Horizons DE441 versus PGDA DE421 frame conflict is resolved at the model level: JPL documents Horizons' high-precision lunar surface frame as the DE421 mean-Earth frame for 1550–2650, while DE441 supplies major-body trajectories. Keep the response header and confirm its lunar `Target pole/equ` label on each saved query. A geometric estimate places the outward 80S edge 182.5 km from Site23 and 264–297 km from the other three centers. An idealized 10 km obstacle gives a ~186 km horizon distance, so Site23 is the limiting candidate.
 
 The 20 km profile comparison found mean absolute 80 m/20 m horizon differences of 2.2–2.8° at Site01/11/23 (95th percentiles 6.8–7.4°) and 0.32° at Site04 (95th percentile 1.08°, with one 21.28° outlier). All four centers were extended to 25 km at both scales; every cell inside each profile circle was valid. The 25 km mean absolute differences were 2.21° at Site01, 0.32° at Site04, 2.64° at Site11, and 2.33° at Site23. Site04's maximum remained near 19.4 km. Site01/11 still have 80 m maxima in the outer 2.5 km for 50/88 azimuths, while Site23 has 2 such bins at 80 m and none at 20 m. A 50 km extension of 80 m profiles at Site01, Site11 and Site23 had 100% valid coverage, but maxima remained in the outer 5 km for 93, 94 and 35 azimuths. Under a provisional 5 km-relief scenario, all four 80 m profiles were extended to 131.8 km, with 100% valid circles. Site04's max remained at 19.384 km; Site01/11/23 still have edge maxima in 32/52/56 azimuths. The 131.8 km windows do not reach the 80S boundary, so those three profiles remain radius-limited. The Site23 edge is about 182.5 km from its center; a 10 km-relief geometric horizon is about 186.4 km and would exceed that margin by ~3.9 km. The 131.8 km step transferred 165.2 MB including a timed-out attempt and repeated ranges; all profile reads total about 414.4 MB. No full raster was retained. Next agree the observer points, 95th-percentile angular tolerance and relief/horizon scenario before larger regional reads or scale selection. Exact sites, footprints, cadence and validation references remain undecided.
+
+## Remaining DE/data-mining parts
+
+The [terrain-horizon decision packet](../open-decisions.md#terrain-horizon-comparison-decision-packet) now summarizes candidate inputs. **Three parts remain before a data-acquisition decision:** (1) the team confirms observer points/ROI, the p95 angular-difference threshold, and the relief or maximum-ray-distance scenario; (2) profiles are extended for those accepted points/scenario, then the scale, exact products and footprint are proposed; (3) an asset manifest, transfer/storage estimate and acquisition request are prepared. A subsequent acquisition/processing/validation phase is separate and needs its own explicit scope. No final data choice has been made.
 
 ## Verification and limits
 

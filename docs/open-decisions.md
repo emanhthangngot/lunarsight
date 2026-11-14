@@ -17,6 +17,18 @@ Status: **proposals awaiting team discussion**. None of the options below is sel
 | OD-11 | Where will the application and data live? | Local demonstration; a chosen deployment provider; independently hosted data/compute where needed. | Budget, data access patterns, execution duration, identity/secrets needs, and operational ownership. |
 | OD-12 | What licenses and review/release conventions apply? | Team-selected code license and contribution/release process. | Ownership, source data acknowledgements, intended sharing, and collaborators' agreement. |
 
+## Terrain-horizon comparison decision packet
+
+The following inputs are ready for team review after the exploratory work in the [pilot data-mining inventory](data-mining-plan.md). They remain proposals; do not treat the reference points, thresholds, or relief scenarios as approved values.
+
+| Input to decide | Candidate options for discussion | Evidence and practical consequence |
+| --- | --- | --- |
+| Observer points and footprints (OD-02) | Keep the four NASA Data Book centers as reproducible screening points until the team supplies ROI-specific analysis points; or select verified points inside accepted ROI geometry now. | The Data Book centers are not approved landing points. Site01/04/11 reference centers do not fall within the inspected ROI polygons, and a verified Site23 ROI is still missing. New selected points require coverage checks again. |
+| 80 m / 20 m consistency threshold (OD-03) | Consider hypothetical p95 absolute angular-difference thresholds of 2°, 5°, 7°, or 8°, and report the maximum difference alongside p95. | At 25 km, 2°/5° would screen in Site04 only; 7° would screen in Site01/04/23; 8° would screen all four. Site04's maximum outlier is 21.28°. These compare two resolutions; the 20 m DEM is not ground truth, so passing a threshold is not scientific validation. |
+| Relief / horizon coverage scenario (OD-02/OD-05) | Consider 5 km relative relief (~131.8 km geometric horizon) as a baseline scenario and 10 km (~186.4 km) as a stress case; the team may choose another height or directly set a maximum ray distance. | Every 80S circle window was valid to 131.8 km, but Site01/11/23 profiles still had maxima at the window edge. Site23's outward 80S margin is about 182.5 km, so the 10 km stress case exceeds it by about 3.9 km and may require broader far-field context. These are geometric planning estimates, not observed terrain heights. |
+
+Suggested record for a decision: exact observer coordinates and ROI/version; the selected angular statistic and threshold; the relief or maximum-ray-distance scenario; and how to handle rays that reach an edge. Record the choice in an ADR with authority and date before using it to finalize a product, footprint, or scale.
+
 ## Suggested discussion order
 
 Resolve OD-01 first, then OD-02–OD-05 for a bounded use case. Compare stack/storage choices against that use case rather than choosing them from a generic template. Address persistence and the advisor according to the first useful demonstration.
