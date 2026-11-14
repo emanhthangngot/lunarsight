@@ -1,0 +1,38 @@
+{
+  "version": "pilot-v1",
+  "status": "working-agreement",
+  "authority": "User confirmed team agreement in conversation",
+  "decision_date": "2026-11-14",
+  "sites": [
+    {
+      "id": "Site01",
+      "latitude_deg": -89.4632,
+      "longitude_east_deg": -137.49
+    },
+    {
+      "id": "Site04",
+      "latitude_deg": -89.7668,
+      "longitude_east_deg": -171.87
+    }
+  ],
+  "point_purpose": "Data Book reference point; outside inspected ROI, not landing site",
+  "local_preview": {
+    "width_m": 2500,
+    "height_m": 2500,
+    "resolution_m": 5,
+    "roi_status": "reference-centered preview, not PGDA polygon"
+  },
+  "mission": {
+    "start_utc": "2027-01-01T00:00:00Z",
+    "end_utc_exclusive": "2027-02-01T00:00:00Z",
+    "cadence_minutes": 60,
+    "observer_height_agl_m": 1,
+    "ellipsoid_altitude_m": null
+  },
+  "horizon": {
+    "diagnostic_radius_km": 25,
+    "radius_validated": false,
+    "p95_threshold_deg": null
+  },
+  "products_status": "provisional; no full acquisition authorized"
+}
