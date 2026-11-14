@@ -13,6 +13,8 @@ Updated: **14 November 2026**. This is the concise starting point for the team a
 - Pre-decision review now includes nine 2.5 km local DEM previews, including Site06/Site42/Haworth; all nine displayed crops had 250,000/250,000 valid pixels. This does not verify their regional coverage or complete ROI. See the [worksheet](predecision-review.md) and [terrain notebook](../notebooks/terrain-predecision-review.ipynb).
 - Review correction, 14 November 2026: the historical horizon/p95 reports have unresolved cross-radius inconsistencies and lack retained per-bin reproduction evidence. They are not a basis for selecting p95 tolerance, resolution or horizon radius; see the [inventory warning](data-mining-plan.md#bounded-80-m--20-m-horizon-profile-comparison). Horizons lunar observer-frame checks use `Center pole/equ`; `0.001 km` in the feasibility query is ellipsoid altitude, not height above terrain.
 
+- The team accepted a revisable Site01/Site04 pilot working configuration: see [ADR 0003](decisions/0003-pilot-working-agreement.md) and [pilot-v1](../config/pilot-v1.json). Full acquisition, final ROI and p95 tolerance remain open.
+
 ## Current scope
 
 Documentation plus explicitly authorized analysis notebooks for pre-decision review. The current request authorizes bounded local DEM previews, visual comparison and a decision worksheet; native preview arrays are cached under ignored `data/preview/`. Rendered notebook outputs and source/window metadata are retained for review. No production ingestion pipeline, full raster acquisition, application implementation or deployment is authorized by this step.
