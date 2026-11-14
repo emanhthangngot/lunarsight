@@ -1,10 +1,12 @@
 # Pilot data-mining inventory
 
-Status: **research proposal, checked 14 November 2026**. This inventory narrows the accepted feature scope in [ADR 0002](decisions/0002-data-mining-feature-scope.md). It is not approval for bulk raster acquisition. Three small ROI shapefile bundles were downloaded temporarily to inspect their geometry. Twelve 9×9 pixel windows and exploratory 20 km horizon-profile windows were read through HTTP byte ranges; all four centers were additionally profiled to 25 km at both scales, and all four were profiled to 131.8 km at 80 m for an illustrative 5 km-relief case. All completed profile-circle reads were valid, and no full raster was saved. The profile runs transferred about 414.4 MB in total, including overlapping/repeated tile ranges and an interrupted read. The temporary ROI bundles and Rasterio reader are outside the repository.
+Status: **research proposal, checked 14 November 2026**. This inventory narrows the accepted feature scope in [ADR 0002](decisions/0002-data-mining-feature-scope.md). It is not approval for bulk raster acquisition. Four small ROI shapefile bundles were downloaded temporarily to inspect their geometry. Six reference centers now have bounded 9×9 reads at local 5 m and PGDA 90 80 m/20 m; Site20v2 also had a local 5 m point read. The original four centers were profiled to 25 km at both scales and 131.8 km at 80 m for an illustrative 5 km-relief case. All completed profile-circle reads were valid, and no full raster was saved. The profile runs transferred about 414.4 MB in total, including overlapping/repeated tile ranges and an interrupted read. The temporary ROI bundles and Rasterio reader are outside the repository.
 
 ## Recommended pilot sites for coverage review
 
-The current research shortlist is **Site04 (Shackleton rim), Site11 (de Gerlache rim), and Site23 (Malapert massif)**. NASA PGDA product 78 lists 5 m/pixel products for these site regions, including LDEM, slope, LDEC count, elevation/slope uncertainty and DEM clones. The team-provided `Resource.docx` also names **Site01 (Connecting ridge)** as a candidate example. Compare Site01 with the current three before fixing the pilot list; its inclusion here does not select it. These are data-coverage candidates, not validated landing coordinates: inspect each archive ROI and coordinate record, verify naming and frame, and do not substitute a feature center for a proposed landing point.
+The original comparison cohort is **Site01 (Connecting Ridge), Site04 (Shackleton rim), Site11 (de Gerlache rim 1), and Site23 (Malapert massif)**. Site04/11/23 came from the initial PGDA 78 shortlist; the team-provided `Resource.docx` also named Site01. A lightweight screen now adds **Site07 (Peak near Shackleton)** and **Site20 (Leibnitz Beta Plateau)** because PGDA 78 also provides products for them. This six-center set is still not exhaustive: PGDA 78 lists other regional products such as Site06, Site42, Haworth, and DM/NP/LM areas. The four previously analyzed sites were not the only technically available candidates; the earlier choice reflected the team references and bounded initial scope. These are data-coverage candidates, not validated landing coordinates.
+
+The Site07 and Site20 screen confirms point-window coverage, but does not promote them into the analysis cohort. Site07 has a small ROI bundle, although its Data Book reference center falls outside both ROI polygons. Site20 and its larger Site20v2 raster set have no ROI link on the PGDA page, and the expected ROI paths return a not-found HTML page. Check each selected analysis point against a verified ROI before assigning a site to the pilot.
 
 NASA's 2025 Lunar Surface Data Book provides reference centers generated from the PGDA DEM polygons (the source reports 5–10 m center-point accuracy). Use these only as reproducible metadata/test points until the team chooses analysis points; a polygon center is not a landing authorization or a selected landing coordinate.
 
@@ -12,17 +14,19 @@ NASA's 2025 Lunar Surface Data Book provides reference centers generated from th
 | --- | --- |
 | Site01 — Connecting Ridge | −89.4632, −137.49 |
 | Site04 — Shackleton Rim | −89.7668, −171.87 |
+| Site07 — Peak near Shackleton | −88.811, 123.6901 |
 | Site11 — de Gerlache Rim 1 | −88.6834, −67.9321 |
+| Site20 — Leibnitz Beta Plateau | −85.4266, 31.74276 |
 | Site23 — Malapert Massif | −85.9948, −0.23578 |
 
-If schedule or local-product volume is restrictive, compare Site04 and Site11 as the initial pair, with Site01 as the resource-document alternative; Site23 remains a candidate after locating a verified ROI and checking its shorter margin to the 80S regional-data edge. This is a review order, not an approved site selection. Mission associations remain proposals until reviewed against authoritative coordinates and nomenclature.
+If schedule or local-product volume is restrictive, compare Site04 and Site11 as the initial pair, with Site01 as the resource-document alternative; Site23 remains a candidate after locating a verified ROI and checking its shorter margin to the 80S regional-data edge. Site07 and Site20 are newly screened coverage candidates only; ROI verification and team relevance remain open. This is a review order, not an approved site selection. Mission associations remain proposals until reviewed against authoritative coordinates and nomenclature.
 
 ## Source-to-feature inventory
 
 | Feature / priority | Candidate product or service | Required contents | Known conventions / coverage | Planning volume | Decision still needed |
 | --- | --- | --- | --- | --- | --- |
-| Site catalog — P0 | NASA PGDA 78 site/ROI metadata; NASA mission records and USGS/IAU nomenclature for independent identity checks | Site ID, name, point/ROI geometry, elevation source, mission status, citations | PGDA 78 includes Site04, Site11, Site23 and additional site regions; a named feature is not itself a landing coordinate | Tiny metadata table (KB-scale, estimate) | Confirm the 2–3 sites, representative analysis points, and naming policy |
-| Local high-resolution terrain — P0/P1 | NASA PGDA 78 | Nominal LDEM, slope, LDEC, elevation and slope RMS uncertainty; a small clone subset for P1 | 5 m/pixel GeoTIFFs in south polar stereographic X/Y metres, MOON_ME frame with DE421; PGDA reports about 90% interpolated 5 m pixels. Site01, Site04, Site11 and Site23 are listed in the archive. | HTTP HEAD returned exact sizes for five core TIFFs per candidate, shown below. One 9×9 LDEM window at each reference center was read; no full raster was saved. All 100 clones and XYZI point clouds are excluded. | Choose locations/layers/clones; check the actual selected analysis points and ROI polygons before selecting |
+| Site catalog — P0 | NASA PGDA 78 site/ROI metadata; NASA mission records and USGS/IAU nomenclature for independent identity checks | Site ID, name, point/ROI geometry, elevation source, mission status, citations | PGDA 78 contains multiple named regions and versions; Site01/04/07/11/20/23 are the current screened subset, not the complete catalog | Tiny metadata table (KB-scale, estimate) | Confirm the pilot sites, representative analysis points, and naming policy |
+| Local high-resolution terrain — P0/P1 | NASA PGDA 78 | Nominal LDEM, slope, LDEC, elevation and slope RMS uncertainty; a small clone subset for P1 | 5 m/pixel GeoTIFFs in south polar stereographic X/Y metres, MOON_ME frame with DE421; PGDA reports about 90% interpolated 5 m pixels. Base products exist for all six screened references; Site20v2 is a larger alternate product set. | HTTP HEAD sizes for five core TIFFs per screened center are shown below. 9×9 LDEM point reads passed for Site01/04/07/11/20/23 and Site20v2; no full raster was saved. All 100 clones and XYZI point clouds are excluded. | Choose locations/layers/clones; check actual selected analysis points and verified ROI polygons before selecting |
 | Surrounding terrain — P0 | NASA PGDA 90; compare 80S 80MPP and 80S 20MPP | LDEM, LDEC, elevation error, slope and slope error for horizon context | COG GeoTIFFs in south polar stereographic X/Y metres, MOON_ME / DE421. Nominal pixel scale is not effective resolution; evaluate the published effective-resolution layer separately if useful. | HTTP HEAD totals for the five full rasters are **1,051,288,835 bytes** at 80 m and **15,617,598,506 bytes** at 20 m. Four 9×9 point windows and 20 km/25 km profiles were read at both scales; all four centers were then profiled to 131.8 km at 80 m in a provisional relief scenario. | Determine full horizon extent and compare profiles against an accepted angular tolerance before selecting a scale |
 | Sun/Earth ephemeris — P0 | JPL Horizons API; Astroquery is a possible client library, not a selected dependency | Time-tagged Sun and Earth geometry for each selected lunar observer/site; preserve query settings and returned metadata | `Resource.docx` suggests Sun target 10, Earth target 399, and a lunar-centered observer (301) with site coordinates. Treat these as candidate query settings to validate. Horizons geometry does not include terrain obstruction. | Small per site/date response; estimate after choosing cadence and scenario count | Validate CENTER/observer coordinates, coordinate convention, UTC/time scale, reference frame, aberration/refraction settings and cadence with a saved sample response |
 | Horizon and mission-window summaries — P0 | Derived from selected terrain + ephemeris | Azimuth/elevation, local terrain horizon, visibility state, interval durations, longest dark interval and simultaneous Sun/Earth visibility | Horizons altitude is relative to the local horizontal. The terrain horizon must be calculated separately from DEM. Model the Moon without atmospheric refraction and account for lunar curvature and observer height. | Small tables/arrays compared with raster inputs; size depends on cadence and retained trials | Choose cadence and transition refinement; establish reference cases before calling results verified |
@@ -41,50 +45,62 @@ Sizes are the NASA endpoint `Content-Length` values read with HTTP HEAD on 13 No
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Site01 — Connecting ridge | 40,980,810 | 40,980,744 | 40,980,776 | 40,980,810 | 40,980,810 | 204,903,950 |
 | Site04 — Shackleton rim | 40,980,806 | 40,980,740 | 40,980,772 | 40,980,808 | 40,980,806 | 204,903,932 |
+| Site07 — Peak near Shackleton | 40,980,808 | 40,980,742 | 40,980,774 | 40,980,810 | 40,980,808 | 204,903,942 |
 | Site11 — de Gerlache rim | 40,980,806 | 40,980,742 | 40,980,774 | 40,980,810 | 40,980,808 | 204,903,940 |
+| Site20 — Leibnitz Beta Plateau | 40,980,802 | 40,980,740 | 40,980,772 | 40,980,809 | 40,980,807 | 204,903,930 |
 | Site23 — Malapert massif | 70,586,804 | 70,586,742 | 70,586,810 | 70,586,811 | 70,586,809 | 352,933,976 |
-| **All four candidates** |  |  |  |  |  | **967,645,798** |
+| **Six screened base site sets** |  |  |  |  |  | **1,377,453,670** |
+| Site20v2 — alternate Site20 set (not included above) | 108,192,905 | 108,192,845 | 108,192,875 | 108,192,913 | 108,192,911 | 540,964,449 |
+
+Site20v2's five-layer total is about 2.64× the original Site20 set. It is listed as an alternate product version, not a seventh site or an approved replacement.
 
 These are file-transfer totals, not evidence that the site footprints are spatially comparable or sufficient for horizon work. One 9×9 LDEM window at each reference center was read and had 81/81 valid pixels. The exact team-selected analysis points and ROI geometries still need inspection against each raster's coverage; no full raster was retained.
 
 ### ROI geometry inspection
 
-Three compressed ROI bundles were retrieved temporarily from the PGDA 78 site paths and parsed for vector geometry. Bounding boxes below are in projected X/Y metres from the bundled shapefile; they describe the union envelope of the ROI polygons, not the full raster extent or a landing-point coordinate. The `.prj` files specify south polar stereographic projection on a 1,737,400 m lunar sphere, while the shapefile CRS identifiers are labeled `unknown`; reconcile them with each raster's GeoTIFF CRS/frame before combining coordinates.
+Four compressed ROI bundles were retrieved temporarily from the PGDA 78 site paths and parsed for vector geometry. Bounding boxes below are in projected X/Y metres from the bundled shapefile; they describe the union envelope of the ROI polygons, not the full raster extent or a landing-point coordinate. The `.prj` files specify south polar stereographic projection on a 1,737,400 m lunar sphere, while the shapefile CRS identifiers are labeled `unknown`; reconcile them with each raster's GeoTIFF CRS/frame before combining coordinates.
 
 | Site | ROI bundle status/size | Polygon count | Union bbox X/Y (m) | Approx. envelope |
 | --- | --- | ---: | --- | --- |
 | Site01 — Connecting ridge | Valid TGZ, 2,934 bytes | 7 | X −11,657.5 to −10,167.5; Y −12,637.5 to −11,492.5 | 1,490 × 1,145 m |
 | Site04 — Shackleton rim | Valid TGZ, 1,712 bytes | 4 | X −2,842.5 to −2,627.5; Y −6,802.5 to −5,902.5 | 215 × 900 m |
+| Site07 — Peak near Shackleton | Valid TGZ, 1,312 bytes | 2 | X 29,962.5 to 30,202.5; Y −20,167.5 to −19,962.5 | 240 × 205 m |
 | Site11 — de Gerlache rim | Valid TGZ, 1,719 bytes | 4 | X −37,672.5 to −36,477.5; Y 14,312.5 to 14,927.5 | 1,195 × 615 m |
+| Site20 — Leibnitz Beta Plateau | No ROI link; expected `Site20/Site20_ROIs.tgz` path returns PGDA not-found HTML | Unknown | Not available | Needs a verified ROI or raster-derived analysis area |
+| Site20v2 — alternate Site20 product | No ROI link; expected `Site20v2/Site20v2_ROIs.tgz` path returns PGDA not-found HTML | Unknown | Not available | No verified ROI found |
 | Site23 — Malapert massif | No valid TGZ at the expected `Site23/Site23_ROIs.tgz` path; request returned an HTML not-found page | Unknown | Not available from that bundle | Needs a verified ROI definition or raster-derived coverage check |
 
-The Site01/04/11 archive DBF records expose projected X/Y attributes, but their semantic role is not sufficiently documented to call them approved analysis points. Site23 therefore cannot be compared against an ROI polygon because no verified ROI archive is available. Its NASA Data Book reference center does have valid raster pixels in the window checks below; coverage for a team-selected point or polygon remains to be checked. The temporary ROI bundles remain outside the repository and are not part of the project data store.
+The Site01/04/07/11 archive DBF records expose projected X/Y attributes, but their semantic role is not sufficiently documented to call them approved analysis points. The Site07 Data Book reference center projects inside the union envelope but outside both Site07 polygons. Site20 and Site23 therefore cannot be compared against verified ROI polygons. Their Data Book reference centers do have valid pixels in the small LDEM window checks below; coverage for a team-selected point or polygon remains to be checked. The temporary ROI bundles remain outside the repository and are not part of the project data store.
 
 ### Reference-center to ROI coordinate check
 
-The four NASA Data Book reference centers were transformed from longitude/latitude into the shapefile `.prj` projection using spherical south-polar stereographic parameters: central meridian 0°, standard parallel −90°, false easting/northing 0 m, and lunar radius 1,737,400 m. The `.prj` files label their CRS identifiers `unknown`, so this is a reproducible interpretation of their projection parameters, not an authoritative raster-CRS comparison.
+The six screened NASA Data Book reference centers were transformed from longitude/latitude into the shapefile `.prj` projection using spherical south-polar stereographic parameters: central meridian 0°, standard parallel −90°, false easting/northing 0 m, and lunar radius 1,737,400 m. The `.prj` files label their CRS identifiers `unknown`, so this is a reproducible interpretation of their projection parameters, not an authoritative raster-CRS comparison.
 
 | Site | Projected reference center X/Y (m) | Relation to available ROI polygons |
 | --- | --- | --- |
 | Site01 | −10,999.145 / −11,999.255 | Inside the union bounding box, outside all seven polygons |
 | Site04 | −1,000.037 / −7,000.346 | Outside the union bounding box and all four polygons |
+| Site07 | 30,000.192 / −20,000.153 | Inside union envelope, outside both polygons |
 | Site11 | −37,000.510 / 15,000.207 | Outside the union bounding box and all four polygons |
+| Site20 | 72,999.635 / 117,999.415 | No verified ROI archive to compare |
 | Site23 | −499.990 / 121,499.535 | No usable ROI archive to compare |
 
 This result means the Data Book reference centers are not interchangeable with the PGDA ROI polygons. ROI polygons are analysis areas within the product, not verified raster bounds or authoritative landing points. The polygon comparison alone did not establish raster coverage; the small reference-center pixel reads below subsequently verified center coverage in the inspected local and regional LDEMs. Coverage for any different, team-selected point or ROI still needs its own check.
 
 ### Raster point-coverage and COG window reads
 
-Rasterio 1.5.2 was installed temporarily outside the repository and used through GDAL `/vsicurl`. Each read requested a 9×9 pixel window centered on the projected NASA reference point. At all four sites, all 81 pixels were valid in the local PGDA 78 5 m LDEM and in each PGDA 90 regional LDEM at 80 m and 20 m. These checks verify coverage at the reference centers only; they do not select those centers as landing/analysis points or verify the ROI polygons.
+Rasterio 1.5.2 was installed temporarily outside the repository and used through GDAL `/vsicurl`. Each read requested a 9×9 pixel window centered on the projected NASA reference point. All 81 pixels were valid at Site01/04/07/11/20/23 in the applicable local PGDA 78 5 m LDEM and in the PGDA 90 80 m and 20 m LDEMs. Site20v2 also had 81/81 valid pixels in its local 5 m LDEM. These checks verify coverage at reference centers only; they do not select those centers as landing/analysis points or verify ROI polygons. Site20's regional windows were read on the base Site20 point, not on Site20v2.
 
 | Site | PGDA 78 5 m bounds (Xmin, Ymin, Xmax, Ymax; m) | 5 m row/col; window elevation range (m) | 80 m row/col; range (m) | 20 m row/col; range (m) |
 | --- | --- | --- | --- | --- |
 | Site01 | −19,000, −20,000, −3,000, −4,000 | 1599 / 1600; 1941.240–1946.973 | 3949 / 3662; 1881–1956 | 15799 / 14650; 1933–1950 |
 | Site04 | −9,000, −15,000, 7,000, 1,000 | 1600 / 1599; 758.054–785.745 | 3887 / 3787; 558–982 | 15550 / 15149; 723–832 |
+| Site07 | Bounds not recorded in this screen | 1600 / 1600; 1643.553–1647.301 | 4050 / 4175; 1603.037–1647.657 | 16200 / 16700; 1640.688–1648.611 |
 | Site11 | −45,000, 7,000, −29,000, 23,000 | 1599 / 1599; 1792.609–1794.521 | 3612 / 3337; 1729–1807 | 14449 / 13349; 1782–1800 |
+| Site20 | Bounds not recorded in this screen | 1600 / 1599; 6393.463–6401.779 | 2325 / 4712; 6335.624–6450.165 | 9300 / 18849; 6381.691–6411.994 |
 | Site23 | −11,000, 111,000, 10,000, 132,000 | 2100 / 2100; 4782.270–4785.751 | 2281 / 3793; 4743–4820 | 9125 / 15175; 4776–4792 |
 
-Raster row/column indices are zero-based. Every listed window contained 81/81 valid cells. The range values are surface elevation in metres; the 9×9 windows cover different ground areas at 5 m, 20 m, and 80 m, so their min/max values are not a direct resolution comparison. The local 5 m GeoTIFFs use 3,200×3,200 pixels for Site01/04/11 and 4,200×4,200 for Site23, with bounds shown above. The PGDA 90 80 m raster is 7,600×7,600 pixels; the 20 m raster is 30,400×30,400; both report bounds X/Y ±304,000 m.
+Raster row/column indices are zero-based. Every listed window contained 81/81 valid cells. The range values are surface elevation in metres; the 9×9 windows cover different ground areas at 5 m, 20 m, and 80 m, so their min/max values are not a direct resolution comparison. Local bounds were not recorded for the newly screened Site07 and Site20 rasters; retain that as a metadata follow-up if either is selected. The previously inspected local rasters use 3,200×3,200 pixels for Site01/04/11 and 4,200×4,200 for Site23, with bounds shown above. The PGDA 90 80 m raster is 7,600×7,600 pixels; the 20 m raster is 30,400×30,400; both report bounds X/Y ±304,000 m.
 
 | PGDA 90 product | Full LDEM size | Range data transferred for four windows | Window result |
 | --- | ---: | ---: | --- |

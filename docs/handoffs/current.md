@@ -4,7 +4,7 @@ Updated: **14 November 2026**.
 
 ## Current state
 
-The documentation and shared agent-guidance foundation is complete. ADR 0002 records the accepted initial data-mining feature priorities; [the pilot inventory](../data-mining-plan.md) now compares Site01, Site04, Site11 and Site23 as coverage candidates, based on the team Resource.docx and NASA PGDA listings. No site or product is selected for acquisition. Application implementation, bulk dataset acquisition, scientific validation and deployment have not started in this repository. Exact sites/products/footprints, cadence, validation targets, stack, and deployment remain open.
+The documentation and shared agent-guidance foundation is complete. ADR 0002 records the accepted initial data-mining feature priorities; [the pilot inventory](../data-mining-plan.md) retains the original Site01/04/11/23 cohort and adds a bounded coverage screen for Site07 and Site20. The six centers passed local 5 m and regional 80 m/20 m 9×9 point reads; Site20v2 also passed a local 5 m read. Site07's reference center is outside both polygons in its available ROI; no verified Site20 ROI was found at the checked paths. The screen is not an exhaustive PGDA candidate search. No site or product is selected for acquisition. Application implementation, bulk dataset acquisition, scientific validation and deployment have not started in this repository. Exact sites/products/footprints, cadence, validation targets, stack, and deployment remain open.
 
 ## Start the next task
 
@@ -16,7 +16,7 @@ The documentation and shared agent-guidance foundation is complete. ADR 0002 rec
 
 ## Next useful decision
 
-The NASA Data Book reference centers were projected into the ROI `.prj` south-polar stereographic CRS and compared with the available Site01/04/11 polygons. None lies inside an ROI polygon; Site01 lies only inside the union bounding box. Site23 raster products are listed by PGDA, but its ROI archive is unavailable at the expected path. Rasterio 1.5.2, installed temporarily outside the repository, read one 9×9 window at each reference center from PGDA 78 5 m and PGDA 90 80 m/20 m LDEMs. All 12 windows had 81/81 valid pixels. HTTP byte ranges transferred 770,048 bytes for local 5 m windows, 2,048,000 bytes for 80 m windows, and 3,112,960 bytes for 20 m windows; no full raster was retained.
+The NASA Data Book reference centers were projected into the ROI `.prj` south-polar stereographic CRS and compared with available polygons. Site01/04/11 centers and the newly checked Site07 center all fall outside the polygons; Site01 and Site07 lie inside their union envelopes. Site20 and Site23 ROI archives were unavailable at the checked paths. Bounded reads verified 81/81 valid pixels at all six centers in PGDA 78 5 m and PGDA 90 80 m/20 m LDEMs; Site20v2 also had 81/81 valid pixels in its local 5 m LDEM. No full raster was retained. Exact successful range-byte totals for the additional Site07/Site20 windows were 1,343,488 bytes at 80 m and 1,212,416 bytes at 20 m, in addition to the prior four-center reads. The ROI and point checks do not establish selected landing points or raster-wide coverage.
 
 The apparent Horizons DE441 versus PGDA DE421 frame conflict is resolved at the model level: JPL documents Horizons' high-precision lunar surface frame as the DE421 mean-Earth frame for 1550–2650, while DE441 supplies major-body trajectories. Keep the response header and confirm its lunar `Target pole/equ` label on each saved query. A geometric estimate places the outward 80S edge 182.5 km from Site23 and 264–297 km from the other three centers. An idealized 10 km obstacle gives a ~186 km horizon distance, so Site23 is the limiting candidate.
 
@@ -24,7 +24,7 @@ The 20 km profile comparison found mean absolute 80 m/20 m horizon differences o
 
 ## Remaining DE/data-mining parts
 
-The [terrain-horizon decision packet](../open-decisions.md#terrain-horizon-comparison-decision-packet) now summarizes candidate inputs. **Three parts remain before a data-acquisition decision:** (1) the team confirms observer points/ROI, the p95 angular-difference threshold, and the relief or maximum-ray-distance scenario; (2) profiles are extended for those accepted points/scenario, then the scale, exact products and footprint are proposed; (3) an asset manifest, transfer/storage estimate and acquisition request are prepared. A subsequent acquisition/processing/validation phase is separate and needs its own explicit scope. No final data choice has been made.
+The [terrain-horizon decision packet](../open-decisions.md#terrain-horizon-comparison-decision-packet) now summarizes candidate inputs. **Three parts remain before a data-acquisition decision:** (1) the team confirms the candidate roster (including whether to include Site07/Site20 or other PGDA regions), observer points/ROI, the p95 angular-difference threshold, and the relief or maximum-ray-distance scenario; (2) profiles and metadata/ROI coverage are completed for those accepted candidates, then the scale, exact products and footprint are proposed; (3) an asset manifest, transfer/storage estimate and acquisition request are prepared. A subsequent acquisition/processing/validation phase is separate and needs its own explicit scope. No final data choice has been made.
 
 ## Verification and limits
 
