@@ -4,6 +4,8 @@ Status: **research proposal, checked 14 November 2026**. This inventory narrows 
 
 For a visual review of the candidate locations, ROI outlines, raster volumes and p95 resolution comparison, open the rendered [candidate-site notebook](../notebooks/candidate-site-visual-review.ipynb). Its figures are decision aids; it does not show full terrain rasters or select sites.
 
+The next review artifact is the [real-terrain notebook](../notebooks/terrain-predecision-review.ipynb), with its bounded preview evidence in the [team decision packet](predecision-review.md). Its new local crop checks supplement the historical reads below; they do not reproduce the horizon/profile calculations or validate regional coverage.
+
 ## Recommended pilot sites for coverage review
 
 The original comparison cohort is **Site01 (Connecting Ridge), Site04 (Shackleton rim), Site11 (de Gerlache rim 1), and Site23 (Malapert massif)**. Site04/11/23 came from the initial PGDA 78 shortlist; the team-provided `Resource.docx` also named Site01. Bounded point checks added **Site07 (Peak near Shackleton)** and **Site20 (Leibnitz Beta Plateau)**. A further metadata-only screen covered **Site06 (Nobile Rim 1), Site42 (de Gerlache-Kocher Massif), and Haworth**. The official PGDA page lists 27 product entries, including Site20v2 as an alternate version and many named regional products. These nine geographic candidates are still only a subset; the earlier four-site comparison reflected team references and bounded initial scope, not an exhaustive technical shortlist. These are data-coverage candidates, not validated landing coordinates.

@@ -2,6 +2,12 @@
 
 Updated: **14 November 2026**.
 
+## Pre-decision terrain review
+
+The [terrain notebook](../../notebooks/terrain-predecision-review.ipynb) and [team decision worksheet](../predecision-review.md) provide real PGDA 78 previews for nine reference centers. Each displayed crop is 500×500 native 5 m pixels; all nine had 250,000/250,000 valid center pixels. The read includes one-pixel halo; full source rasters were not retained. Figures, crop metadata and array hashes are retained; raw preview caches are Git-ignored. Hillshade is synthetic, slope is a finite-difference proxy, and these crops do not validate whole ROIs or horizon coverage. Historical horizon/p95 inconsistencies remain unresolved.
+
+Notebook executed with four rendered figures and no cell errors. Independent analytical plane/nodata checks and Range reader checks passed. The next team step is to inspect the visuals and worksheet, decide which sites/ROIs merit further investigation, and assign the unresolved horizon reproduction and mission requirements.
+
 ## Current state
 
 The documentation and shared agent-guidance foundation is complete. ADR 0002 records the accepted initial data-mining feature priorities; [the pilot inventory](../data-mining-plan.md) retains the original Site01/04/11/23 cohort, adds bounded point checks for Site07/Site20, and metadata/size checks for Site06/Site42/Haworth. The six point-screened centers passed local 5 m and regional 80 m/20 m 9×9 windows; Site20v2 also passed a local 5 m read. The further alternatives have only product availability/size evidence, no pixel coverage checks. Site07's reference center is outside both polygons in its available ROI; no verified Site06/Site20/Site23 ROI was found at the checked paths. Site42/Haworth have no ROI links on the PGDA page. The candidate screen is not exhaustive. No site or product is selected for acquisition. Application implementation, bulk dataset acquisition, scientific validation and deployment have not started in this repository. Exact sites/products/footprints, cadence, validation targets, stack, and deployment remain open.
