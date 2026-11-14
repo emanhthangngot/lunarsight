@@ -81,6 +81,15 @@ export function App({ provider }: { provider: LunarDataProvider }) {
   }, [openCommands]);
   function toggleMission() { setShowInputs((value) => !value); if (compact) setShowResults(false); }
   function toggleInspector() { setShowResults((value) => !value); if (compact) setShowInputs(false); }
+  const dataBadge = (() => {
+    if (provider.kind === 'mock') return { label: 'MOCK DATA', kind: 'mock' as const };
+    if (!result) return { label: 'NASA DATA', kind: 'processed' as const };
+    const kinds = [terrain?.provenance.kind, result.ephemeris.provenance.kind, result.mask?.provenance.kind].filter(Boolean);
+    if (kinds.every((k) => k === 'processed')) return { label: 'NASA DATA', kind: 'processed' as const };
+    if (kinds.every((k) => k === 'mock')) return { label: 'MOCK DATA', kind: 'mock' as const };
+    return { label: 'MIXED DATA', kind: 'mixed' as const };
+  })();
+  const isProcessedMode = provider.kind === 'processed';
   const currentUtc = result ? utc(result.ephemeris.timesUtcMs[cursorIndex]) : 'No submitted time';
   const saved = !!result && state.comparisons.some((comparison) => scenarioKey(comparison.inputs) === scenarioKey(result.inputs));
   const appStyle = { '--instrument-top': insets.instrumentTop + 'px', '--dock-safe-bottom': insets.bottom + 'px' } as CSSProperties;
@@ -106,19 +115,19 @@ export function App({ provider }: { provider: LunarDataProvider }) {
         <button className="icon-button" type="button" aria-label={'Compare scenarios (' + state.comparisons.length + ' saved)'} aria-haspopup="dialog" title={'Compare scenarios · ' + state.comparisons.length + '/3'} onClick={() => setComparisonOpen(true)}><ArrowLeftRight size={18} aria-hidden="true" />{state.comparisons.length > 0 && <span className="saved-count">{state.comparisons.length}</span>}</button>
         <button className="icon-button" type="button" aria-label="Open provenance" aria-haspopup="dialog" title="Provenance & conventions" onClick={() => setProvenanceOpen(true)}><Info size={18} aria-hidden="true" /></button>
       </div>
-      <strong className="mock-badge">MOCK DATA</strong>
+      <strong className="mock-badge" data-kind={dataBadge.kind}>{dataBadge.label}</strong>
     </header>
     <div id="workspace" className="result-status" role="status" aria-live="polite" data-status={pending ? 'pending' : state.error ? 'error' : 'ready'}>
-      <span className="status-dot" aria-hidden="true" /><span>{pending ? 'Computing — prior result is stale' : state.error ? (state.outsideCoverage ? 'Outside mock coverage — result unavailable' : 'Scenario unavailable') : result ? result.inputs.site.name + ' · ' + result.id : 'Loading workspace'}</span>
+      <span className="status-dot" aria-hidden="true" /><span>{pending ? 'Computing — prior result is stale' : state.error ? (state.outsideCoverage ? 'Outside coverage — result unavailable' : 'Scenario unavailable') : result ? result.inputs.site.name + ' · ' + result.id : 'Loading workspace'}</span>
       {dirty && !pending && <strong>Draft not applied</strong>}
     </div>
-    {(bootError || state.error) && <div className="error-banner glass-surface" role="alert"><strong>{state.outsideCoverage ? 'Outside mock terrain coverage' : 'Scenario unavailable'}</strong><p>{bootError ?? state.error}</p>{state.outsideCoverage && <p>Choose −90° &lt; latitude ≤ −84°. Missing data is not zero.</p>}<button type="button" onClick={() => { setShowInputs(true); if (compact) setShowResults(false); }}>Edit mission inputs</button></div>}
+    {(bootError || state.error) && <div className="error-banner glass-surface" role="alert"><strong>{state.outsideCoverage ? (isProcessedMode ? 'Outside processed data coverage' : 'Outside mock terrain coverage') : 'Scenario unavailable'}</strong><p>{bootError ?? state.error}</p>{state.outsideCoverage && <p>{isProcessedMode ? 'Select a pilot site and date within 2027-01-01 to 2027-04-01 UTC (−90° < lat ≤ −84°). Missing data is not zero.' : 'Choose −90° < latitude ≤ −84°. Missing data is not zero.'}</p>}<button type="button" onClick={() => { setShowInputs(true); if (compact) setShowResults(false); }}>Edit mission inputs</button></div>}
 
     <aside id="mission-drawer" className="instrument-drawer mission-drawer glass-surface" data-open={showInputs} inert={!showInputs} aria-hidden={!showInputs} aria-label="Mission inputs">
       <header className="instrument-heading"><div><MapPin size={17} aria-hidden="true" /><h2>Mission</h2></div><button className="icon-button" type="button" aria-label="Collapse Mission drawer" onClick={() => setShowInputs(false)}><X size={17} aria-hidden="true" /></button></header>
       <div className="instrument-scroll"><SitePanel sites={sites} selectedSite={draft?.site ?? null} terrain={terrain} onSelect={selectSite} />
         {draft && <ScenarioPanel draft={draft} pending={pending} dirty={dirty} onChange={(patch) => dispatch({ type: 'draft', patch })} onSubmit={() => submit(draft)} />}
-        <p className="integrity-note">Fictional terrain & analytic Sun/Earth geometry. Not JPL ephemerides or LOLA data.</p>
+        <p className="integrity-note">{isProcessedMode ? 'NASA PGDA LOLA terrain & JPL Horizons ephemerides (Q1 2027). Not flight-certified.' : 'Fictional terrain & analytic Sun/Earth geometry. Not JPL ephemerides or LOLA data.'}</p>
       </div>
     </aside>
     <aside id="inspector-drawer" className="instrument-drawer inspector-drawer glass-surface" data-open={showResults} inert={!showResults} aria-hidden={!showResults} aria-label="Visibility inspector">
@@ -128,12 +137,12 @@ export function App({ provider }: { provider: LunarDataProvider }) {
       </div>
     </aside>
     <div ref={dockRef} className="timeline-dock glass-surface">
-      <div className="dock-toolbar"><button type="button" aria-expanded={showHorizon} aria-controls="panoramic-horizon" onClick={() => setShowHorizon((value) => !value)}><ScanLine size={16} aria-hidden="true" />Local sky & horizon<ChevronDown size={15} className={showHorizon ? 'chevron-open' : ''} aria-hidden="true" /></button><span>Centre visibility · mock · no refraction</span><button type="button" className="dock-compare" onClick={() => setComparisonOpen(true)}><ArrowLeftRight size={15} aria-hidden="true" />Compare {state.comparisons.length}/3</button></div>
+      <div className="dock-toolbar"><button type="button" aria-expanded={showHorizon} aria-controls="panoramic-horizon" onClick={() => setShowHorizon((value) => !value)}><ScanLine size={16} aria-hidden="true" />Local sky & horizon<ChevronDown size={15} className={showHorizon ? 'chevron-open' : ''} aria-hidden="true" /></button><span>Centre visibility · {result?.ephemeris.provenance.kind === 'processed' ? 'PGDA + Horizons' : provider.kind} · no refraction</span><button type="button" className="dock-compare" onClick={() => setComparisonOpen(true)}><ArrowLeftRight size={15} aria-hidden="true" />Compare {state.comparisons.length}/3</button></div>
       <section id="panoramic-horizon" className="panoramic-horizon" hidden={!showHorizon} aria-label="Local sky and terrain horizon"><SkyHorizonView mask={result?.mask ?? null} ephemeris={result?.ephemeris ?? null} cursorIndex={result ? cursorIndex : null} observerHeightM={result?.inputs.observerHeightM ?? 0} /></section>
       <TimelinePanel result={result} cursorIndex={cursorIndex} playing={state.playing} speed={state.speed} disabled={pending} dispatch={dispatch} />
     </div>
     <SiteCommand open={commandOpen} onClose={() => setCommandOpen(false)} sites={viewerSites} selectedSiteId={draft?.site.id ?? null} onChoose={(site) => { selectSite(site); setShowInputs(true); if (compact) setShowResults(false); }} />
     <OverlayDialog open={comparisonOpen} onClose={() => setComparisonOpen(false)} title="Scenario comparison" description="Independent site-date snapshots. Differences are relative to the first saved scenario." className="comparison-dialog"><ComparisonPanel comparisons={state.comparisons} result={result} pending={pending} dispatch={dispatch} /></OverlayDialog>
-    <OverlayDialog open={provenanceOpen} onClose={() => setProvenanceOpen(false)} title="Data provenance" description="Mock model, scientific conventions and finite-range limitations." className="provenance-dialog"><ProvenancePanel kind={provider.kind} terrain={terrain} result={result} /></OverlayDialog>
+    <OverlayDialog open={provenanceOpen} onClose={() => setProvenanceOpen(false)} title="Data provenance" description="Data sources, scientific conventions and finite-range limitations." className="provenance-dialog"><ProvenancePanel kind={provider.kind} terrain={terrain} result={result} /></OverlayDialog>
   </main>;
 }

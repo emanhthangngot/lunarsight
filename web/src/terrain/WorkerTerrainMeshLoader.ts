@@ -1,6 +1,6 @@
 import type { LocalTerrainMesh, TerrainMeshLoader, TerrainMeshRequest } from '../data/contract';
 import { validateCoordinates } from '../geo/coordinates';
-import type { MeshBuildRequest, MeshBuildResponse, MeshWorker } from './workerProtocol';
+import type { DemInitMessage, MeshBuildRequest, MeshBuildResponse, MeshWorker } from './workerProtocol';
 
 interface PendingMesh { id: number; cancel(message: string): void }
 const abortError = (message: string) => new DOMException(message, 'AbortError');
@@ -17,7 +17,10 @@ export class WorkerTerrainMeshLoader implements TerrainMeshLoader {
   private nextId = 0;
   private disposed = false;
 
-  constructor(private readonly createWorker: () => MeshWorker) {}
+  constructor(
+    private readonly createWorker: () => MeshWorker,
+    private readonly initMessage?: DemInitMessage,
+  ) {}
 
   load(request: TerrainMeshRequest, signal?: AbortSignal): Promise<LocalTerrainMesh> {
     if (this.disposed) return Promise.reject(new Error('Terrain mesh loader is disposed'));
@@ -37,8 +40,13 @@ export class WorkerTerrainMeshLoader implements TerrainMeshLoader {
       return Promise.resolve(cached);
     }
     let worker: MeshWorker;
+    const isNewWorker = this.worker === null;
     try { worker = this.worker ?? this.createWorker(); this.worker = worker; }
     catch (reason) { return Promise.reject(reason); }
+    if (isNewWorker && this.initMessage) {
+      try { worker.postMessage(this.initMessage); }
+      catch (reason) { this.worker = null; worker.terminate(); return Promise.reject(reason); }
+    }
     const id = ++this.nextId;
     // The project targets ES2022; Worker event completion uses its Promise executor.
     return new Promise<LocalTerrainMesh>((resolve, reject) => {

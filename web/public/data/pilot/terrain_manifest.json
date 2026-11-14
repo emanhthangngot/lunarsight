@@ -1,0 +1,82 @@
+{
+  "version": "pilot-v2",
+  "coverage": {
+    "southDeg": -90.0,
+    "northDeg": -84.0,
+    "westDegE": 0.0,
+    "eastDegE": 360.0
+  },
+  "provenance": {
+    "kind": "processed",
+    "source": "NASA PGDA 78 (5 m local) + PGDA 90 LDEM_80S_80MPP_ADJ (320 m regional)",
+    "version": "pilot-v2",
+    "generatedAt": "2026-11-14T06:49:41.500534+00:00",
+    "notes": "Multi-resolution Lunar South Pole DEM mosaic in Polar Stereographic MOON_ME frame (R = 1,737,400 m)."
+  },
+  "layers": [
+    {
+      "id": "site04-5m",
+      "siteId": "site-04",
+      "url": "/data/pilot/terrain_site04_5m.bin",
+      "xMinM": -3905.0,
+      "yMaxM": -4695.0,
+      "spacingM": 5.0,
+      "rows": 501,
+      "cols": 501,
+      "minHeightM": 1017.1073608398438,
+      "maxHeightM": 1739.121826171875,
+      "source": "PGDA 78 Site04 5 m/px"
+    },
+    {
+      "id": "site01-5m",
+      "siteId": "site-01",
+      "url": "/data/pilot/terrain_site01_5m.bin",
+      "xMinM": -12255.0,
+      "yMaxM": -10745.0,
+      "spacingM": 5.0,
+      "rows": 501,
+      "cols": 501,
+      "minHeightM": 1554.0255126953125,
+      "maxHeightM": 1959.4962158203125,
+      "source": "PGDA 78 Site01 5 m/px"
+    },
+    {
+      "id": "site04-40m",
+      "siteId": "site-04",
+      "url": "/data/pilot/terrain_site04_40m.bin",
+      "xMinM": -9000.0,
+      "yMaxM": 1000.0,
+      "spacingM": 40.0,
+      "rows": 400,
+      "cols": 400,
+      "minHeightM": -2846.317138671875,
+      "maxHeightM": 1803.33935546875,
+      "source": "PGDA 78 Site04 5 m/px (downsampled 8x to 40 m/px)"
+    },
+    {
+      "id": "site01-40m",
+      "siteId": "site-01",
+      "url": "/data/pilot/terrain_site01_40m.bin",
+      "xMinM": -19000.0,
+      "yMaxM": -4000.0,
+      "spacingM": 40.0,
+      "rows": 400,
+      "cols": 400,
+      "minHeightM": -517.6748657226562,
+      "maxHeightM": 1958.33203125,
+      "source": "PGDA 78 Site01 5 m/px (downsampled 8x to 40 m/px)"
+    },
+    {
+      "id": "south-pole-320m",
+      "url": "/data/pilot/terrain_south_pole_320m.bin",
+      "xMinM": -192000.0,
+      "yMaxM": 192000.0,
+      "spacingM": 320.0,
+      "rows": 1200,
+      "cols": 1200,
+      "minHeightM": -5493.44189453125,
+      "maxHeightM": 7022.576171875,
+      "source": "PGDA 90 LDEM_80S_80MPP_ADJ (downsampled 4x to 320 m/px)"
+    }
+  ]
+}

@@ -3,16 +3,16 @@
     "id": "site-04",
     "name": "Site 04 \u2014 Connecting Ridge",
     "category": "artemis-candidate",
-    "latDeg": -89.7668,
-    "lonDegE": -171.87,
+    "latDeg": -89.785092,
+    "lonDegE": 204.018283,
     "nameVerified": true,
     "description": "Connecting ridge candidate site near Shackleton crater with high illumination.",
     "provenance": {
       "kind": "processed",
-      "source": "NASA Artemis Candidate Landing Sites / PGDA 78",
-      "version": "pilot-v1",
-      "generatedAt": "2026-11-14T05:53:45.044152+00:00",
-      "notes": "Reference coordinates from NASA Data Book & PGDA 78."
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 78 Site04 5 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T06:49:41.500534+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
     }
   },
   {
@@ -20,15 +20,15 @@
     "name": "Site 01 \u2014 de Gerlache Rim",
     "category": "artemis-candidate",
     "latDeg": -89.4632,
-    "lonDegE": -137.49,
+    "lonDegE": 222.51,
     "nameVerified": true,
     "description": "Elevated ridge crest on the rim of de Gerlache crater.",
     "provenance": {
       "kind": "processed",
-      "source": "NASA Artemis Candidate Landing Sites / PGDA 78",
-      "version": "pilot-v1",
-      "generatedAt": "2026-11-14T05:53:45.044152+00:00",
-      "notes": "Reference coordinates from NASA Data Book & PGDA 78."
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 78 Site01 5 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T06:49:41.500534+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
     }
   }
 ]

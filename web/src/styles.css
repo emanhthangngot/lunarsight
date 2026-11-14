@@ -48,6 +48,7 @@ button.icon-button { padding: 0; width: 44px; min-width: 44px; height: 44px; bor
 button.icon-button:hover:not(:disabled) { background: var(--ls-surface-raised); }
 .saved-count { position: absolute; top: 1px; right: 1px; background: var(--ls-surface-raised); color: var(--ls-text); font: 11px var(--ls-font-mono); min-width: 15px; border-radius: 3px; }
 .mock-badge { color: var(--ls-mock); background: var(--ls-mock-surface); border-radius: 6px; padding: 8px 10px; font-size: var(--ls-type-xs); font-weight: 550; white-space: nowrap; flex-shrink: 0; }
+.mock-badge[data-kind="processed"] { color: #9ee7b8; background: rgba(46, 138, 86, 0.22); border: 1px solid rgba(114, 214, 152, 0.3); }
 .result-status { position: absolute; z-index: 15; top: calc(var(--instrument-top) - 8px); left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; gap: 8px; max-width: calc(100% - 48px); padding: 5px 12px; border-radius: 6px; background: var(--ls-surface-glass); color: var(--ls-text-muted); font-size: var(--ls-type-xs); white-space: nowrap; }
 .result-status strong { color: var(--ls-mock); font-weight: 500; }
 .status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ls-text-muted); flex-shrink: 0; }

@@ -1,6 +1,6 @@
 import type { EphemerisSeries, HorizonMask, LunarDataProvider, SiteSummary, TerrainSource } from '../contract';
-import { DEG_TO_RAD, MOON_RADIUS_M, RAD_TO_DEG, normalizeLongitude, southPolarInverse, validateCoordinates } from '../../geo/coordinates';
-import { horizonElevationDeg } from '../../geo/horizon';
+import { normalizeLongitude, southPolarInverse, validateCoordinates } from '../../geo/coordinates';
+import { rayMarchHorizonMask } from '../../geo/horizonRayMarch';
 import { subPointToAzEl } from '../../geo/topocentric';
 import { createMockTerrain } from './terrain';
 import { mockProvenance } from './terrainField';
@@ -39,48 +39,13 @@ export class MockDataProvider implements LunarDataProvider {
   }
 
   async getHorizonMask(site: SiteLocation, observerHeightM: number): Promise<HorizonMask | null> {
-    const point = validateCoordinates(site.latDeg, site.lonDegE);
-    if (!Number.isFinite(observerHeightM) || observerHeightM < 0) throw new RangeError('Observer height must be finite and nonnegative');
-    const groundM = this.terrain.heightAt(point.latDeg, point.lonDegE);
-    if (groundM === null) return null;
-    // Limit every ray to the fully covered circle about this site. Do not silently
-    // substitute zero terrain or publish partial azimuths near the coverage edge.
-    const edgeDistanceM = (-84 - point.latDeg) * DEG_TO_RAD * MOON_RADIUS_M;
-    const maxRangeM = Math.min(150_000, edgeDistanceM * (1 - 1e-10));
-    if (maxRangeM < 25) return null;
-    const lat = point.latDeg * DEG_TO_RAD, lon = point.lonDegE * DEG_TO_RAD;
-    const sinLat = Math.sin(lat), cosLat = Math.cos(lat);
-    const azimuthsDeg: number[] = [], elevationsDeg: number[] = [];
-    for (let az = 0; az < 360; az++) {
-      const bearing = az * DEG_TO_RAD;
-      const cosBearing = Math.cos(bearing), sinBearing = Math.sin(bearing);
-      let highest = -Infinity;
-      let distanceM = 25;
-      while (true) {
-        const angle = distanceM / MOON_RADIUS_M;
-        const sinAngle = Math.sin(angle), cosAngle = Math.cos(angle);
-        const targetLat = Math.asin(Math.max(-1, Math.min(1, sinLat * cosAngle + cosLat * sinAngle * cosBearing)));
-        const targetLon = lon + Math.atan2(sinBearing * sinAngle * cosLat, cosAngle - sinLat * Math.sin(targetLat));
-        // A ray can cross the mathematical pole. Longitude is immaterial there;
-        // evaluate infinitesimally off it while preserving the public pole policy.
-        const sampleLatDeg = Math.max(-89.9999999999, targetLat * RAD_TO_DEG);
-        const heightM = this.terrain.heightAt(sampleLatDeg, normalizeLongitude(targetLon * RAD_TO_DEG));
-        if (heightM === null) return null;
-        highest = Math.max(highest, horizonElevationDeg(distanceM, heightM - groundM - observerHeightM));
-        if (distanceM === maxRangeM) break;
-        distanceM = Math.min(maxRangeM, distanceM + Math.max(25, distanceM * 0.04));
-      }
-      azimuthsDeg.push(az);
-      elevationsDeg.push(highest);
-    }
-    return {
-      siteId: site.id,
+    return rayMarchHorizonMask(
+      site,
       observerHeightM,
-      azimuthsDeg,
-      elevationsDeg,
-      maxRangeM,
-      provenance: mockProvenance('1-degree ray-marched terrain mask; 25 m initial/near step, growing by 4% of range, up to 150 km clipped to coverage. Curvature d²/(2R); body-centre visibility uses strict elevation > interpolated mask. No refraction; not a power or radio-link assessment.'),
-    };
+      this.terrain.heightAt,
+      -84,
+      mockProvenance('1-degree ray-marched terrain mask; 25 m initial/near step, growing by 4% of range, up to 150 km clipped to coverage. Curvature d²/(2R); body-centre visibility uses strict elevation > interpolated mask. No refraction; not a power or radio-link assessment.'),
+    );
   }
 
   async getEphemeris(site: SiteLocation, startUtcMs: number, endUtcMs: number, stepSeconds: number, observerHeightM = 0): Promise<EphemerisSeries> {

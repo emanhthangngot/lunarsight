@@ -16,20 +16,22 @@ export function SitePanel({ sites, selectedSite, terrain, onSelect }: {
       const point = validateCoordinates(Number(latitude), Number(longitude));
       if (!terrain) throw new Error('Terrain metadata is not available yet');
       const outside = point.latDeg > terrain.coverage.northDeg || point.latDeg < terrain.coverage.southDeg || (terrain.type === 'heightFunction' && terrain.heightAt(point.latDeg, point.lonDegE) === null);
+      const isProcessed = terrain.provenance.kind === 'processed';
       onSelect({
         id: 'custom:' + point.latDeg + ':' + point.lonDegE, name: 'Custom coordinate', category: 'custom', ...point, nameVerified: false,
-        description: 'User-entered coordinates evaluated on mock terrain, not a catalog site.',
+        description: isProcessed ? 'User-entered coordinates evaluated on PGDA LOLA DEM.' : 'User-entered coordinates evaluated on mock terrain, not a catalog site.',
         provenance: { ...terrain.provenance, notes: (terrain.provenance.notes ?? '') + ' User-entered coordinate; name and position are not catalog-verified.' },
       });
       setInvalid(false);
-      setMessage(outside ? 'Outside mock terrain coverage (latitude must be at or south of −84°). Analysis will show unavailable, not fabricated values.' : 'Valid custom coordinate selected. Apply scenario to analyze. Longitude normalized to ' + point.lonDegE + '° E.');
+      setMessage(outside ? 'Outside terrain coverage (latitude must be at or south of −84°). Analysis will show unavailable, not fabricated values.' : 'Valid custom coordinate selected. Apply scenario to analyze. Longitude normalized to ' + point.lonDegE + '° E.');
     } catch (reason) {
       setInvalid(true); setMessage(reason instanceof Error ? reason.message : 'Invalid coordinates');
     }
   }
+  const isProcessed = terrain?.provenance.kind === 'processed';
   return <section className="panel" aria-labelledby="site-title">
-    <div className="section-heading"><h2 id="site-title">Landing site</h2><span className="quiet-meta">{sites.length} fictional sites</span></div>
-    <p className="muted">Fictional south-polar locations</p>
+    <div className="section-heading"><h2 id="site-title">Landing site</h2><span className="quiet-meta">{sites.length} {isProcessed ? 'pilot' : 'fictional'} sites</span></div>
+    <p className="muted">{isProcessed ? 'NASA Artemis south-polar candidate sites' : 'Fictional south-polar locations'}</p>
     <div className="site-options">
       {sites.map((site) => <button key={site.id} type="button" className="site-option" aria-pressed={selectedSite?.id === site.id} onClick={() => { setMessage(null); onSelect(site); }}>
         <span className="site-option-heading"><strong>{site.name}</strong><span className="tag">{site.category}</span></span>

@@ -1,73 +1,96 @@
-import { describe, expect, it } from 'vitest';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PilotDataProvider } from './PilotDataProvider';
 
-describe('PilotDataProvider contracts', () => {
-  it('lists verified Artemis candidate sites alongside mock sites', async () => {
+const PUBLIC_ROOT = resolve(import.meta.dirname, '../../../public');
+
+function stubPilotPublicFetch() {
+  vi.stubGlobal('fetch', async (input: string | URL | Request) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.pathname : input.url;
+    if (!url.startsWith('/data/pilot/')) {
+      return new Response('Not Found', { status: 404 });
+    }
+    const bytes = await readFile(resolve(PUBLIC_ROOT, url.slice(1)));
+    return new Response(bytes, { status: 200 });
+  });
+}
+
+describe('PilotDataProvider real NASA asset contracts', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('lists processed Artemis candidate sites without mock sites', async () => {
     const provider = new PilotDataProvider();
     const sites = await provider.listSites();
-    expect(sites.length).toBeGreaterThanOrEqual(7);
+    expect(sites).toHaveLength(2);
+    expect(sites.every((s) => s.provenance.kind === 'processed')).toBe(true);
 
     const site04 = sites.find((s) => s.id === 'site-04');
-    expect(site04).toBeDefined();
-    expect(site04!.name).toContain('Connecting Ridge');
-    expect(site04!.category).toBe('artemis-candidate');
-    expect(site04!.nameVerified).toBe(true);
-    expect(site04!.provenance.kind).toBe('processed');
-
     const site01 = sites.find((s) => s.id === 'site-01');
-    expect(site01).toBeDefined();
-    expect(site01!.name).toContain('de Gerlache Rim');
-    expect(site01!.category).toBe('artemis-candidate');
-
-    const mockSite = sites.find((s) => s.id === 'mock-ridge-a');
-    expect(mockSite).toBeDefined();
-    expect(mockSite!.provenance.kind).toBe('mock');
+    expect(site04?.name).toContain('Connecting Ridge');
+    expect(site01?.name).toContain('de Gerlache Rim');
   });
 
-  it('provides real near/far fused horizon mask for Site 04', async () => {
+  it('loads real PGDA DEM mosaic and resolves accurate site elevations', async () => {
+    stubPilotPublicFetch();
     const provider = new PilotDataProvider();
-    const site04 = (await provider.listSites()).find((s) => s.id === 'site-04')!;
+    const sites = await provider.listSites();
+    const site04 = sites.find((s) => s.id === 'site-04')!;
+    const site01 = sites.find((s) => s.id === 'site-01')!;
 
-    const mask = await provider.getHorizonMask(site04, 1.0);
-    expect(mask).not.toBeNull();
-    expect(mask!.azimuthsDeg.length).toBe(360);
-    expect(mask!.elevationsDeg.length).toBe(360);
-    expect(mask!.maxRangeM).toBe(25000);
-    expect(mask!.provenance.kind).toBe('processed');
-    expect(mask!.provenance.source).toContain('PGDA');
+    const terrain = await provider.getTerrain();
+    expect(terrain.provenance.kind).toBe('processed');
+    expect(terrain.heightAt(site04.latDeg, site04.lonDegE)).toBeCloseTo(1737.178, 1);
+    expect(terrain.heightAt(site01.latDeg, site01.lonDegE)).toBeCloseTo(1944.772, 1);
+    expect(terrain.heightAt(-83.0, 0)).toBeNull();
   });
 
-  it('interpolates real JPL Horizons ephemeris for Site 04 during January 2027', async () => {
+  it('provides precomputed 150 km PGDA horizon masks and ray-marches non-preset heights', async () => {
+    stubPilotPublicFetch();
     const provider = new PilotDataProvider();
-    const site04 = (await provider.listSites()).find((s) => s.id === 'site-04')!;
+    const site01 = (await provider.listSites()).find((s) => s.id === 'site-01')!;
+
+    const presetMask = await provider.getHorizonMask(site01, 2.5);
+    expect(presetMask).not.toBeNull();
+    expect(presetMask!.azimuthsDeg).toHaveLength(360);
+    expect(presetMask!.maxRangeM).toBe(150_000);
+    expect(presetMask!.provenance.kind).toBe('processed');
+
+    // Non-preset observer height falls back to live ray-marching on loaded PGDA DEM
+    const customHeightMask = await provider.getHorizonMask(site01, 5.0);
+    expect(customHeightMask).not.toBeNull();
+    expect(customHeightMask!.observerHeightM).toBe(5.0);
+    expect(customHeightMask!.elevationsDeg[0]!).toBeLessThanOrEqual(presetMask!.elevationsDeg[0]!);
+  });
+
+  it('serves 3-month JPL Horizons ephemeris for Site 01 and Site 04 and rejects outside coverage', async () => {
+    const provider = new PilotDataProvider();
+    const sites = await provider.listSites();
+    const site04 = sites.find((s) => s.id === 'site-04')!;
+    const site01 = sites.find((s) => s.id === 'site-01')!;
 
     const start = Date.parse('2027-01-01T00:00:00Z');
-    const end = Date.parse('2027-01-01T06:00:00Z');
-    const stepSeconds = 3600; // hourly
+    const end = Date.parse('2027-03-15T00:00:00Z');
 
-    const series = await provider.getEphemeris(site04, start, end, stepSeconds, 1.0);
-    expect(series.siteId).toBe('site-04');
-    expect(series.frame).toBe('MOON_ME');
-    expect(series.provenance.kind).toBe('processed');
-    expect(series.provenance.source).toContain('Horizons');
-    expect(series.timesUtcMs.length).toBe(7);
+    const s04 = await provider.getEphemeris(site04, start, start + 6 * 3600_000, 3600, 2.5);
+    expect(s04.provenance.kind).toBe('processed');
+    expect(s04.sunAzDeg[0]).toBeCloseTo(59.1008, 1);
+    expect(s04.sunElDeg[0]).toBeCloseTo(1.1243, 1);
+    expect(s04.earthAzDeg[0]).toBeCloseTo(163.1606, 1);
+    expect(s04.earthElDeg[0]).toBeCloseTo(-6.4541, 1);
 
-    // Initial values from sun.json: Azi: 59.1008, Elev: 1.1243
-    expect(series.sunAzDeg[0]).toBeCloseTo(59.1008, 1);
-    expect(series.sunElDeg[0]).toBeCloseTo(1.1243, 1);
+    const s01 = await provider.getEphemeris(site01, end, end + 3600_000, 3600, 2.5);
+    expect(s01.provenance.kind).toBe('processed');
+    expect(s01.timesUtcMs).toHaveLength(2);
 
-    // Initial values from earth.json: Azi: 163.1606, Elev: -6.4541
-    expect(series.earthAzDeg[0]).toBeCloseTo(163.1606, 1);
-    expect(series.earthElDeg[0]).toBeCloseTo(-6.4541, 1);
-  });
+    await expect(
+      provider.getEphemeris(site04, Date.parse('2026-06-01T00:00:00Z'), Date.parse('2026-06-02T00:00:00Z'), 3600),
+    ).rejects.toThrow(/outside processed coverage/i);
 
-  it('falls back to deterministic mock model for dates outside pilot January 2027', async () => {
-    const provider = new PilotDataProvider();
-    const site04 = (await provider.listSites()).find((s) => s.id === 'site-04')!;
-
-    // Query in 2026 (outside January 2027 Horizons table)
-    const start2026 = Date.parse('2026-06-01T00:00:00Z');
-    const series = await provider.getEphemeris(site04, start2026, start2026 + 7200_000, 3600);
-    expect(series.provenance.kind).toBe('mock');
+    await expect(
+      provider.getEphemeris({ id: 'custom:-89.5:0', latDeg: -89.5, lonDegE: 0 }, start, start + 3600_000, 3600),
+    ).rejects.toThrow(/outside coverage/i);
   });
 });

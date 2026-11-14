@@ -16,8 +16,8 @@ export function ScenarioPanel({ draft, pending, dirty, onChange, onSubmit }: {
         <label>Step (seconds)<input name="stepSeconds" type="number" min="60" step="60" value={numberValue(draft.stepSeconds)} onChange={(e) => onChange({ stepSeconds: e.target.value === '' ? NaN : Number(e.target.value) })} /></label>
       </div>
       <label>Observer above terrain (m)<input name="observerHeightM" type="number" min="0" max="1000" step="any" value={numberValue(draft.observerHeightM)} onChange={(e) => onChange({ observerHeightM: e.target.value === '' ? NaN : Number(e.target.value) })} /></label>
-      <div className="preset-row" aria-label="Observer height presets">{[1.2, 2.5, 10].map((height) => <button key={height} type="button" aria-pressed={draft.observerHeightM === height} onClick={() => onChange({ observerHeightM: height })}>{height} m</button>)}</div>
-      <p className="muted">End UTC: <span className="tabular">{utc(end)}</span><br />1 day = 24 hours. Presets are demo assumptions.</p>
+      <div className="preset-row" aria-label="Observer height presets">{[1, 2.5, 10].map((height) => <button key={height} type="button" aria-pressed={draft.observerHeightM === height} onClick={() => onChange({ observerHeightM: height })}>{height} m</button>)}</div>
+      <p className="muted">End UTC: <span className="tabular">{utc(end)}</span><br />1 day = 24 hours.</p>
       <button className="primary-button" type="submit" disabled={pending}>{pending ? 'Computing…' : 'Apply scenario'}</button>
       <p className="muted" role="status">{dirty ? 'Unapplied draft — panels retain the identified submitted result.' : 'Inputs match the displayed result.'}</p>
     </form>
