@@ -17,6 +17,18 @@ Status: **proposals awaiting team discussion**. None of the options below is sel
 | OD-11 | Where will the application and data live? | Local demonstration; a chosen deployment provider; independently hosted data/compute where needed. | Budget, data access patterns, execution duration, identity/secrets needs, and operational ownership. |
 | OD-12 | What licenses and review/release conventions apply? | Team-selected code license and contribution/release process. | Ownership, source data acknowledgements, intended sharing, and collaborators' agreement. |
 
+## Terrain-horizon comparison decision packet
+
+The following inputs are proposals for team discussion, not approved values. The [pilot inventory](data-mining-plan.md#bounded-80-m--20-m-horizon-profile-comparison) records an unresolved inconsistency between profile runs and missing per-bin reproduction evidence. Discuss roster and mission needs now, but do not use the current p95/profile summaries to select a threshold, resolution or horizon radius until that evidence is resolved.
+
+| Input to decide | Candidate options for discussion | Evidence and practical consequence |
+| --- | --- | --- |
+| Candidate roster, observer points and footprints (OD-02) | Decide whether the pilot compares the original Site01/04/11/23 cohort, includes screened Site07/Site20, adds Site06/Site42/Haworth, or evaluates other PGDA 78 areas; then select reference/ROI-specific analysis points. | Review the [candidate-site visual notebook](../notebooks/candidate-site-visual-review.ipynb) alongside the inventory. The bounded point screen covers Site01/04/07/11/20/23 only. Metadata/size checks also cover Site06/Site42/Haworth; Site06's PGDA-listed ROI link currently returns not-found, and the PGDA page has no ROI links for Site42/Haworth. The PGDA page lists 27 product entries including Site20v2, an alternate version. None of the reference centers is an approved landing coordinate; selected points require coverage checks again. |
+| 80 m / 20 m consistency threshold (OD-03) | Define the required statistic and tolerance from the intended use and reference evidence; the historical 2°, 5°, 7° and 8° examples are not recommendations. | The notebook reproduces supplied p95 numbers, not their calculation. Its threshold groupings are arithmetically consistent with those numbers, but the profile-run inconsistency remains unresolved. Recover/reproduce the profiles before using these values to choose a threshold or scale; report maximum differences too. The 20 m DEM is not ground truth. |
+| Relief / horizon coverage scenario (OD-02/OD-05) | Discuss illustrative 5 km relative relief (~131.8 km geometric horizon), 10 km (~186.4 km), or another mission-motivated scenario. | These distances are geometric planning estimates, not observed terrain bounds. Historical edge-maxima reports remain unverified pending profile reconciliation. Site23's estimated outward 80S margin is about 182.5 km; validate relevant rays and coverage before choosing a maximum distance or broader context. |
+
+Suggested record for a decision: exact observer coordinates and ROI/version; the selected angular statistic and threshold; the relief or maximum-ray-distance scenario; and how to handle rays that reach an edge. Record the choice in an ADR with authority and date before using it to finalize a product, footprint, or scale.
+
 ## Suggested discussion order
 
 Resolve OD-01 first, then OD-02–OD-05 for a bounded use case. Compare stack/storage choices against that use case rather than choosing them from a generic template. Address persistence and the advisor according to the first useful demonstration.
