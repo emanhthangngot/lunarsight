@@ -145,6 +145,10 @@ The Site23 80S outward margin corresponds to about 9.6 km of relative relief und
 
 ### Bounded 80 m / 20 m horizon-profile comparison
 
+> **Review status — 14 November 2026:** the profile tables below are retained as historical exploratory reports, not independently reproduced measurements. Three minimum-horizon values decrease across radius extensions: Site23 at 80 m, −10.253° → −10.399° (20 → 25 km); Site11 at 20 m, −7.283° → −7.302° (20 → 25 km); Site04 at 80 m, 0.142° → 0.131° (25 → 131.8 km). These exceed three-decimal rounding. A maximum over nested terrain samples cannot decrease with fixed observer, grid, bins and angle calculation. Those conditions are not established by the retained evidence, so this is an unresolved inconsistency, not a proven algorithm defect.
+>
+> The repository contains neither the original calculation script nor per-bin profiles. Before using these results to select a p95 threshold, resolution or horizon radius, recover or reproduce the asset versions, observer elevation/datum and height above ground, grid/mask, interpolation, binning, near-observer exclusions, empty-bin handling and percentile definition. A square 40×40 km window and a 25 km-radius circle need not be nested; whether that explains any reported difference is unknown. The visual notebook plots supplied summary values; it does not reproduce the horizon calculation. No numerical result has been silently corrected.
+
 An exploratory profile comparison was computed at the four NASA reference centers using the PGDA 90 80 m and 20 m LDEMs. Each profile covers a 20 km radius (40×40 km raster window) with 360 one-degree azimuth bins, measured clockwise from north. For each bin, the reported horizon is the maximum apparent terrain elevation after an idealized lunar-curvature correction `z_relative − d²/(2R)`, with `R = 1,737,400 m`. All cells in these windows were valid. This method and radius are exploratory; no scientific acceptance tolerance or final observer point has been selected.
 
 | Site | 80 m profile range (°) | 20 m profile range (°) | Mean / 95th percentile / max absolute difference (°) | Bins differing >0.1° (of 360) | Max in outer 10% of 20 km window (80 m / 20 m) |
@@ -205,7 +209,7 @@ The circle windows were valid through 131.8 km, so these reads did not reach the
 
 #### Illustrative angular-threshold sensitivity
 
-The 25 km comparison's 95th-percentile absolute differences are Site01 6.609°, Site04 1.076°, Site11 7.065° and Site23 6.524°. To make the pending tolerance choice concrete, the table shows which profiles would meet hypothetical 95th-percentile screening thresholds. These are examples only; a 20 m DEM is not ground truth, and a percentile threshold does not constrain the worst-case tail.
+The reported 25 km comparison's 95th-percentile absolute differences are Site01 6.609°, Site04 1.076°, Site11 7.065° and Site23 6.524°. The table preserves the arithmetic consequences of hypothetical thresholds, not a basis for selecting one: the profile inconsistency above remains unresolved and the p95 measurements have not been independently reproduced. A 20 m DEM is not ground truth, and a percentile threshold does not constrain the worst-case tail.
 
 | Hypothetical 95th-percentile threshold | Profiles at or below threshold |
 | ---: | --- |
@@ -215,7 +219,7 @@ The 25 km comparison's 95th-percentile absolute differences are Site01 6.609°, 
 | 7° | Site01, Site04, Site23 |
 | 8° | All four |
 
-**Interpretation:** 80 m and 20 m produce materially different near/mid-field profiles, especially at Site01, Site11, and Site23. The common comparison is bounded to 25 km; 80 m-only profiles to 131.8 km remain window-limited at three centers. These results do not justify calling 80 m sufficient or selecting 20 m for the full region. No observer point, acceptable angular tolerance, relief scenario, or horizon radius has been accepted. Across the profile experiments the range transfers include repeated/overlapping reads and an interrupted attempt; no full raster was retained.
+**Interpretation:** the historical reports suggest differences between 80 m and 20 m profiles and possible radius limitations, but the unresolved comparison inconsistency prevents using them to establish convergence, select a p95 threshold, or choose a scale or footprint. The reported common comparison is bounded to 25 km; 80 m-only profiles extend to 131.8 km. No observer point, acceptable angular tolerance, relief scenario, or horizon radius has been accepted. Transfer totals include repeated/overlapping reads and an interrupted attempt; no full raster was retained.
 
 ### Other resources and physical interpretation limits
 
@@ -236,27 +240,29 @@ For Horizons, preserve the target identifier (candidate Sun `10` or Earth `399`)
 
 ### Horizons feasibility query run
 
-A small observer-ephemeris query was run against the JPL API for both targets using the Site04 reference center and an assumed observer height of 1 m. The UTC interval was 2026-11-14 00:00–02:00 at one-hour steps, with airless apparent azimuth/elevation requested. Both targets returned three rows. This confirms the candidate API shape works; it is not a chosen mission interval or a scientific validation case.
+A small observer-ephemeris query was run against the JPL API for both targets using the Site04 reference center and an assumed altitude of 1 m above the lunar reference ellipsoid, not 1 m above local terrain. The UTC interval was 2026-11-14 00:00–02:00 at one-hour steps, with airless apparent azimuth/elevation requested. Both targets returned three rows. This confirms the candidate API shape works; it is not a chosen mission interval, a terrain-relative observer definition, or a scientific validation case.
 
 | Setting | Value used |
 | --- | --- |
 | Target | Sun `10`, then Earth `399` |
 | Center | user coordinates on Moon `301`, `coord@301` |
-| Geodetic site coordinates | Site04 reference center: east longitude equivalent `188.13°`, latitude `−89.7668°`, height `0.001 km`; submitted longitude `−171.87°` was normalized by Horizons |
+| Geodetic site coordinates | Site04 reference center: east longitude equivalent `188.13°`, latitude `−89.7668°`, ellipsoid altitude `0.001 km` (not height above ground); submitted longitude `−171.87°` was normalized by Horizons |
 | Time | 2026-11-14 00:00–02:00 `UT`; `STEP_SIZE=1h`; output labeled UTC |
 | Output | Observer table quantity `4` (airless apparent azimuth/elevation) |
 | Returned lunar center frame/source | `MEAN_ME (high precision)`, DE441 |
 | Terrain source frame/source | PGDA 78/90 identify `MOON_ME`, DE421 |
 
-**Frame review:** the earlier note treated the Horizons header's DE441 provenance as a possible mismatch with PGDA's `MOON_ME` / DE421 label. JPL's Horizons manual distinguishes the major-body ephemeris (DE441) from the high-precision lunar surface orientation: within 1550–2650, Horizons uses the lunar mean-Earth frame of DE421 (`MOON_ME`). PGDA 78 and 90 also label their raster frame `MOON_ME` / DE421. This resolves the apparent DE441-versus-DE421 naming conflict for the 2026 sample interval; do not apply a frame transform solely because Horizons uses DE441 for body trajectories. Preserve the returned Horizons header and confirm the lunar `Target pole/equ` model for each saved query, especially for intervals outside 1550–2650 where Horizons switches to its lower-precision IAU lunar model.
+**Frame review:** JPL's Horizons manual distinguishes the major-body ephemeris (DE441) from the high-precision lunar surface orientation: within 1550–2650, Horizons uses the lunar mean-Earth frame of DE421 (`MOON_ME`). PGDA 78 and 90 also label their raster frame `MOON_ME` / DE421. This resolves the apparent DE441-versus-DE421 naming conflict for the 2026 sample interval; do not apply a frame transform solely because Horizons uses DE441 for body trajectories. With the Moon as observer center and Sun/Earth as targets, inspect **`Center pole/equ`**, not `Target pole/equ`, for lunar orientation. Preserve the full header and revisit the model outside 1550–2650, where Horizons uses its lower-precision IAU lunar model.
+
+**API recheck — 14 November 2026:** four bounded queries (Sun/Earth, each at ellipsoid altitude `0.001 km` and `0.786745 km`, same coordinates and three hourly instants) returned three rows each without an API error. Headers reported lunar `Center pole/equ: MEAN_ME (high precision)` and reference radii 1737.4 km; `Target pole/equ` was `IAU_SUN` or `ITRF93 (high precision)`. The second altitude was a sensitivity probe based on the reported 9×9 window maximum plus 1 m, not a verified center elevation. Maximum elevation changes were 0.000000305° for the Sun and 0.000110581° for Earth in this sample only. This does not explain or validate the terrain-profile differences. For a terrain-relative observer, reconcile the DEM height datum with the Horizons reference surface before adding height above ground; do not substitute a window maximum for the observer's elevation. See the [Horizons coordinate contract](https://ssd.jpl.nasa.gov/horizons/manual.html#center).
 
 Keep metadata tables and file-level manifests separate from raster pixels. Do not populate illustrative coordinates, mission assumptions, or missing science fields with demo values.
 
 ## Recommended next sequence
 
 1. Compare Site01, Site04, Site11 and Site23 against the team use case. Reference-center coverage is verified at all three tested terrain scales. Resolve Site23's missing ROI and repeat coverage checks for any team-selected analysis points and ROI polygons.
-2. The 80 m/20 m comparison reaches 25 km and the provisional 5 km-relief 80 m profiles reach 131.8 km; Site01, Site11 and Site23 remain radius-limited. Agree an angular tolerance, observer points and relief/horizon distance before any larger regional read. Then extend profiles within the accepted coverage scenario and determine whether the 80S edge limits Site23. Consider a 60S layer only if a relevant ray reaches the 80S valid-data edge.
-3. Keep the Horizons response header with each ephemeris sample and confirm its lunar `Target pole/equ` model. The official manual resolves the apparent DE441 trajectory / DE421 lunar-frame discrepancy for current dates; revisit only if the model, interval, or observer definition changes.
+2. Resolve the profile comparison inconsistency and recover or reproduce the per-bin evidence before using the reported p95 values to select a tolerance, scale or horizon radius. Discuss observer points and mission needs independently; then propose bounded coverage/resolution analysis for explicit authorization. Consider a 60S layer only if supported evidence shows a relevant ray reaches the 80S valid-data edge.
+3. Keep each Horizons response header and confirm the lunar `Center pole/equ` model for Moon-centered observer queries. Record ellipsoid altitude separately from terrain-relative observer height. The official manual resolves the DE441 trajectory / DE421 lunar-frame distinction for current dates; revisit if the model, interval or observer definition changes.
 4. Submit the proposed sites, selected layers, exact footprint, total bytes and open validation questions for team decision.
 5. Only after that decision and a separate explicit acquisition/processing request, create the asset manifest and begin raster data handling.
 
