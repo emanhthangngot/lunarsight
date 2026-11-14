@@ -1,18 +1,28 @@
 # Current handoff
 
-Updated: **14 November 2026**. **Public Vercel Production healthy within the anonymous browser smoke scope.** Prior local Three.js acceptance remains PASS with V1 CLOSED for default Ridge/Rim. Neither result is scientific or universal-performance certification.
+Updated: **14 November 2026**. **Public Vercel Production healthy within the anonymous mock browser smoke scope.** Prior local Three.js acceptance remains PASS with V1 CLOSED for default Ridge/Rim; on `feat/pilot-data-pipeline`, offline pilot assets, `PilotDataProvider`, `ApiDataProvider`, and FastAPI Stages 1–3 were added and merged with `main`'s pre-decision DE terrain/horizon reviews. Neither result is full scientific or universal-performance certification.
 
 ## Current implementation and authority
 
-The user accepted mock-first development on 13 November and a **local Three.js 0.187.0** representation on 14 November ([ADR 0002](../decisions/0002-mock-first-3d-web.md)). The Cesium runtime/assets are removed. The modern [React workspace](../../web/src/App.tsx), scenario identity, comparisons, timeline and mock **1.1.0** scientific semantics remain; this is a finite terrain overview/Surface viewer, not a global globe.
+The user accepted mock-first development on 13 November and a **local Three.js 0.187.0** representation on 14 November ([ADR 0002 — web](../decisions/0002-mock-first-3d-web.md)). The Cesium runtime/assets are removed. The modern [React workspace](../../web/src/App.tsx), scenario identity, comparisons, timeline and mock **1.1.0** scientific semantics remain; this is a finite terrain overview/Surface viewer, not a global globe.
 
-Use the existing [web commands](../../web/README.md#run-locally). The [provider contract](../../web/src/data/contract.ts), [terrain Worker/client](../../web/src/terrain/) and [viewer notes](../../web/src/viewer/README.md) own implementation details. A processed-data adapter remains pending; no real dataset is selected or acquired.
+On `feat/pilot-data-pipeline`, [build_pilot_assets.py](../../scripts/pipeline/build_pilot_assets.py), 15 Artemis candidate site assets under `web/public/data/pilot/`, [PilotDataProvider](../../web/src/data/pilot/PilotDataProvider.ts), [ApiDataProvider](../../web/src/data/api/ApiDataProvider.ts), [AdvisorPanel](../../web/src/panels/AdvisorPanel.tsx), and [backend/](../../backend/README.md) (FastAPI Stages 1–3) are implemented and pass offline unit/API contract suites (`web/`: typecheck, 10 files / 67 Vitest tests, production build; `backend/`: 10/10 pytest). Formal dataset/backend ADR acceptance and live end-to-end browser verification against the backend remain pending.
 
-The fixture migration and implementation handoffs are complete; the historical viewer-owner restriction no longer blocks approved work. Current hosting access is evidenced by the completed deployment, not a claim that unrelated credentials were repaired. Further implementation/upload remains bounded and owner-authorized.
+Use the existing [web commands](../../web/README.md#run-locally) and [backend commands](../../backend/README.md#run-locally). The [provider contract](../../web/src/data/contract.ts), [terrain Worker/client](../../web/src/terrain/) and [viewer notes](../../web/src/viewer/README.md) own frontend implementation details.
 
-## Current public deployment
+The fixture migration and implementation handoffs are complete; the historical viewer-owner restriction no longer blocks approved work. Current hosting access is evidenced by the completed Vercel static mock deployment, not a claim that unrelated credentials were repaired. Further implementation/upload remains bounded and owner-authorized.
 
-**[https://lunarsight.vercel.app](https://lunarsight.vercel.app)** is anonymously reachable and **healthy** in the final round-24 smoke, observed **2026-11-14 04:49:29–04:54:03 UTC**. Provider state is READY. Identity comes from sanitized provider/deployment receipts; the tester independently confirmed the public application, not a browser-readable Git SHA.
+## Pre-decision terrain and DE reviews (`main`)
+
+- **Pre-decision terrain review:** The [terrain notebook](../../notebooks/terrain-predecision-review.ipynb) and [team decision worksheet](../predecision-review.md) provide real PGDA 78 previews for nine reference centers (500×500 native 5 m pixels, 250,000/250,000 valid center pixels each; raw preview caches stay Git-ignored). Hillshade is synthetic, slope is a finite-difference proxy, and these crops do not validate whole ROIs or horizon coverage.
+- **Pilot working agreement:** [ADR 0003](../decisions/0003-pilot-working-agreement.md), [configuration](../../config/pilot-v1.json), and [sample evidence](../../notebooks/evidence/pilot-v1-samples.json) record the revisable Site01/Site04 configuration; full ROI, datum reconciliation, horizon reproduction, and product selection remain open.
+- **Pilot ROI and datum review:** See [pilot ROI/datum review](../pilot-roi-datum-review.md). Site01 ROI is inside reference preview bounds, Site04 ROI is outside; both reference points fall outside ROI. Source elevation versus Horizons ellipsoid datum remains unverified; do not convert AGL until confirmed.
+- **Site04 ROI coverage & diagnostics:** [Site04 ROI coverage](../site04-roi-coverage.md) reports 526/526 finite pixels (468 LDEC zeros). [Diagnostic report](../site04-observer-diagnostic.md) and [near/far report](../site04-near-far-review.md) combine 5 m (5–1000 m) with 80 m (1–25 km) profiles; 1 km seam validation, frame/vertical datum reconciliation, and far-field convergence remain open.
+- **Data-mining inventory & historical p95 warning:** [ADR 0002 — data](../decisions/0002-data-mining-feature-scope.md) records the initial feature priorities; [the pilot inventory](../data-mining-plan.md) retains candidate checks for Site01/04/07/11/20/23 and metadata-only checks for Site06/Site42/Haworth. Historical 20/25/50/131.8 km p95 reports lack per-bin reproduction evidence and must not be used directly to choose tolerances or radius until reproduced. See [candidate-site visual review notebook](../../notebooks/candidate-site-visual-review.ipynb) and the [decision packet](../open-decisions.md#terrain-horizon-comparison-decision-packet).
+
+## Current public deployment (static mock baseline)
+
+**[https://lunarsight.vercel.app](https://lunarsight.vercel.app)** is anonymously reachable and **healthy** in the final round-24 smoke, observed **2026-11-14 04:49:29–04:54:03 UTC** (from the `feat/3d-mock-viewer` mock baseline). Provider state is READY. Identity comes from sanitized provider/deployment receipts; the tester independently confirmed the public application, not a browser-readable Git SHA.
 
 | Deployment field | Recorded value |
 | --- | --- |
@@ -26,15 +36,15 @@ The CLI uploaded **54 files / 289,872 bytes** from an archived committed `web/` 
 
 The anonymous live check confirmed readable Three.js terrain, actual active dedicated Worker/module MIME, fonts/assets, Surface, native timeline play/pause/scrub, Ridge→Rim→Ridge, **10 m preset + Apply**, and mock/provenance/display-aid labels. No page/console errors, failed requests or unexpected external application calls were observed in the recorded segments. **Exact remote cache/transfer/job counts remain unverified**: a diagnostic observer did not see private transport, so empty counters prove nothing. Prior detailed cache/transfer/cancellation evidence below remains **local**, not a new remote certification. The remote smoke did not establish a 0.25 m result.
 
-The stable alias was public without login/bypass; unique deployment/preview protection was not disabled or bypassed, and those URLs are not certified public. No app runtime secrets or backend exist. This initial deployment has **no earlier rollback target**; retain it as the known-good candidate for a later eligible rollback, not an exercised recovery result. No rebuild, upload, auth, rollback or credential action was performed in this documentation task; localhost **5173** remains untouched.
+The stable alias was public without login/bypass; unique deployment/preview protection was not disabled or bypassed, and those URLs are not certified public. No app runtime secrets or backend exist on the deployed static mock build. This initial deployment has **no earlier rollback target**; retain it as the known-good candidate for a later eligible rollback, not an exercised recovery result.
 
 ## Prior local production evidence
 
-Round 18 passed the cutover/Worker/scientific integration but failed default relief clarity (**V1**). Final round 20 tested the repaired production defaults, closed V1 and passed scoped regressions. Only viewer framing, lighting, styling and notes changed between those checks; matching source hashes justified reusing unchanged round-18 evidence rather than replaying its full matrix. These are tester-observed results, not checks rerun during documentation work.
+Round 18 passed the cutover/Worker/scientific integration but failed default relief clarity (**V1**). Final round 20 tested the repaired production defaults, closed V1 and passed scoped regressions. Only viewer framing, lighting, styling and notes changed between those checks; matching source hashes justified reusing unchanged round-18 evidence rather than replaying its full matrix. These are tester-observed results on the mock baseline.
 
 | Check | Result and bounded scope |
 | --- | --- |
-| Typecheck / unit suite / production build | **PASS, exit 0 each** in round 20; **7 files / 57 tests**, 2.60 s. Production build served and exercised; existing >500 kB chunk warning retained. |
+| Typecheck / unit suite / production build | **PASS, exit 0 each** in round 20 (**7 files / 57 tests**, 2.60 s on mock baseline); post-merge `feat/pilot-data-pipeline` offline checks also passed (`web/`: typecheck, **10 files / 67 tests**, Vite build; `backend/`: **10 / 10 pytest**). |
 | Default relief clarity, V1 | **CLOSED:** identifiable bowl/rim/ridge context at Ridge **1600×1000** and Rim **1280×900**, Jan 1 defaults, without manual camera/date correction. Not all sites/dates or whole-footprint framing. |
 | Actual Worker and bounded cache | Round 18 observed `DedicatedWorkerGlobalScope`, native buffer detachment, usable identical cached arrays after GPU disposal, and terminated superseded builds without stale scene replacement. Two-entry cache; no main-thread geometry fallback. |
 | Geometry / sky / observer | Actual curved uploaded mesh, valid winding/unit normals, actual ground origin and provider-driven body directions. Ridge/Rim eye positions exactly `[0,h,0]` at **0 / 0.25 / 2.5 m**; round 20 freshly confirmed 0.25 m Surface and Sun/Earth. |
@@ -61,7 +71,7 @@ Those are actual renderer calls, **not monitor-presented FPS**. Input transport/
 
 ## How to resume
 
-1. Read [project state](../project-state.md), [AGENTS.md](../../AGENTS.md), [documentation index](../README.md) and [testing policy](../testing-policy.md). Run only existing commands from the web guide when an authorized task requires them.
-2. Keep V1 closed for the exercised defaults; no old fixture/authentication/repair dispatch is pending. New source changes need their affected verification, not an automatic replay of every earlier screenshot or timing matrix.
-3. Retain unknowns: other sites/dates, whole-footprint framing, all coverage/threshold edges, global skyline, physical science, repeated cold startup, touch/mobile/no-WebGL, full React-unmount/heap soak and exclusive-hardware performance. Do not invent certification or start unbounded tuning.
-4. The public static Vercel demo is live; future uploads/recovery use the explicit clean-source operations route, not an assumed Git integration. Real-data acquisition/integration, processing, backend/CI/DNS/paid services and other hosting remain outside scope. The **56.2 GB** example remains unapproved ([data sources](../data-sources.md), [open decisions](../open-decisions.md)).
+1. Read [project state](../project-state.md), [AGENTS.md](../../AGENTS.md), [documentation index](../README.md) and [testing policy](../testing-policy.md). Run existing commands from the web and backend guides when an authorized task requires them.
+2. Keep V1 closed for the exercised mock defaults; run live browser E2E checks if validating the 15-site `PilotDataProvider` or FastAPI `ApiDataProvider` integration in a real browser.
+3. Retain unknowns: datum/1 km seam/horizon convergence reconciliation (`site04-*` reports), historical p95 reproduction, other sites/dates, whole-footprint framing, touch/mobile/no-WebGL, full React-unmount/heap soak, and exclusive-hardware performance. Do not invent certification.
+4. The public static Vercel mock demo is live; future static uploads/recovery use the explicit clean-source operations route, not an assumed Git integration. Formal dataset/backend/hosting ADRs remain open in [open decisions](../open-decisions.md).

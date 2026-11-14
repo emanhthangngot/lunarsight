@@ -8,7 +8,7 @@ The source of product intent is the [LunarSight V2 proposal](reference/proposal-
 
 ## Functional requirements
 
-The identifiers are stable discussion references. Priorities and release assignment remain proposed until the team records a decision.
+The identifiers are stable discussion references. Initial feature priorities are recorded in [ADR 0002](decisions/0002-data-mining-feature-scope.md); exact release assignments beyond that scope remain open.
 
 | ID | Capability and proposed behavior | Proposal section | Future acceptance condition |
 | --- | --- | --- | --- |
