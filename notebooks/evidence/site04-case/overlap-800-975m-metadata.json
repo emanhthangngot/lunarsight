@@ -1,0 +1,17 @@
+{
+  "status": "nearest-cell exploratory comparison, not co-registration or datum verification",
+  "annulus_m": [
+    800,
+    975
+  ],
+  "eligible_80m_cells": 153,
+  "valid_pairs": 153,
+  "median_z5_minus_z80_m": -0.208251953125,
+  "mean_z5_minus_z80_m": -0.49969203176062094,
+  "max_abs_z5_minus_z80_m": 9.562744140625,
+  "p95_abs_z5_minus_z80_m": 2.7315673828125,
+  "max_center_offset_m": 3.5355339059327378,
+  "near_window_sha256": "a02fd72960ecc269a8e65be4cdce9f7d29de222094da292d7bebe8b7f4cbfed2",
+  "far_window_sha256": "ff5fcaf5bcbfb3d497da46587545ae3a96351f7ad7a6bcb8373eae30aa01343c",
+  "pair_csv_sha256": "91674208807fba4bed6e1a39c0054c02535c95f33df2c4515f910ef967b7eb6a"
+}

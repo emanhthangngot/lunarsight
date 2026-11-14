@@ -17,6 +17,8 @@ Updated: **14 November 2026**. This is the concise starting point for the team a
 
 - A [conditional Site04 observer diagnostic](site04-observer-diagnostic.md) retains two Horizons responses and 80 m nested-radius per-azimuth evidence. It assumes datum compatibility, omits the inner 1 km and is not a validated full horizon or mission visibility result.
 
+- A [conditional 5 m/80 m near/far diagnostic](site04-near-far-review.md) retains 360-bin fusion evidence. It assumes compatible vertical datum and frame; 1 km seam, true-north conversion, far convergence and independent validation remain open.
+
 ## Current scope
 
 Documentation plus explicitly authorized analysis notebooks for pre-decision review. The current request authorizes bounded local DEM previews, visual comparison and a decision worksheet; native preview arrays are cached under ignored `data/preview/`. Rendered notebook outputs and source/window metadata are retained for review. No production ingestion pipeline, full raster acquisition, application implementation or deployment is authorized by this step.

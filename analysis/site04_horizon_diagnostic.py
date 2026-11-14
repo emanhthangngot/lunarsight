@@ -86,6 +86,7 @@ with rasterio.Env(GDAL_DISABLE_READDIR_ON_OPEN='EMPTY_DIR'):
       if old['window'] != [col,row,int(w.width),int(w.height)] or old['window_sha256'] != window_hash:
         np.savez_compressed(OUTPUT/'quarantine-window.npz',data=a)
         raise ValueError(f"Source crop changed: window {old['window']} -> {[col,row,int(w.width),int(w.height)]}; SHA256 {old['window_sha256']} -> {window_hash}. Quarantined; review before comparing.")
+    np.savez_compressed(OUTPUT/'source-window.npz',data=a)  # ignored local cache; never overwrite evidence
     xs=ds.transform.c+(col+np.arange(a.shape[1])+.5)*ds.transform.a
     ys=ds.transform.f+(row+np.arange(a.shape[0])+.5)*ds.transform.e
     xx=xs[None,:]-X0;yy=ys[:,None]-Y0;d=np.hypot(xx,yy)
