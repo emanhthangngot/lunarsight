@@ -41,7 +41,10 @@ export function scenarioKey(inputs: ScenarioInputs): string {
   return JSON.stringify([inputs.site.id, inputs.site.latDeg, inputs.site.lonDegE, inputs.startUtcMs, inputs.durationDays, inputs.stepSeconds, inputs.observerHeightM]);
 }
 export function defaultInputs(site: SiteSummary): ScenarioInputs {
-  return { site, startUtcMs: Date.parse('2026-01-01T00:00:00Z'), durationDays: 30, stepSeconds: 3600, observerHeightM: 2.5 };
+  const startUtcMs = site.category === 'artemis-candidate'
+    ? Date.parse('2027-01-01T00:00:00Z')
+    : Date.parse('2026-01-01T00:00:00Z');
+  return { site, startUtcMs, durationDays: 30, stepSeconds: 3600, observerHeightM: 2.5 };
 }
 export function validateScenario(inputs: ScenarioInputs): void {
   validateCoordinates(inputs.site.latDeg, inputs.site.lonDegE);

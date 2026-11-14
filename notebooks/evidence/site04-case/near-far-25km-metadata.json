@@ -1,0 +1,105 @@
+{
+  "status": "conditional experimental 5m+80m azimuth-bin maximum, not validated horizon",
+  "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_surf.tif",
+  "source_headers": {
+    "Content-Length": "40980806",
+    "ETag": "W/\"2715146-17285c863d0\"",
+    "Last-Modified": "Fri, 05 Jun 2020 18:40:02 GMT",
+    "Content-Type": "image/tiff"
+  },
+  "source_shape": [
+    3200,
+    3200
+  ],
+  "source_crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+  "near_far_crs_semantic_equal": false,
+  "near_far_projection_parameters_match": true,
+  "source_transform": [
+    5.0,
+    0.0,
+    -9000.0,
+    0.0,
+    -5.0,
+    1000.0
+  ],
+  "source_scale": 1.0,
+  "source_offset": 0.0,
+  "source_nodata": "nan",
+  "window": [
+    1069,
+    1190,
+    401,
+    401
+  ],
+  "array_sha256": "a02fd72960ecc269a8e65be4cdce9f7d29de222094da292d7bebe8b7f4cbfed2",
+  "range_requests": [
+    [
+      0,
+      524287
+    ],
+    [
+      15204352,
+      15728639
+    ],
+    [
+      15728640,
+      16252927
+    ],
+    [
+      16252928,
+      16777215
+    ],
+    [
+      16777216,
+      17301503
+    ],
+    [
+      17301504,
+      17825791
+    ],
+    [
+      17825792,
+      18350079
+    ],
+    [
+      18350080,
+      18874367
+    ],
+    [
+      18874368,
+      19398655
+    ],
+    [
+      19398656,
+      19922943
+    ],
+    [
+      19922944,
+      20447231
+    ]
+  ],
+  "http_body_bytes": 5767168,
+  "observer_xy_m": [
+    -2652.5,
+    -5952.5
+  ],
+  "observer_ground_m": 1737.1783447265625,
+  "height_agl_m": 1,
+  "near_distance_m": [
+    5.0,
+    1000.0
+  ],
+  "far_distance_m": [
+    1000,
+    25000
+  ],
+  "near_cells": 125608,
+  "near_valid_cells": 125608,
+  "near_empty_bins": 0,
+  "near_bins_with_missing": 0,
+  "combined_available_bins": 360,
+  "far_csv_sha256": "4cc2938e65218a7af421c257b67fbf480586984c9e87ae665d9155180b668c46",
+  "far_metadata_sha256": "77a80f84c47f878c71d51679991bfcae6b6fb72bbe8d8b248223f12c5b385a02",
+  "rasterio": "1.5.2",
+  "gdal": "3.12.2"
+}

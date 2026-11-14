@@ -5,10 +5,10 @@ import '@fontsource-variable/geist-mono';
 import './theme/tokens.css';
 import './styles.css';
 import { App } from './App';
-import { MockDataProvider } from './data/mock/MockDataProvider';
+import { PilotDataProvider } from './data/pilot/PilotDataProvider';
 
-// The only concrete-provider wiring point; UI consumers use the interface.
-const provider = new MockDataProvider();
+// Concrete provider wiring point; PilotDataProvider serves real NASA Artemis data with mock fallback.
+const provider = new PilotDataProvider();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -1,0 +1,1260 @@
+{
+  "purpose": "Pre-decision terrain preview; no final site/product selection",
+  "window_pixels": 500,
+  "halo_pixels": 1,
+  "sites": [
+    {
+      "site": "Site01",
+      "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/Site01_final_adj_5mpp_surf.tif",
+      "source_headers": {
+        "Content-Length": "40980810",
+        "ETag": "W/\"271514a-17285c7fa58\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:39:35 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "retrieved_utc": "2026-11-14T03:14:05.102106+00:00",
+      "reference_lat_lon": [
+        -89.4632,
+        -137.49
+      ],
+      "reference_xy_m": [
+        -10999.1448143328,
+        -11999.255038124049
+      ],
+      "reference_row_col": [
+        1599,
+        1600
+      ],
+      "source_shape": [
+        3200,
+        3200
+      ],
+      "source_bounds_m": [
+        -19000.0,
+        -20000.0,
+        -3000.0,
+        -4000.0
+      ],
+      "source_crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "source_frame": "MOON_ME / DE421 (PGDA product description)",
+      "source_nodata": "NaN",
+      "source_scale": 1.0,
+      "source_offset": 0.0,
+      "read_window": [
+        1349,
+        1348,
+        502,
+        502
+      ],
+      "display_bounds_m": [
+        -12250.0,
+        -13245.0,
+        -9750.0,
+        -10745.0
+      ],
+      "pixel_size_m": [
+        5.0,
+        5.0
+      ],
+      "shape_with_halo": [
+        502,
+        502
+      ],
+      "array_sha256": "8bb22953e90054803cbdf7f702caba532791a8a5f779bfe78f4c5caa6405e809",
+      "dtype": "float32",
+      "unit": "m",
+      "rasterio_version": "1.5.2",
+      "gdal_version": "3.12.2",
+      "successful_source_ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          16777216,
+          17301503
+        ],
+        [
+          17301504,
+          17825791
+        ],
+        [
+          17825792,
+          18350079
+        ],
+        [
+          18350080,
+          18874367
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ],
+        [
+          20447232,
+          20971519
+        ],
+        [
+          20971520,
+          21495807
+        ],
+        [
+          21495808,
+          22020095
+        ],
+        [
+          22020096,
+          22544383
+        ],
+        [
+          22544384,
+          23068671
+        ],
+        [
+          23068672,
+          23592959
+        ],
+        [
+          23592960,
+          24117247
+        ]
+      ],
+      "http_body_bytes": 7864320,
+      "valid_pixels": 250000,
+      "total_pixels": 250000,
+      "valid_fraction": 1.0,
+      "elevation_min_m": 1555.6455078125,
+      "elevation_max_m": 1959.4962158203125,
+      "elevation_median_m": 1879.77880859375
+    },
+    {
+      "site": "Site04",
+      "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_surf.tif",
+      "source_headers": {
+        "Content-Length": "40980806",
+        "ETag": "W/\"2715146-17285c863d0\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:40:02 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "retrieved_utc": "2026-11-14T03:16:49.625179+00:00",
+      "reference_lat_lon": [
+        -89.7668,
+        -171.87
+      ],
+      "reference_xy_m": [
+        -1000.0366057189256,
+        -7000.345565270375
+      ],
+      "reference_row_col": [
+        1600,
+        1599
+      ],
+      "source_shape": [
+        3200,
+        3200
+      ],
+      "source_bounds_m": [
+        -9000.0,
+        -15000.0,
+        7000.0,
+        1000.0
+      ],
+      "source_crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "source_frame": "MOON_ME / DE421 (PGDA product description)",
+      "source_nodata": "NaN",
+      "source_scale": 1.0,
+      "source_offset": 0.0,
+      "read_window": [
+        1348,
+        1349,
+        502,
+        502
+      ],
+      "display_bounds_m": [
+        -2255.0,
+        -8250.0,
+        245.0,
+        -5750.0
+      ],
+      "pixel_size_m": [
+        5.0,
+        5.0
+      ],
+      "shape_with_halo": [
+        502,
+        502
+      ],
+      "array_sha256": "00e4d8aa1dd6049dcb5a8864bffb45bacb7419e5d3575b2b3c2f59072581ea60",
+      "dtype": "float32",
+      "unit": "m",
+      "rasterio_version": "1.5.2",
+      "gdal_version": "3.12.2",
+      "successful_source_ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          16777216,
+          17301503
+        ],
+        [
+          17301504,
+          17825791
+        ],
+        [
+          17825792,
+          18350079
+        ],
+        [
+          18350080,
+          18874367
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ],
+        [
+          20447232,
+          20971519
+        ],
+        [
+          20971520,
+          21495807
+        ],
+        [
+          21495808,
+          22020095
+        ],
+        [
+          22020096,
+          22544383
+        ],
+        [
+          22544384,
+          23068671
+        ],
+        [
+          23068672,
+          23592959
+        ],
+        [
+          23592960,
+          24117247
+        ]
+      ],
+      "http_body_bytes": 7864320,
+      "valid_pixels": 250000,
+      "total_pixels": 250000,
+      "valid_fraction": 1.0,
+      "elevation_min_m": -44.99630355834961,
+      "elevation_max_m": 1586.9473876953125,
+      "elevation_median_m": 783.82763671875
+    },
+    {
+      "site": "Site06",
+      "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site06/Site06_final_adj_5mpp_surf.tif",
+      "source_headers": {
+        "Content-Length": "64025603",
+        "ETag": "W/\"3d0f403-17796725fb0\"",
+        "Last-Modified": "Fri, 12 Feb 2021 13:33:34 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "retrieved_utc": "2026-11-14T03:17:04.884807+00:00",
+      "reference_lat_lon": [
+        -85.4381,
+        37.36667
+      ],
+      "reference_xy_m": [
+        84000.01002578872,
+        110000.01079172148
+      ],
+      "reference_row_col": [
+        1999,
+        2000
+      ],
+      "source_shape": [
+        4000,
+        4000
+      ],
+      "source_bounds_m": [
+        74000.0,
+        100000.0,
+        94000.0,
+        120000.0
+      ],
+      "source_crs_wkt": "PROJCS[\"unknown\",GEOGCS[\"unknown\",DATUM[\"unknown\",SPHEROID[\"unknown\",1737400,0]],PRIMEM[\"Reference meridian\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "source_frame": "MOON_ME / DE421 (PGDA product description)",
+      "source_nodata": "NaN",
+      "source_scale": 1.0,
+      "source_offset": 0.0,
+      "read_window": [
+        1749,
+        1748,
+        502,
+        502
+      ],
+      "display_bounds_m": [
+        82750.0,
+        108755.0,
+        85250.0,
+        111255.0
+      ],
+      "pixel_size_m": [
+        5.0,
+        5.0
+      ],
+      "shape_with_halo": [
+        502,
+        502
+      ],
+      "array_sha256": "25b10566a7dccf2a3064c4ee36c75a873a3b77f5fdb6ee745013317b24ce6ffc",
+      "dtype": "float32",
+      "unit": "m",
+      "rasterio_version": "1.5.2",
+      "gdal_version": "3.12.2",
+      "successful_source_ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          27787264,
+          28311551
+        ],
+        [
+          28311552,
+          28835839
+        ],
+        [
+          28835840,
+          29360127
+        ],
+        [
+          29360128,
+          29884415
+        ],
+        [
+          29884416,
+          30408703
+        ],
+        [
+          30408704,
+          30932991
+        ],
+        [
+          30932992,
+          31457279
+        ],
+        [
+          31457280,
+          31981567
+        ],
+        [
+          31981568,
+          32505855
+        ],
+        [
+          32505856,
+          33030143
+        ],
+        [
+          33030144,
+          33554431
+        ],
+        [
+          33554432,
+          34078719
+        ],
+        [
+          34078720,
+          34603007
+        ],
+        [
+          34603008,
+          35127295
+        ],
+        [
+          35127296,
+          35651583
+        ],
+        [
+          35651584,
+          36175871
+        ]
+      ],
+      "http_body_bytes": 8912896,
+      "valid_pixels": 250000,
+      "total_pixels": 250000,
+      "valid_fraction": 1.0,
+      "elevation_min_m": 5577.224609375,
+      "elevation_max_m": 6058.21484375,
+      "elevation_median_m": 5925.689453125
+    },
+    {
+      "site": "Site07",
+      "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site07/Site07_final_adj_5mpp_surf.tif",
+      "source_headers": {
+        "Content-Length": "40980808",
+        "ETag": "W/\"2715148-17285c8c960\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:40:28 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "retrieved_utc": "2026-11-14T03:16:47.877564+00:00",
+      "reference_lat_lon": [
+        -88.811,
+        123.6901
+      ],
+      "reference_xy_m": [
+        30000.19238525798,
+        -20000.15281741031
+      ],
+      "reference_row_col": [
+        1600,
+        1600
+      ],
+      "source_shape": [
+        3200,
+        3200
+      ],
+      "source_bounds_m": [
+        22000.0,
+        -28000.0,
+        38000.0,
+        -12000.0
+      ],
+      "source_crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "source_frame": "MOON_ME / DE421 (PGDA product description)",
+      "source_nodata": "NaN",
+      "source_scale": 1.0,
+      "source_offset": 0.0,
+      "read_window": [
+        1349,
+        1349,
+        502,
+        502
+      ],
+      "display_bounds_m": [
+        28750.0,
+        -21250.0,
+        31250.0,
+        -18750.0
+      ],
+      "pixel_size_m": [
+        5.0,
+        5.0
+      ],
+      "shape_with_halo": [
+        502,
+        502
+      ],
+      "array_sha256": "036c16ea20a4a05039c28ffbbbcbbeaf17545cf524b0d74a6aa09a1c943fec45",
+      "dtype": "float32",
+      "unit": "m",
+      "rasterio_version": "1.5.2",
+      "gdal_version": "3.12.2",
+      "successful_source_ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          16777216,
+          17301503
+        ],
+        [
+          17301504,
+          17825791
+        ],
+        [
+          17825792,
+          18350079
+        ],
+        [
+          18350080,
+          18874367
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ],
+        [
+          20447232,
+          20971519
+        ],
+        [
+          20971520,
+          21495807
+        ],
+        [
+          21495808,
+          22020095
+        ],
+        [
+          22020096,
+          22544383
+        ],
+        [
+          22544384,
+          23068671
+        ],
+        [
+          23068672,
+          23592959
+        ],
+        [
+          23592960,
+          24117247
+        ]
+      ],
+      "http_body_bytes": 7864320,
+      "valid_pixels": 250000,
+      "total_pixels": 250000,
+      "valid_fraction": 1.0,
+      "elevation_min_m": 1241.4150390625,
+      "elevation_max_m": 1648.6798095703125,
+      "elevation_median_m": 1565.52587890625
+    },
+    {
+      "site": "Site11",
+      "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site11/Site11_final_adj_5mpp_surf.tif",
+      "source_headers": {
+        "Content-Length": "40980806",
+        "ETag": "W/\"2715146-17285c92ef0\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:40:54 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "retrieved_utc": "2026-11-14T03:18:04.471699+00:00",
+      "reference_lat_lon": [
+        -88.6834,
+        -67.9321
+      ],
+      "reference_xy_m": [
+        -37000.510022975184,
+        15000.207095102249
+      ],
+      "reference_row_col": [
+        1599,
+        1599
+      ],
+      "source_shape": [
+        3200,
+        3200
+      ],
+      "source_bounds_m": [
+        -45000.0,
+        7000.0,
+        -29000.0,
+        23000.0
+      ],
+      "source_crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "source_frame": "MOON_ME / DE421 (PGDA product description)",
+      "source_nodata": "NaN",
+      "source_scale": 1.0,
+      "source_offset": 0.0,
+      "read_window": [
+        1348,
+        1348,
+        502,
+        502
+      ],
+      "display_bounds_m": [
+        -38255.0,
+        13755.0,
+        -35755.0,
+        16255.0
+      ],
+      "pixel_size_m": [
+        5.0,
+        5.0
+      ],
+      "shape_with_halo": [
+        502,
+        502
+      ],
+      "array_sha256": "734ae82f20db4dbc765f24ea37ea632c80167877261794d5839665d83b8aafa8",
+      "dtype": "float32",
+      "unit": "m",
+      "rasterio_version": "1.5.2",
+      "gdal_version": "3.12.2",
+      "successful_source_ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          16777216,
+          17301503
+        ],
+        [
+          17301504,
+          17825791
+        ],
+        [
+          17825792,
+          18350079
+        ],
+        [
+          18350080,
+          18874367
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ],
+        [
+          20447232,
+          20971519
+        ],
+        [
+          20971520,
+          21495807
+        ],
+        [
+          21495808,
+          22020095
+        ],
+        [
+          22020096,
+          22544383
+        ],
+        [
+          22544384,
+          23068671
+        ],
+        [
+          23068672,
+          23592959
+        ],
+        [
+          23592960,
+          24117247
+        ]
+      ],
+      "http_body_bytes": 7864320,
+      "valid_pixels": 250000,
+      "total_pixels": 250000,
+      "valid_fraction": 1.0,
+      "elevation_min_m": 1406.9317626953125,
+      "elevation_max_m": 1815.9869384765625,
+      "elevation_median_m": 1708.20703125
+    },
+    {
+      "site": "Site20",
+      "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site20/Site20_final_adj_5mpp_surf.tif",
+      "source_headers": {
+        "Content-Length": "40980802",
+        "ETag": "W/\"2715142-172a8536850\"",
+        "Last-Modified": "Fri, 12 Jun 2020 11:38:58 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "retrieved_utc": "2026-11-14T03:18:16.768405+00:00",
+      "reference_lat_lon": [
+        -85.4266,
+        31.74276
+      ],
+      "reference_xy_m": [
+        72999.63459445091,
+        117999.41465376168
+      ],
+      "reference_row_col": [
+        1600,
+        1599
+      ],
+      "source_shape": [
+        3200,
+        3200
+      ],
+      "source_bounds_m": [
+        65000.0,
+        110000.0,
+        81000.0,
+        126000.0
+      ],
+      "source_crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "source_frame": "MOON_ME / DE421 (PGDA product description)",
+      "source_nodata": "NaN",
+      "source_scale": 1.0,
+      "source_offset": 0.0,
+      "read_window": [
+        1348,
+        1349,
+        502,
+        502
+      ],
+      "display_bounds_m": [
+        71745.0,
+        116750.0,
+        74245.0,
+        119250.0
+      ],
+      "pixel_size_m": [
+        5.0,
+        5.0
+      ],
+      "shape_with_halo": [
+        502,
+        502
+      ],
+      "array_sha256": "239d5ed3f5267c737a923754f7fa0728950725f051217911a8532b077354fab1",
+      "dtype": "float32",
+      "unit": "m",
+      "rasterio_version": "1.5.2",
+      "gdal_version": "3.12.2",
+      "successful_source_ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          16777216,
+          17301503
+        ],
+        [
+          17301504,
+          17825791
+        ],
+        [
+          17825792,
+          18350079
+        ],
+        [
+          18350080,
+          18874367
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ],
+        [
+          20447232,
+          20971519
+        ],
+        [
+          20971520,
+          21495807
+        ],
+        [
+          21495808,
+          22020095
+        ],
+        [
+          22020096,
+          22544383
+        ],
+        [
+          22544384,
+          23068671
+        ],
+        [
+          23068672,
+          23592959
+        ],
+        [
+          23592960,
+          24117247
+        ]
+      ],
+      "http_body_bytes": 7864320,
+      "valid_pixels": 250000,
+      "total_pixels": 250000,
+      "valid_fraction": 1.0,
+      "elevation_min_m": 6126.40966796875,
+      "elevation_max_m": 6463.86376953125,
+      "elevation_median_m": 6362.6435546875
+    },
+    {
+      "site": "Site23",
+      "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site23/Site23_final_adj_5mpp_surf.tif",
+      "source_headers": {
+        "Content-Length": "70586804",
+        "ETag": "W/\"43511b4-172a853aab8\"",
+        "Last-Modified": "Fri, 12 Jun 2020 11:39:15 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "retrieved_utc": "2026-11-14T03:18:50.983225+00:00",
+      "reference_lat_lon": [
+        -85.9948,
+        -0.23578
+      ],
+      "reference_xy_m": [
+        -499.9900921043164,
+        121499.53502323072
+      ],
+      "reference_row_col": [
+        2100,
+        2100
+      ],
+      "source_shape": [
+        4200,
+        4200
+      ],
+      "source_bounds_m": [
+        -11000.0,
+        111000.0,
+        10000.0,
+        132000.0
+      ],
+      "source_crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "source_frame": "MOON_ME / DE421 (PGDA product description)",
+      "source_nodata": "NaN",
+      "source_scale": 1.0,
+      "source_offset": 0.0,
+      "read_window": [
+        1849,
+        1849,
+        502,
+        502
+      ],
+      "display_bounds_m": [
+        -1750.0,
+        120250.0,
+        750.0,
+        122750.0
+      ],
+      "pixel_size_m": [
+        5.0,
+        5.0
+      ],
+      "shape_with_halo": [
+        502,
+        502
+      ],
+      "array_sha256": "05520bb2166b183e64340f81aea055e0e17682a36b9957da027e1bebe8f41d42",
+      "dtype": "float32",
+      "unit": "m",
+      "rasterio_version": "1.5.2",
+      "gdal_version": "3.12.2",
+      "successful_source_ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          30932992,
+          31457279
+        ],
+        [
+          31457280,
+          31981567
+        ],
+        [
+          31981568,
+          32505855
+        ],
+        [
+          32505856,
+          33030143
+        ],
+        [
+          33030144,
+          33554431
+        ],
+        [
+          33554432,
+          34078719
+        ],
+        [
+          34078720,
+          34603007
+        ],
+        [
+          34603008,
+          35127295
+        ],
+        [
+          35127296,
+          35651583
+        ],
+        [
+          35651584,
+          36175871
+        ],
+        [
+          36175872,
+          36700159
+        ],
+        [
+          36700160,
+          37224447
+        ],
+        [
+          37224448,
+          37748735
+        ],
+        [
+          37748736,
+          38273023
+        ],
+        [
+          38273024,
+          38797311
+        ],
+        [
+          38797312,
+          39321599
+        ],
+        [
+          39321600,
+          39845887
+        ]
+      ],
+      "http_body_bytes": 9437184,
+      "valid_pixels": 250000,
+      "total_pixels": 250000,
+      "valid_fraction": 1.0,
+      "elevation_min_m": 4490.521484375,
+      "elevation_max_m": 4859.57421875,
+      "elevation_median_m": 4778.77734375
+    },
+    {
+      "site": "Site42",
+      "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site42/Site42_final_adj_5mpp_surf.tif",
+      "source_headers": {
+        "Content-Length": "64025611",
+        "ETag": "W/\"3d0f40b-17855dd8460\"",
+        "Last-Modified": "Sun, 21 Mar 2021 17:38:04 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "retrieved_utc": "2026-11-14T03:19:59.546598+00:00",
+      "reference_lat_lon": [
+        -85.8296,
+        -116.322
+      ],
+      "reference_xy_m": [
+        -113398.66978432763,
+        -56099.30139407114
+      ],
+      "reference_row_col": [
+        1999,
+        2000
+      ],
+      "source_shape": [
+        4000,
+        4000
+      ],
+      "source_bounds_m": [
+        -123400.0,
+        -66100.0,
+        -103400.0,
+        -46100.0
+      ],
+      "source_crs_wkt": "PROJCS[\"unknown\",GEOGCS[\"unknown\",DATUM[\"unknown\",SPHEROID[\"unknown\",1737400,0]],PRIMEM[\"Reference meridian\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "source_frame": "MOON_ME / DE421 (PGDA product description)",
+      "source_nodata": "NaN",
+      "source_scale": 1.0,
+      "source_offset": 0.0,
+      "read_window": [
+        1749,
+        1748,
+        502,
+        502
+      ],
+      "display_bounds_m": [
+        -114650.0,
+        -57345.0,
+        -112150.0,
+        -54845.0
+      ],
+      "pixel_size_m": [
+        5.0,
+        5.0
+      ],
+      "shape_with_halo": [
+        502,
+        502
+      ],
+      "array_sha256": "53679ab67c198e8734c0eba5defa2da295b214c33793b64d69f363c1cdfe330a",
+      "dtype": "float32",
+      "unit": "m",
+      "rasterio_version": "1.5.2",
+      "gdal_version": "3.12.2",
+      "successful_source_ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          27787264,
+          28311551
+        ],
+        [
+          28311552,
+          28835839
+        ],
+        [
+          28835840,
+          29360127
+        ],
+        [
+          29360128,
+          29884415
+        ],
+        [
+          29884416,
+          30408703
+        ],
+        [
+          30408704,
+          30932991
+        ],
+        [
+          30932992,
+          31457279
+        ],
+        [
+          31457280,
+          31981567
+        ],
+        [
+          31981568,
+          32505855
+        ],
+        [
+          32505856,
+          33030143
+        ],
+        [
+          33030144,
+          33554431
+        ],
+        [
+          33554432,
+          34078719
+        ],
+        [
+          34078720,
+          34603007
+        ],
+        [
+          34603008,
+          35127295
+        ],
+        [
+          35127296,
+          35651583
+        ],
+        [
+          35651584,
+          36175871
+        ]
+      ],
+      "http_body_bytes": 8912896,
+      "valid_pixels": 250000,
+      "total_pixels": 250000,
+      "valid_fraction": 1.0,
+      "elevation_min_m": 2292.859130859375,
+      "elevation_max_m": 2760.2158203125,
+      "elevation_median_m": 2595.114013671875
+    },
+    {
+      "site": "Haworth",
+      "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Haworth/Haworth_final_adj_5mpp_surf.tif",
+      "source_headers": {
+        "Content-Length": "142123767",
+        "ETag": "W/\"878a2f7-175fcd726c0\"",
+        "Last-Modified": "Wed, 25 Nov 2020 00:39:20 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "retrieved_utc": "2026-11-14T03:20:57.735037+00:00",
+      "reference_lat_lon": [
+        -86.7639,
+        -22.777
+      ],
+      "reference_xy_m": [
+        -38000.45550640537,
+        90501.19024542473
+      ],
+      "reference_row_col": [
+        2979,
+        2979
+      ],
+      "source_shape": [
+        5960,
+        5960
+      ],
+      "source_bounds_m": [
+        -52900.0,
+        75600.0,
+        -23100.0,
+        105400.0
+      ],
+      "source_crs_wkt": "PROJCS[\"unknown\",GEOGCS[\"unknown\",DATUM[\"unknown\",SPHEROID[\"unknown\",1737400,0]],PRIMEM[\"Reference meridian\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "source_frame": "MOON_ME / DE421 (PGDA product description)",
+      "source_nodata": "NaN",
+      "source_scale": 1.0,
+      "source_offset": 0.0,
+      "read_window": [
+        2728,
+        2728,
+        502,
+        502
+      ],
+      "display_bounds_m": [
+        -39255.0,
+        89255.0,
+        -36755.0,
+        91755.0
+      ],
+      "pixel_size_m": [
+        5.0,
+        5.0
+      ],
+      "shape_with_halo": [
+        502,
+        502
+      ],
+      "array_sha256": "1832149e7f2eb7b7b520a38100a2304fe9ed4046184774f69d1deaa0de0547d1",
+      "dtype": "float32",
+      "unit": "m",
+      "rasterio_version": "1.5.2",
+      "gdal_version": "3.12.2",
+      "successful_source_ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          65011712,
+          65535999
+        ],
+        [
+          65536000,
+          66060287
+        ],
+        [
+          66060288,
+          66584575
+        ],
+        [
+          66584576,
+          67108863
+        ],
+        [
+          67108864,
+          67633151
+        ],
+        [
+          67633152,
+          68157439
+        ],
+        [
+          68157440,
+          68681727
+        ],
+        [
+          68681728,
+          69206015
+        ],
+        [
+          69206016,
+          69730303
+        ],
+        [
+          69730304,
+          70254591
+        ],
+        [
+          70254592,
+          70778879
+        ],
+        [
+          70778880,
+          71303167
+        ],
+        [
+          71303168,
+          71827455
+        ],
+        [
+          71827456,
+          72351743
+        ],
+        [
+          72351744,
+          72876031
+        ],
+        [
+          72876032,
+          73400319
+        ],
+        [
+          73400320,
+          73924607
+        ],
+        [
+          73924608,
+          74448895
+        ],
+        [
+          74448896,
+          74973183
+        ],
+        [
+          74973184,
+          75497471
+        ],
+        [
+          75497472,
+          76021759
+        ],
+        [
+          76021760,
+          76546047
+        ],
+        [
+          76546048,
+          77070335
+        ]
+      ],
+      "http_body_bytes": 12582912,
+      "valid_pixels": 250000,
+      "total_pixels": 250000,
+      "valid_fraction": 1.0,
+      "elevation_min_m": 1464.3509521484375,
+      "elevation_max_m": 1759.7989501953125,
+      "elevation_median_m": 1625.99755859375
+    }
+  ],
+  "hash_definition": "SHA256 of C-contiguous little-endian float32 elevation array including halo; nodata represented by NaN"
+}
