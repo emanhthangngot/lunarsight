@@ -16,6 +16,10 @@ The user confirmed team acceptance of the provisional Site01/Site04 configuratio
 
 See [pilot ROI/datum review](../pilot-roi-datum-review.md). Site01 ROI is fully inside reference preview bounds, Site04 ROI is entirely outside; both reference points fall outside ROI. Source elevation versus Horizons ellipsoid datum remains unverified; do not convert AGL until confirmed. Geometry uses interpreted shapefile projection, not authoritative CRS reconciliation.
 
+## Site01 ROI coverage
+
+See [Site01 ROI coverage](../site01-roi-coverage.md). The five PGDA 78 layers have 2,197/2,197 finite pixels under the seven ROI polygons mask; 1,970 LDEC pixels are zero, 227 positive. An internal candidate technical point (lat −89.47393424°, lon −137.40074627°) provides 30.0 m margin to boundary, 1,948.353 m elevation, 1.121° slope and LDEC=1 for technical review.
+
 ## Site04 ROI coverage
 
 See [Site04 ROI coverage](../site04-roi-coverage.md). The five PGDA 78 layers have 526/526 finite pixels under the ROI pixel-center mask; 468 LDEC pixels are zero. Projection parameters match but semantic CRS equality is false. Vertical datum and observer choice remain open. A point is proposed only for technical review, not landing selection.

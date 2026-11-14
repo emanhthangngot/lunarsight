@@ -29,6 +29,8 @@ Read [project state](project-state.md) first. Documents labeled **proposed** des
 | [Pilot data-mining inventory](data-mining-plan.md) | Candidate site comparison, source-to-feature inventory, known conventions, volume comparison, and open review items. |
 | [Candidate-site visual review notebook](../notebooks/candidate-site-visual-review.ipynb) | Rendered overview of reference centers, available ROI outlines, five-layer file sizes, and the original four-site p95 scale comparison. |
 | [Terrain pre-decision notebook](../notebooks/terrain-predecision-review.ipynb) | Bounded real DEM previews, synthetic hillshade, slope proxy, mask and source evidence. |
+| [Site01 ROI coverage](site01-roi-coverage.md) | Coverage review for the seven PGDA 78 Site01 ROI polygons and candidate technical point. |
+| [Site04 ROI coverage](site04-roi-coverage.md) | Coverage review across five PGDA 78 layers within Site04 ROI and candidate technical point. |
 | [Site04 near/far diagnostic](site04-near-far-review.md) | Conditional 5 m / 80 m bin-wise fusion and overlap evidence, with unresolved datum and convergence limits. |
 | [Team decision worksheet](predecision-review.md) | Comparison table, unresolved evidence, meeting agenda, decision fields and DE handoff responsibilities. |
 | [Data quality proposal](data-quality.md) | Scientific interpretation, provenance, missing data, and acceptance evidence. |

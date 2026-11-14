@@ -15,6 +15,8 @@ Updated: **14 November 2026**. This is the concise starting point for the team a
 
 - The team accepted a revisable Site01/Site04 pilot working configuration: see [ADR 0003](decisions/0003-pilot-working-agreement.md) and [pilot-v1](../config/pilot-v1.json). Full acquisition, final ROI and p95 tolerance remain open.
 
+- Bounded Site01 ROI coverage checks verified 2,197/2,197 valid pixels across five PGDA 78 layers with 227 positive LDEC cells, and retained a 30.0 m margin internal candidate technical point for review (lat −89.47393424°, lon −137.40074627°). See [Site01 ROI coverage](site01-roi-coverage.md).
+
 - A [conditional Site04 observer diagnostic](site04-observer-diagnostic.md) retains two Horizons responses and 80 m nested-radius per-azimuth evidence. It assumes datum compatibility, omits the inner 1 km and is not a validated full horizon or mission visibility result.
 
 - A [conditional 5 m/80 m near/far diagnostic](site04-near-far-review.md) retains 360-bin fusion evidence. It assumes compatible vertical datum and frame; 1 km seam, true-north conversion, far convergence and independent validation remain open.

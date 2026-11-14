@@ -1,8 +1,13 @@
-# Site04 diagnostic reproduction
+# Diagnostic reproduction scripts
 
-These scripts reproduce the conditional case described in [the diagnostic](../docs/site04-observer-diagnostic.md). They are research tools, not production pipelines or validated landing-site results. Python with NumPy and Rasterio 1.5.2 was used; internet access is required. Run from repository root:
+These scripts reproduce the conditional cases described in the diagnostics. They are research tools, not production pipelines or validated landing-site results. Python with NumPy and Rasterio was used; internet access is required for remote reads. Run from repository root:
 
 ```sh
+# Site01 ROI diagnostic and offline contract checks:
+python analysis/site01_roi_diagnostic.py
+python analysis/check_site01_roi.py
+
+# Site04 observer and horizon diagnostics:
 python analysis/site04_horizons_probe.py
 python analysis/site04_horizon_diagnostic.py
 python analysis/check_site04_case.py

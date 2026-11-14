@@ -1,0 +1,402 @@
+{
+  "site": "Site01",
+  "roi_sha256": "40b961417a344ce0274aecbab522e171a22f658507d82e8fb4d7bc97526ffc4f",
+  "mask_rule": "pixel center within polygon, all_touched=False",
+  "crs_comparison": "pyproj semantic equality false; PROJ parameters match; authoritative frame identity not established",
+  "roi_summary": {
+    "polygon_count": 7,
+    "total_area_m2": 52825.0,
+    "roi_cells": 2197,
+    "zero_count_cells": 1970,
+    "positive_count_cells": 227,
+    "candidate_point": {
+      "x_m": -10797.5,
+      "y_m": -11742.5,
+      "lat_deg": -89.47393424406525,
+      "lon_deg": -137.40074627239318,
+      "margin_to_boundary_m": 30.0,
+      "elevation_m": 1948.35302734375,
+      "count": 1,
+      "slope_deg": 1.121172308921814,
+      "z_rms_m": 0.1733117252588272,
+      "slope_rms_deg": 1.7890241146087646
+    }
+  },
+  "layers": [
+    {
+      "layer": "surface",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/Site01_final_adj_5mpp_surf.tif",
+      "head": {
+        "Content-Length": "40980810",
+        "ETag": "W/\"271514a-17285c7fa58\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:39:35 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "roi_crs_wkt": "PROJCS[\"unknown\",GEOGCS[\"GCS_unknown\",DATUM[\"D_unknown\",SPHEROID[\"unknown\",1737400.0,0.0]],PRIMEM[\"Reference meridian\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Stereographic_South_Pole\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",0.0],PARAMETER[\"Standard_Parallel_1\",-90.0],UNIT[\"Meter\",1.0]]",
+      "crs_equivalent": false,
+      "resolution_m": [
+        5.0,
+        5.0
+      ],
+      "window": [
+        1466,
+        1496,
+        302,
+        233
+      ],
+      "window_transform": [
+        5.0,
+        0.0,
+        -11670.0,
+        0.0,
+        -5.0,
+        -11480.0
+      ],
+      "nodata": "nan",
+      "scale": 1.0,
+      "offset": 0.0,
+      "roi_cells": 2197,
+      "valid_roi_cells": 2197,
+      "min": 1927.06787109375,
+      "max": 1959.4962158203125,
+      "median": 1954.9937744140625,
+      "http_body_bytes": 4194304,
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ],
+        [
+          20447232,
+          20971519
+        ],
+        [
+          20971520,
+          21495807
+        ],
+        [
+          21495808,
+          22020095
+        ],
+        [
+          22020096,
+          22544383
+        ]
+      ],
+      "window_sha256": "4066f9b8f2f101f597dc640149920206b4b5d5e4a899b2cce1960eaa5315cc7f"
+    },
+    {
+      "layer": "count",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/Site01_final_adj_5mpp_ldec.tif",
+      "head": {
+        "Content-Length": "40980744",
+        "ETag": "W/\"2715108-17285c811c8\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:39:41 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "roi_crs_wkt": "PROJCS[\"unknown\",GEOGCS[\"GCS_unknown\",DATUM[\"D_unknown\",SPHEROID[\"unknown\",1737400.0,0.0]],PRIMEM[\"Reference meridian\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Stereographic_South_Pole\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",0.0],PARAMETER[\"Standard_Parallel_1\",-90.0],UNIT[\"Meter\",1.0]]",
+      "crs_equivalent": false,
+      "resolution_m": [
+        5.0,
+        5.0
+      ],
+      "window": [
+        1466,
+        1496,
+        302,
+        233
+      ],
+      "window_transform": [
+        5.0,
+        0.0,
+        -11670.0,
+        0.0,
+        -5.0,
+        -11480.0
+      ],
+      "nodata": "nan",
+      "scale": 1.0,
+      "offset": 0.0,
+      "roi_cells": 2197,
+      "valid_roi_cells": 2197,
+      "min": 0.0,
+      "max": 3.0,
+      "median": 0.0,
+      "http_body_bytes": 4194304,
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ],
+        [
+          20447232,
+          20971519
+        ],
+        [
+          20971520,
+          21495807
+        ],
+        [
+          21495808,
+          22020095
+        ],
+        [
+          22020096,
+          22544383
+        ]
+      ],
+      "window_sha256": "ebdefacb3b4a581fc0c304839aee8c9430cf3abd9095a5fdc34a3912fdbaa783"
+    },
+    {
+      "layer": "slope",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/Site01_final_adj_5mpp_slp.tif",
+      "head": {
+        "Content-Length": "40980776",
+        "ETag": "W/\"2715128-17295f7cea8\"",
+        "Last-Modified": "Mon, 08 Jun 2020 22:05:45 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "roi_crs_wkt": "PROJCS[\"unknown\",GEOGCS[\"GCS_unknown\",DATUM[\"D_unknown\",SPHEROID[\"unknown\",1737400.0,0.0]],PRIMEM[\"Reference meridian\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Stereographic_South_Pole\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",0.0],PARAMETER[\"Standard_Parallel_1\",-90.0],UNIT[\"Meter\",1.0]]",
+      "crs_equivalent": false,
+      "resolution_m": [
+        5.0,
+        5.0
+      ],
+      "window": [
+        1466,
+        1496,
+        302,
+        233
+      ],
+      "window_transform": [
+        5.0,
+        0.0,
+        -11670.0,
+        0.0,
+        -5.0,
+        -11480.0
+      ],
+      "nodata": "nan",
+      "scale": 1.0,
+      "offset": 0.0,
+      "roi_cells": 2197,
+      "valid_roi_cells": 2197,
+      "min": 0.10467831790447235,
+      "max": 10.763367652893066,
+      "median": 2.3252367973327637,
+      "http_body_bytes": 4194304,
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ],
+        [
+          20447232,
+          20971519
+        ],
+        [
+          20971520,
+          21495807
+        ],
+        [
+          21495808,
+          22020095
+        ],
+        [
+          22020096,
+          22544383
+        ]
+      ],
+      "window_sha256": "27d955bb89d71c8659a2ffb49baf4a17f6defbd5c1a299cf409d301b12a72259"
+    },
+    {
+      "layer": "z_rms",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/Site01_final_adj_5mpp_toterr.tif",
+      "head": {
+        "Content-Length": "40980810",
+        "ETag": "W/\"271514a-17285c82d20\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:39:48 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "roi_crs_wkt": "PROJCS[\"unknown\",GEOGCS[\"GCS_unknown\",DATUM[\"D_unknown\",SPHEROID[\"unknown\",1737400.0,0.0]],PRIMEM[\"Reference meridian\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Stereographic_South_Pole\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",0.0],PARAMETER[\"Standard_Parallel_1\",-90.0],UNIT[\"Meter\",1.0]]",
+      "crs_equivalent": false,
+      "resolution_m": [
+        5.0,
+        5.0
+      ],
+      "window": [
+        1466,
+        1496,
+        302,
+        233
+      ],
+      "window_transform": [
+        5.0,
+        0.0,
+        -11670.0,
+        0.0,
+        -5.0,
+        -11480.0
+      ],
+      "nodata": "nan",
+      "scale": 1.0,
+      "offset": 0.0,
+      "roi_cells": 2197,
+      "valid_roi_cells": 2197,
+      "min": 0.09487559646368027,
+      "max": 0.7995540499687195,
+      "median": 0.32913896441459656,
+      "http_body_bytes": 4194304,
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ],
+        [
+          20447232,
+          20971519
+        ],
+        [
+          20971520,
+          21495807
+        ],
+        [
+          21495808,
+          22020095
+        ],
+        [
+          22020096,
+          22544383
+        ]
+      ],
+      "window_sha256": "1dc5ab7b924e685bf037563c741c8d3d898b4d7de01082681d4d2203bb50808c"
+    },
+    {
+      "layer": "slope_rms",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/Site01_final_adj_5mpp_slperr.tif",
+      "head": {
+        "Content-Length": "40980810",
+        "ETag": "W/\"271514a-17285c84878\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:39:55 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "roi_crs_wkt": "PROJCS[\"unknown\",GEOGCS[\"GCS_unknown\",DATUM[\"D_unknown\",SPHEROID[\"unknown\",1737400.0,0.0]],PRIMEM[\"Reference meridian\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Stereographic_South_Pole\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",0.0],PARAMETER[\"Standard_Parallel_1\",-90.0],UNIT[\"Meter\",1.0]]",
+      "crs_equivalent": false,
+      "resolution_m": [
+        5.0,
+        5.0
+      ],
+      "window": [
+        1466,
+        1496,
+        302,
+        233
+      ],
+      "window_transform": [
+        5.0,
+        0.0,
+        -11670.0,
+        0.0,
+        -5.0,
+        -11480.0
+      ],
+      "nodata": "nan",
+      "scale": 1.0,
+      "offset": 0.0,
+      "roi_cells": 2197,
+      "valid_roi_cells": 2197,
+      "min": 1.0279947519302368,
+      "max": 3.5013277530670166,
+      "median": 1.8717143535614014,
+      "http_body_bytes": 4194304,
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ],
+        [
+          20447232,
+          20971519
+        ],
+        [
+          20971520,
+          21495807
+        ],
+        [
+          21495808,
+          22020095
+        ],
+        [
+          22020096,
+          22544383
+        ]
+      ],
+      "window_sha256": "53939cbe7f6baf2bd70de48a2558eada7cde3ba5f138086658daf123ca3d7e7d"
+    }
+  ]
+}
