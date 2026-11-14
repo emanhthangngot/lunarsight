@@ -7,8 +7,9 @@ An architecture decision record (ADR) captures one consequential choice, its rat
 | ID | Decision | Status | Authority |
 | --- | --- | --- | --- |
 | [0001](0001-documentation-first.md) | Keep the current bootstrap documentation-only; data and implementation remain proposals. | Accepted for the current phase | Explicit user clarification, 13 November 2026. |
+| [0002](0002-data-mining-feature-scope.md) | Prioritize bounded south-polar site screening and terrain-uncertainty analysis; defer broad acquisition and hardware power modeling. | Accepted feature scope; no dataset acquisition selected | Explicit user instruction, 13 November 2026. |
 
-Product, data, stack, provider, and operational choices remain in [open decisions](../open-decisions.md). No technology or dataset ADR has been accepted.
+Exact sites, products, footprints, cadence, budget, stack, provider, and operational choices remain in [open decisions](../open-decisions.md). ADR 0002 fixes the feature/data categories to prioritize; it does not select exact datasets or authorize acquisition.
 
 ## Lifecycle
 

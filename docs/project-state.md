@@ -6,7 +6,7 @@ Updated: **13 November 2026**. This is the concise starting point for the team a
 
 - Project: **LunarSight — Lunar Landing Site Explorer & Mission Planner**.
 - Repository: **emanhthangngot/lunarsight**, created as private.
-- Current user instruction: prepare the initial repository, agent context, system design, and complete documentation; keep data proposals uncommitted and prepare no scripts or application implementation.
+- Current user instruction: keep work reviewable through a new branch and PR. The initial data-mining feature priorities are now recorded in [ADR 0002](decisions/0002-data-mining-feature-scope.md); exact data products, coverage, versions, and acquisition remain undecided.
 - The team's proposal is preserved as a [historical reference](reference/proposal-v2.md). It informs requirements; it is not proof of a backend or validated science in this repo.
 - The [shared testing policy](testing-policy.md) governs agent test creation, selection and maintenance. It does not select a stack/data product or authorize runtime implementation.
 
@@ -18,8 +18,8 @@ An earlier bootstrap imported exploratory processing material. That approach was
 
 ## Decisions not yet made
 
-- Initial audience, demo/MVP priorities, and performance targets.
-- Geographic region, exact products, resolution, temporal coverage, total data volume, and storage budget.
+- Primary audience, demo success measures, and performance targets.
+- Exact pilot coordinates/sites, product versions and footprints, resolution mix, time cadence, total data volume, and storage budget. ADR 0002 selects a bounded south-polar site-screening workflow, not a geographic coverage or dataset product.
 - Technology stack, map engine, persistence/authentication, hosting, and AI provider.
 - Scientific model fidelity, acceptance tolerances, and validated catalog names/coordinates.
 - Code licensing, collaboration rules, and release process.
@@ -28,7 +28,7 @@ The approximately **56.2 GB** acquisition scenario is an unapproved example from
 
 ## Next useful work
 
-Review and resolve the target demonstration and minimum scientific evidence, then record only the choices actually made. Continue improving documentation while decisions are open. A later explicit implementation request may authorize a bounded coding task; update this file and the relevant decision records then.
+Resolve exact pilot sites, data products/footprints, time cadence, and validation references against the accepted scope in ADR 0002. Data acquisition and implementation have not started; a later explicit request is required for those steps.
 
 ## Status vocabulary
 

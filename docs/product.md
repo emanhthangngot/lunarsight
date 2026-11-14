@@ -1,6 +1,6 @@
 # Product brief
 
-**Status: proposal for team review — documentation phase only.** This document describes the intended product. It does not state that the repository contains a working application, processing pipeline, selected dataset, or agreed deployment stack.
+**Status: product direction is proposed; initial data-mining feature scope accepted on 13 November 2026.** This document does not state that the repository contains a working application, processing pipeline, selected dataset, or agreed deployment stack. See [ADR 0002](decisions/0002-data-mining-feature-scope.md) for the accepted feature priorities.
 
 The product basis is the team's [LunarSight V2 proposal](reference/proposal-v2.md), dated 5 November 2026. Prototype observations in that document are historical evidence of interaction ideas; they are not independent verification of scientific calculations or a specification of the current repository.
 
@@ -42,15 +42,15 @@ Detailed requirements and proposal-section mappings are in [requirements.md](req
 
 ## Proposed first usable release
 
-The following ordering is a recommendation for discussion, not an approved delivery commitment.
+The following feature ordering follows ADR 0002. It is not a dataset acquisition or implementation authorization.
 
 1. A shared scenario can hold a supported location, explicit time interval, observer height, and mission constraints.
-2. Users can inspect a map, source availability, and relevant terrain information for a team-selected pilot area.
-3. Once the scientific approach is selected and implemented, horizon, timeline, summary, and constraint explanations consume one identified analysis result.
-4. Users can compare a small number of scenarios and export the assumptions, results, and limitations.
-5. Both languages, missing-data states, and understandable failure states are included in the core workflow.
+2. Users can inspect candidate south-polar locations, source coverage, and multi-scale terrain evidence, including uncertainty and observation support where available.
+3. Sun/Earth ephemeris and terrain horizons support time-indexed illumination and geometric Earth-visibility results for a selected mission interval.
+4. Users can compare a small number of site/date scenarios on matching intervals and inspect how terrain uncertainty changes the result.
+5. An export preserves assumptions, units, sources, coverage, uncertainty, missing values, and limitations. English/Vietnamese presentation and clear data states use the same identified scenario.
 
-Sensitivity, richer thematic layers, the advisor, educational exercises, and more extensive geographic coverage can follow that foundation. They remain part of the original product direction; their release order depends on the team's decisions and available evidence.
+PSR/resource, Diviner thermal, and selected LROC imagery are optional context after the core workflow. A battery/power-sufficiency model, full communications link budget, advisor, formal optimization, and broader geographic coverage remain deferred or open as described in ADR 0002 and [open decisions](open-decisions.md).
 
 No region, grid spacing, source collection, download quantity, processing duration, provider, or storage budget is committed by this document. Candidate data options are listed in [data-sources.md](data-sources.md).
 

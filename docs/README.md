@@ -25,7 +25,7 @@ Read [project state](project-state.md) first. Documents labeled **proposed** des
 
 | Document | Role |
 | --- | --- |
-| [Candidate data sources](data-sources.md) | Official sources, coverage options, illustrative quantities, and selection questions. |
+| [Candidate data sources](data-sources.md) | Official sources, coverage options, illustrative quantities, and selection questions; feature priorities are recorded in ADR 0002. |
 | [Data quality proposal](data-quality.md) | Scientific interpretation, provenance, missing data, and acceptance evidence. |
 | [Data boundary](../data/README.md) | Explains why this repository currently contains no acquired data. |
 
