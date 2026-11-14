@@ -20,6 +20,7 @@ export class WorkerTerrainMeshLoader implements TerrainMeshLoader {
   constructor(
     private readonly createWorker: () => MeshWorker,
     private readonly initMessage?: DemInitMessage,
+    private readonly prepareForRequest?: (request: TerrainMeshRequest) => Promise<DemInitMessage | null>,
   ) {}
 
   load(request: TerrainMeshRequest, signal?: AbortSignal): Promise<LocalTerrainMesh> {
@@ -86,8 +87,26 @@ export class WorkerTerrainMeshLoader implements TerrainMeshLoader {
       signal?.addEventListener('abort', onAbort, { once: true });
       if (signal?.aborted) { onAbort(); return; }
       const message: MeshBuildRequest = { type: 'build', id, request: normalized };
-      try { worker.postMessage(message); }
-      catch (reason) { fail(reason); }
+      const postBuild = () => {
+        if (!current()) return;
+        try { worker.postMessage(message); }
+        catch (reason) { fail(reason); }
+      };
+      if (this.prepareForRequest) {
+        void this.prepareForRequest(normalized).then(
+          (updatedInit) => {
+            if (!current()) return;
+            if (updatedInit) {
+              try { worker.postMessage(updatedInit); }
+              catch (reason) { fail(reason); return; }
+            }
+            postBuild();
+          },
+          fail,
+        );
+      } else {
+        postBuild();
+      }
     });
   }
 

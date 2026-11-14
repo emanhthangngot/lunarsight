@@ -56,13 +56,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     cfg = settings or load_settings()
     sites_svc = SiteCatalogService(cfg.pilot_src_dir)
     terrain_svc = TerrainService(cfg.pilot_public_dir)
-    horizon_svc = HorizonService(cfg.pilot_src_dir, cfg.cache_dir, terrain_svc)
+    horizon_svc = HorizonService(
+        cfg.pilot_src_dir,
+        cfg.cache_dir,
+        terrain_svc,
+        pilot_public_dir=cfg.pilot_public_dir,
+    )
     ephemeris_svc = EphemerisService(
         cfg.pilot_src_dir,
         cfg.cache_dir,
         terrain_svc,
         horizons_url=cfg.horizons_url,
         horizons_timeout_s=cfg.horizons_timeout_s,
+        pilot_public_dir=cfg.pilot_public_dir,
     )
     coverage_svc = CoverageService(terrain_svc, ephemeris_svc)
     storage_svc = SQLiteStorage(cfg.db_path)
@@ -110,7 +116,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/api/health", response_model=HealthResponse)
     def health() -> HealthResponse:
         return HealthResponse(
-            terrainLayers=len(terrain_svc.layers),
+            terrainLayers=terrain_svc.layer_count,
             catalogSites=len(sites_svc.list_sites()),
             savedScenarios=storage_svc.count_scenarios(),
         )

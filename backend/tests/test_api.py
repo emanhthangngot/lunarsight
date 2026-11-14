@@ -35,14 +35,15 @@ def test_health_and_sites(client: TestClient) -> None:
     assert health.status_code == 200
     body = health.json()
     assert body["status"] == "ok"
-    assert body["terrainLayers"] == 5
-    assert body["catalogSites"] == 2
+    assert body["terrainLayers"] >= 31
+    assert body["catalogSites"] >= 15
 
     sites = client.get("/api/sites")
     assert sites.status_code == 200
     items = sites.json()
-    assert len(items) == 2
-    assert {s["id"] for s in items} == {"site-01", "site-04"}
+    assert len(items) >= 15
+    ids = {s["id"] for s in items}
+    assert {"site-01", "site-04", "site-23", "dm2", "amundsen-rim"}.issubset(ids)
     assert all(s["provenance"]["kind"] == "processed" for s in items)
 
 
@@ -64,8 +65,8 @@ def test_terrain_manifest_binary_elevation_and_patch(client: TestClient) -> None
     assert elev_ok.json()["outsideCoverage"] is False
     assert elev_ok.json()["heightM"] == pytest.approx(1737.178, abs=0.2)
 
-    # Outside -84 deg coverage returns explicit null, never 0
-    elev_out = client.get("/api/terrain/elevation", params={"latDeg": -82.0, "lonDegE": 0.0})
+    # Outside -78 deg coverage returns explicit null, never 0
+    elev_out = client.get("/api/terrain/elevation", params={"latDeg": -75.0, "lonDegE": 0.0})
     assert elev_out.status_code == 200
     assert elev_out.json()["outsideCoverage"] is True
     assert elev_out.json()["heightM"] is None
@@ -109,7 +110,7 @@ def test_horizon_preset_dynamic_and_outside_coverage(client: TestClient) -> None
     # Outside DEM coverage returns 404 instead of fabricated zero mask
     outside = client.get(
         "/api/horizon",
-        params={"latDeg": -80.0, "lonDegE": 10.0, "observerHeightM": 2.0},
+        params={"latDeg": -74.0, "lonDegE": 10.0, "observerHeightM": 2.0},
     )
     assert outside.status_code == 404
 
@@ -190,7 +191,7 @@ def test_ephemeris_precomputed_and_dynamic_horizons_cached(client: TestClient) -
     out = client.get(
         "/api/ephemeris",
         params={
-            "latDeg": -80.0,
+            "latDeg": -74.0,
             "lonDegE": 0.0,
             "startUtcMs": dyn_start,
             "endUtcMs": dyn_end,
@@ -208,7 +209,7 @@ def test_coverage_check(client: TestClient) -> None:
     assert inside.json()["horizonSupported"] is True
     assert inside.json()["ephemerisMode"] == "dynamic_horizons"
 
-    outside = client.post("/api/coverage/check", json={"latDeg": -81.0, "lonDegE": 120.0})
+    outside = client.post("/api/coverage/check", json={"latDeg": -75.0, "lonDegE": 120.0})
     assert outside.status_code == 200
     assert outside.json()["terrainSupported"] is False
     assert outside.json()["groundHeightM"] is None

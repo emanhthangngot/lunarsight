@@ -49,7 +49,7 @@ describe('DEM terrain sampling and layer fallback', () => {
     expect(heightAt(target.latDeg, target.lonDegE)).toBeCloseTo(1850, 4);
     // Away from fine patch, falls back to coarse regional layer
     expect(heightAt(-89.49, 180)).toBeCloseTo(1500, 4);
-    // Outside north coverage returns null rather than fabricating zero
-    expect(heightAt(-83.5, 180)).toBeNull();
+    // Outside north (-78 deg) coverage returns null rather than fabricating zero
+    expect(heightAt(-77.5, 180)).toBeNull();
   });
 });

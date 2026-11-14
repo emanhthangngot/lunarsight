@@ -30,7 +30,7 @@ export function SiteCommand({ open, onClose, sites, selectedSiteId, onChoose }: 
       }} /></div>
     <div id={listId} role="listbox" aria-label="Matching lunar sites" className="command-options">
       {options.map((site, index) => <div key={site.id} id={listId + '-' + index} role="option" aria-selected={index === active} className="command-option" onPointerMove={() => setActive(index)} onClick={() => choose(site)}>
-        <MapPin size={18} aria-hidden="true" /><div><strong>{site.name}</strong><span>{site.latDeg.toFixed(3)}° · {site.lonDegE.toFixed(3)}° E · mock · name unverified</span></div>{site.id === selectedSiteId && <Check size={18} aria-label="Current draft site" />}
+        <MapPin size={18} aria-hidden="true" /><div><strong>{site.name}</strong><span>{site.latDeg.toFixed(3)}° · {site.lonDegE.toFixed(3)}° E{site.category === 'mock' ? ' · mock' : ''}{!site.nameVerified ? ' · name unverified' : ''}</span></div>{site.id === selectedSiteId && <Check size={18} aria-label="Current draft site" />}
       </div>)}
       {options.length === 0 && <p className="command-empty" role="status">No matching mock sites. Custom coordinates are available in Mission.</p>}
     </div>

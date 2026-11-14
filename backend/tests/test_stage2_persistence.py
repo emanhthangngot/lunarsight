@@ -146,7 +146,7 @@ def test_analysis_job_outside_coverage_and_cancellation(client: TestClient) -> N
     sites = client.get("/api/sites").json()
     base_site = sites[0]
     outside_inputs = {
-        "site": {**base_site, "id": "custom:-80:0", "category": "custom", "latDeg": -80.0, "lonDegE": 0.0, "nameVerified": False},
+        "site": {**base_site, "id": "custom:-74:0", "category": "custom", "latDeg": -74.0, "lonDegE": 0.0, "nameVerified": False},
         "startUtcMs": 1_798_761_600_000,
         "durationDays": 1,
         "stepSeconds": 3600,

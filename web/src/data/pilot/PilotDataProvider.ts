@@ -1,12 +1,7 @@
 import type { EphemerisSeries, HorizonMask, LunarDataProvider, Provenance, SiteSummary, TerrainSource } from '../contract';
 import { validateCoordinates } from '../../geo/coordinates';
 import { rayMarchHorizonMask } from '../../geo/horizonRayMarch';
-import { WorkerTerrainMeshLoader } from '../../terrain/WorkerTerrainMeshLoader';
-import { createDemHeightAt, type DemLayerData, type DemManifest } from './demTerrain';
-import ephemerisSite01Raw from './ephemeris_site01.json';
-import ephemerisSite04Raw from './ephemeris_site04.json';
-import horizonSite01Raw from './horizon_site01.json';
-import horizonSite04Raw from './horizon_site04.json';
+import { createLazyDemTerrainSource, type DemManifest, type LazyDemTerrainSource } from './demTerrain';
 import pilotSitesRaw from './sites.json';
 
 type SiteLocation = Pick<SiteSummary, 'id' | 'latDeg' | 'lonDegE'>;
@@ -19,16 +14,6 @@ interface PrecomputedHorizonAsset {
   provenance: Provenance;
 }
 
-const EPHEMERIS_BY_SITE: Record<string, EphemerisSeries> = {
-  'site-01': ephemerisSite01Raw as unknown as EphemerisSeries,
-  'site-04': ephemerisSite04Raw as unknown as EphemerisSeries,
-};
-
-const HORIZONS_BY_SITE: Record<string, PrecomputedHorizonAsset> = {
-  'site-01': horizonSite01Raw as unknown as PrecomputedHorizonAsset,
-  'site-04': horizonSite04Raw as unknown as PrecomputedHorizonAsset,
-};
-
 function interpolateAngleDeg(a1: number, a2: number, alpha: number): number {
   let diff = (a2 - a1) % 360;
   if (diff > 180) diff -= 360;
@@ -40,23 +25,32 @@ function formatHeightKey(heightM: number): string {
   return Number.isInteger(heightM) ? String(heightM) : String(heightM);
 }
 
+const CATALOG_SITES = pilotSitesRaw as unknown as SiteSummary[];
+const CATALOG_SITE_IDS = new Set(CATALOG_SITES.map((s) => s.id));
+
 /**
  * PilotDataProvider serves processed NASA PGDA LOLA DEMs, spherical ray-marched
  * horizon masks (0–150 km), and 3-month JPL Horizons ephemerides (Q1 2027) for
- * verified Artemis candidate sites without mixing mock fallback data.
+ * the full Artemis south-polar candidate site catalog, lazily loading per-site assets.
  */
 export class PilotDataProvider implements LunarDataProvider {
   readonly kind = 'processed' as const;
-  private terrainPromise: Promise<TerrainSource> | null = null;
+  private terrainPromise: Promise<LazyDemTerrainSource> | null = null;
+  private readonly horizonCache = new Map<string, Promise<PrecomputedHorizonAsset | null>>();
+  private readonly ephemerisCache = new Map<string, Promise<EphemerisSeries>>();
 
   async listSites(): Promise<SiteSummary[]> {
-    return (pilotSitesRaw as unknown as SiteSummary[]).map((site) => ({
+    return CATALOG_SITES.map((site) => ({
       ...site,
       provenance: { ...site.provenance },
     }));
   }
 
   async getTerrain(): Promise<TerrainSource> {
+    return this.getLazyTerrain();
+  }
+
+  private getLazyTerrain(): Promise<LazyDemTerrainSource> {
     if (!this.terrainPromise) {
       this.terrainPromise = this.loadTerrain().catch((error) => {
         this.terrainPromise = null;
@@ -66,56 +60,53 @@ export class PilotDataProvider implements LunarDataProvider {
     return this.terrainPromise;
   }
 
-  private async loadTerrain(): Promise<TerrainSource> {
+  private async loadTerrain(): Promise<LazyDemTerrainSource> {
     const manifestResp = await fetch('/data/pilot/terrain_manifest.json');
     if (!manifestResp.ok) {
       throw new Error(`Failed to load terrain manifest (${manifestResp.status})`);
     }
     const manifest = (await manifestResp.json()) as DemManifest;
+    return createLazyDemTerrainSource(manifest, (meta) => meta.url);
+  }
 
-    const layers: DemLayerData[] = await Promise.all(
-      manifest.layers.map(async (meta) => {
-        const resp = await fetch(meta.url);
-        if (!resp.ok) {
-          throw new Error(`Failed to load DEM layer ${meta.id} (${resp.status})`);
-        }
-        const buffer = await resp.arrayBuffer();
-        const data = new Float32Array(buffer);
-        if (data.length !== meta.rows * meta.cols) {
-          throw new Error(`DEM layer ${meta.id} size mismatch: expected ${meta.rows * meta.cols}, got ${data.length}`);
-        }
-        return {
-          xMinM: meta.xMinM,
-          yMaxM: meta.yMaxM,
-          spacingM: meta.spacingM,
-          rows: meta.rows,
-          cols: meta.cols,
-          data,
-        };
-      }),
-    );
+  private loadPrecomputedHorizon(siteId: string): Promise<PrecomputedHorizonAsset | null> {
+    if (!CATALOG_SITE_IDS.has(siteId)) {
+      return Promise.resolve(null);
+    }
+    let cached = this.horizonCache.get(siteId);
+    if (!cached) {
+      cached = fetch(`/data/pilot/horizon_${siteId}.json`)
+        .then(async (resp) => {
+          if (resp.status === 404) return null;
+          if (!resp.ok) throw new Error(`Failed to load horizon asset for "${siteId}" (${resp.status})`);
+          return (await resp.json()) as PrecomputedHorizonAsset;
+        })
+        .catch((err) => {
+          this.horizonCache.delete(siteId);
+          throw err;
+        });
+      this.horizonCache.set(siteId, cached);
+    }
+    return cached;
+  }
 
-    const heightAt = createDemHeightAt(layers, manifest.coverage);
-
-    return {
-      type: 'heightFunction',
-      provenance: { ...manifest.provenance },
-      coverage: { ...manifest.coverage },
-      heightAt,
-      createMeshLoader: () =>
-        new WorkerTerrainMeshLoader(
-          () =>
-            new Worker(new URL('../../terrain/localMesh.worker.ts', import.meta.url), {
-              type: 'module',
-            }),
-          {
-            type: 'init',
-            layers,
-            coverage: manifest.coverage,
-            provenance: manifest.provenance,
-          },
-        ),
-    };
+  private loadPrecomputedEphemeris(siteId: string): Promise<EphemerisSeries> {
+    let cached = this.ephemerisCache.get(siteId);
+    if (!cached) {
+      cached = fetch(`/data/pilot/ephemeris_${siteId}.json`)
+        .then(async (resp) => {
+          if (!resp.ok) {
+            throw new Error(`Failed to load JPL Horizons asset for "${siteId}" (${resp.status})`);
+          }
+          return (await resp.json()) as EphemerisSeries;
+        })
+        .catch((err) => {
+          this.ephemerisCache.delete(siteId);
+          throw err;
+        });
+      this.ephemerisCache.set(siteId, cached);
+    }
+    return cached;
   }
 
   async getHorizonMask(site: SiteLocation, observerHeightM: number): Promise<HorizonMask | null> {
@@ -124,7 +115,7 @@ export class PilotDataProvider implements LunarDataProvider {
       throw new RangeError('Observer height must be finite and nonnegative');
     }
 
-    const asset = HORIZONS_BY_SITE[site.id];
+    const asset = await this.loadPrecomputedHorizon(site.id);
     const presetElevations = asset?.heights[formatHeightKey(observerHeightM)];
     if (asset && presetElevations) {
       return {
@@ -138,7 +129,8 @@ export class PilotDataProvider implements LunarDataProvider {
     }
 
     // Arbitrary heights or custom south-polar coordinates ray-march the real loaded PGDA DEM.
-    const terrain = await this.getTerrain();
+    const terrain = await this.getLazyTerrain();
+    await terrain.ensureLayersFor(point.latDeg, point.lonDegE);
     return rayMarchHorizonMask(
       { ...site, ...point },
       observerHeightM,
@@ -166,12 +158,13 @@ export class PilotDataProvider implements LunarDataProvider {
       throw new RangeError('Use finite UTC bounds, end >= start, and a step of at least 1 ms');
     }
 
-    const ephem = EPHEMERIS_BY_SITE[site.id];
-    if (!ephem) {
+    if (!CATALOG_SITE_IDS.has(site.id)) {
       throw new RangeError(
-        `Processed JPL Horizons ephemeris is outside coverage for "${site.id}". Select Site 01 or Site 04 in static pilot mode.`,
+        `Processed JPL Horizons ephemeris is outside coverage for "${site.id}". Select a catalog site in static pilot mode.`,
       );
     }
+
+    const ephem = await this.loadPrecomputedEphemeris(site.id);
 
     const pilotStartMs = ephem.startUtcMs;
     const pilotStepMs = ephem.stepSeconds * 1000;

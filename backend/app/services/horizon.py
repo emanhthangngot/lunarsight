@@ -22,25 +22,53 @@ def _format_height_key(height_m: float) -> str:
 class HorizonService:
     """Serves precomputed site masks and computes/caches custom South Polar horizon masks."""
 
-    def __init__(self, pilot_src_dir: Path, cache_dir: Path, terrain: TerrainService) -> None:
-        self._src_dir = pilot_src_dir
+    def __init__(
+        self,
+        pilot_src_dir: Path,
+        cache_dir: Path,
+        terrain: TerrainService,
+        pilot_public_dir: Path | None = None,
+    ) -> None:
+        self._asset_dirs = [d for d in (pilot_public_dir, pilot_src_dir) if d is not None]
         self._cache_dir = cache_dir / "horizons"
         self._terrain = terrain
-        self._precomputed: dict[str, dict] | None = None
+        self._precomputed_paths: dict[str, Path] | None = None
+        self._precomputed_cache: dict[str, dict] = {}
         self._mem_cache: dict[str, HorizonMask] = {}
 
-    def _load_precomputed(self) -> dict[str, dict]:
-        if self._precomputed is None:
-            loaded: dict[str, dict] = {}
-            for site_id, filename in [
-                ("site-01", "horizon_site01.json"),
-                ("site-04", "horizon_site04.json"),
-            ]:
-                path = self._src_dir / filename
-                if path.exists():
-                    loaded[site_id] = json.loads(path.read_text(encoding="utf-8"))
-            self._precomputed = loaded
-        return self._precomputed
+    def _discover_precomputed(self) -> dict[str, Path]:
+        if self._precomputed_paths is None:
+            discovered: dict[str, Path] = {}
+            for directory in self._asset_dirs:
+                if not directory.exists():
+                    continue
+                for path in sorted(directory.glob("horizon_*.json")):
+                    try:
+                        payload = json.loads(path.read_text(encoding="utf-8"))
+                        sid = payload.get("siteId")
+                        if isinstance(sid, str) and sid and sid not in discovered:
+                            discovered[sid] = path
+                    except (OSError, json.JSONDecodeError):
+                        continue
+            self._precomputed_paths = discovered
+        return self._precomputed_paths
+
+    def _get_precomputed(self, site_id: str) -> dict | None:
+        cached = self._precomputed_cache.get(site_id)
+        if cached is not None:
+            return cached
+        for directory in self._asset_dirs:
+            direct = directory / f"horizon_{site_id}.json"
+            if direct.exists():
+                loaded = json.loads(direct.read_text(encoding="utf-8"))
+                self._precomputed_cache[site_id] = loaded
+                return loaded
+        path = self._discover_precomputed().get(site_id)
+        if path is not None and path.exists():
+            loaded = json.loads(path.read_text(encoding="utf-8"))
+            self._precomputed_cache[site_id] = loaded
+            return loaded
+        return None
 
     def get_horizon_mask(
         self,
@@ -54,7 +82,7 @@ class HorizonService:
             raise ValueError("observerHeightM must be finite and nonnegative")
 
         if site_id:
-            pre = self._load_precomputed().get(site_id)
+            pre = self._get_precomputed(site_id)
             if pre is not None:
                 heights_map = pre.get("heights", {})
                 preset = heights_map.get(_format_height_key(observer_height_m))

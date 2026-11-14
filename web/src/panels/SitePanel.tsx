@@ -23,7 +23,7 @@ export function SitePanel({ sites, selectedSite, terrain, onSelect }: {
         provenance: { ...terrain.provenance, notes: (terrain.provenance.notes ?? '') + ' User-entered coordinate; name and position are not catalog-verified.' },
       });
       setInvalid(false);
-      setMessage(outside ? 'Outside terrain coverage (latitude must be at or south of −84°). Analysis will show unavailable, not fabricated values.' : 'Valid custom coordinate selected. Apply scenario to analyze. Longitude normalized to ' + point.lonDegE + '° E.');
+      setMessage(outside ? `Outside terrain coverage (latitude must be at or south of ${terrain.coverage.northDeg}°). Analysis will show unavailable, not fabricated values.` : 'Valid custom coordinate selected. Apply scenario to analyze. Longitude normalized to ' + point.lonDegE + '° E.');
     } catch (reason) {
       setInvalid(true); setMessage(reason instanceof Error ? reason.message : 'Invalid coordinates');
     }

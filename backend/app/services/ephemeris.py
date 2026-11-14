@@ -115,36 +115,57 @@ class EphemerisService:
         terrain: TerrainService,
         horizons_url: str,
         horizons_timeout_s: float = 45.0,
+        pilot_public_dir: Path | None = None,
     ) -> None:
-        self._src_dir = pilot_src_dir
+        self._asset_dirs = [d for d in (pilot_public_dir, pilot_src_dir) if d is not None]
         self._cache_dir = cache_dir / "ephemeris"
         self._terrain = terrain
         self._horizons_url = horizons_url
         self._horizons_timeout_s = horizons_timeout_s
-        self._precomputed: dict[str, EphemerisSeries] | None = None
+        self._precomputed_paths: dict[str, Path] | None = None
+        self._precomputed_cache: dict[str, EphemerisSeries] = {}
         self._mem_cache: dict[str, EphemerisSeries] = {}
 
-    def _load_precomputed(self) -> dict[str, EphemerisSeries]:
-        if self._precomputed is None:
-            loaded: dict[str, EphemerisSeries] = {}
-            for site_id, filename in [
-                ("site-01", "ephemeris_site01.json"),
-                ("site-04", "ephemeris_site04.json"),
-            ]:
-                path = self._src_dir / filename
-                if path.exists():
-                    loaded[site_id] = EphemerisSeries.model_validate_json(
-                        path.read_text(encoding="utf-8")
-                    )
-            self._precomputed = loaded
-        return self._precomputed
+    def _discover_precomputed(self) -> dict[str, Path]:
+        if self._precomputed_paths is None:
+            discovered: dict[str, Path] = {}
+            for directory in self._asset_dirs:
+                if not directory.exists():
+                    continue
+                for path in sorted(directory.glob("ephemeris_*.json")):
+                    try:
+                        payload = json.loads(path.read_text(encoding="utf-8"))
+                        sid = payload.get("siteId")
+                        if isinstance(sid, str) and sid and sid not in discovered:
+                            discovered[sid] = path
+                    except (OSError, json.JSONDecodeError):
+                        continue
+            self._precomputed_paths = discovered
+        return self._precomputed_paths
+
+    def _get_precomputed(self, site_id: str) -> EphemerisSeries | None:
+        cached = self._precomputed_cache.get(site_id)
+        if cached is not None:
+            return cached
+        for directory in self._asset_dirs:
+            direct = directory / f"ephemeris_{site_id}.json"
+            if direct.exists():
+                loaded = EphemerisSeries.model_validate_json(direct.read_text(encoding="utf-8"))
+                self._precomputed_cache[site_id] = loaded
+                return loaded
+        path = self._discover_precomputed().get(site_id)
+        if path is not None and path.exists():
+            loaded = EphemerisSeries.model_validate_json(path.read_text(encoding="utf-8"))
+            self._precomputed_cache[site_id] = loaded
+            return loaded
+        return None
 
     def has_precomputed_coverage(
         self, site_id: str | None, start_utc_ms: int, end_utc_ms: int
     ) -> bool:
         if not site_id:
             return False
-        ephem = self._load_precomputed().get(site_id)
+        ephem = self._get_precomputed(site_id)
         if ephem is None or not ephem.timesUtcMs:
             return False
         return start_utc_ms >= ephem.timesUtcMs[0] and end_utc_ms <= ephem.timesUtcMs[-1]
@@ -171,9 +192,9 @@ class EphemerisService:
 
         resolved_site_id = site_id or f"custom:{lat_v}:{lon_v}"
 
-        # Fast-path: precomputed Q1 2027 Horizons series for Site 01 / Site 04
+        # Fast-path: precomputed Q1 2027 Horizons series for any catalog site
         if site_id:
-            ephem = self._load_precomputed().get(site_id)
+            ephem = self._get_precomputed(site_id)
             if ephem is not None and ephem.timesUtcMs:
                 if start_utc_ms >= ephem.timesUtcMs[0] and end_utc_ms <= ephem.timesUtcMs[-1]:
                     return _resample_series(ephem, site_id, start_utc_ms, end_utc_ms, step_seconds)

@@ -11,7 +11,7 @@
       "kind": "processed",
       "source": "NASA Artemis Candidate Landing Sites / PGDA 78 Site04 5 m/px",
       "version": "pilot-v2",
-      "generatedAt": "2026-11-14T06:49:41.500534+00:00",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
       "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
     }
   },
@@ -27,7 +27,215 @@
       "kind": "processed",
       "source": "NASA Artemis Candidate Landing Sites / PGDA 78 Site01 5 m/px",
       "version": "pilot-v2",
-      "generatedAt": "2026-11-14T06:49:41.500534+00:00",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "site-06",
+    "name": "Site 06 \u2014 Nobile Rim 1",
+    "category": "artemis-candidate",
+    "latDeg": -85.4381,
+    "lonDegE": 37.36667,
+    "nameVerified": true,
+    "description": "Elevated rim terrain bordering Nobile crater with access to nearby shadowed floors.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 78 Site06 5 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "site-07",
+    "name": "Site 07 \u2014 Peak Near Shackleton",
+    "category": "artemis-candidate",
+    "latDeg": -88.81101,
+    "lonDegE": 123.69007,
+    "nameVerified": true,
+    "description": "Prominent ridge peak near Shackleton crater offering sustained solar illumination.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 78 Site07 5 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "site-11",
+    "name": "Site 11 \u2014 de Gerlache Rim",
+    "category": "artemis-candidate",
+    "latDeg": -88.68342,
+    "lonDegE": 292.0679,
+    "nameVerified": true,
+    "description": "Artemis III candidate region along the illuminated rim of de Gerlache crater.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 78 Site11 5 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "site-20",
+    "name": "Site 20 \u2014 Leibnitz Beta Plateau",
+    "category": "artemis-candidate",
+    "latDeg": -85.42658,
+    "lonDegE": 31.74276,
+    "nameVerified": true,
+    "description": "High-standing plateau region (Mons Mouton / Leibnitz Beta) with broad sunlit benches.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 78 Site20 5 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "site-23",
+    "name": "Site 23 \u2014 Malapert Massif",
+    "category": "artemis-candidate",
+    "latDeg": -85.99478,
+    "lonDegE": 359.76422,
+    "nameVerified": true,
+    "description": "Earth-facing massif peak with strong direct-to-Earth visibility and illumination.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 78 Site23 5 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "haworth",
+    "name": "Haworth",
+    "category": "artemis-candidate",
+    "latDeg": -86.76394,
+    "lonDegE": 337.22298,
+    "nameVerified": true,
+    "description": "Artemis III candidate region bordering Haworth crater and adjacent permanently shadowed terrain.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 78 Haworth 5 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "shoemaker",
+    "name": "Shoemaker",
+    "category": "artemis-candidate",
+    "latDeg": -87.18351,
+    "lonDegE": 62.83501,
+    "nameVerified": true,
+    "description": "High-resolution PGDA 78 site adjacent to Shoemaker crater.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 78 Shoemaker 5 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "dm2",
+    "name": "DM2 \u2014 Nobile Rim 2",
+    "category": "artemis-candidate",
+    "latDeg": -83.95402,
+    "lonDegE": 58.82205,
+    "nameVerified": true,
+    "description": "Artemis III candidate region on the eastern rim of Nobile crater.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 78 DM2 5 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "amundsen-rim",
+    "name": "Amundsen Rim",
+    "category": "artemis-candidate",
+    "latDeg": -84.22874,
+    "lonDegE": 69.44395,
+    "nameVerified": true,
+    "description": "Artemis III candidate region on the rim of Amundsen crater.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 90 LDEM_83S_10MPP_ADJ 10 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "faustini-rim-a",
+    "name": "Faustini Rim A",
+    "category": "artemis-candidate",
+    "latDeg": -87.88965,
+    "lonDegE": 90.0,
+    "nameVerified": true,
+    "description": "Artemis III candidate region along the rim of Faustini crater.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 90 LDEM_83S_10MPP_ADJ 10 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "de-gerlache-rim-2",
+    "name": "de Gerlache Rim 2",
+    "category": "artemis-candidate",
+    "latDeg": -88.22998,
+    "lonDegE": 295.37156,
+    "nameVerified": true,
+    "description": "Secondary Artemis III candidate region near de Gerlache crater.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 90 LDEM_83S_10MPP_ADJ 10 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "connecting-ridge-ext",
+    "name": "Connecting Ridge Extension",
+    "category": "artemis-candidate",
+    "latDeg": -89.03242,
+    "lonDegE": 258.00071,
+    "nameVerified": true,
+    "description": "Artemis III candidate region extending from Connecting Ridge toward de Gerlache.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 90 LDEM_83S_10MPP_ADJ 10 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
+      "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
+    }
+  },
+  {
+    "id": "de-gerlache-kocher",
+    "name": "de Gerlache-Kocher Massif",
+    "category": "artemis-candidate",
+    "latDeg": -85.82955,
+    "lonDegE": 243.67798,
+    "nameVerified": true,
+    "description": "Artemis III candidate massif between de Gerlache and Kocher craters.",
+    "provenance": {
+      "kind": "processed",
+      "source": "NASA Artemis Candidate Landing Sites / PGDA 90 LDEM_83S_10MPP_ADJ 10 m/px",
+      "version": "pilot-v2",
+      "generatedAt": "2026-11-14T09:49:29.152386+00:00",
       "notes": "Verified coordinates matched across DEM, horizon mask, and JPL Horizons ephemeris."
     }
   }

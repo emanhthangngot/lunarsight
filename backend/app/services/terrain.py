@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import json
 import math
 from pathlib import Path
+import threading
 import numpy as np
 
 from ..geo import south_polar_forward, validate_coordinates
@@ -17,6 +18,29 @@ class LoadedDemLayer:
     meta: DemLayerMeta
     raw_bytes: bytes
     grid: np.ndarray  # shape (rows, cols), dtype float32
+
+
+def _meta_bounds_xy(meta: DemLayerMeta) -> tuple[float, float, float, float]:
+    """Return pixel-center bounding box (x_min, x_max, y_min, y_max) in polar stereographic metres."""
+    x_min = meta.xMinM + 0.5 * meta.spacingM
+    x_max = meta.xMinM + (meta.cols - 0.5) * meta.spacingM
+    y_max = meta.yMaxM - 0.5 * meta.spacingM
+    y_min = meta.yMaxM - (meta.rows - 0.5) * meta.spacingM
+    return x_min, x_max, y_min, y_max
+
+
+def _meta_contains_xy(meta: DemLayerMeta, x_m: float, y_m: float) -> bool:
+    if meta.rows < 2 or meta.cols < 2 or meta.spacingM <= 0:
+        return False
+    x_min, x_max, y_min, y_max = _meta_bounds_xy(meta)
+    return x_min <= x_m <= x_max and y_min <= y_m <= y_max
+
+
+def _meta_overlaps_xy(meta: DemLayerMeta, x_arr: np.ndarray, y_arr: np.ndarray) -> np.ndarray:
+    if meta.rows < 2 or meta.cols < 2 or meta.spacingM <= 0:
+        return np.zeros(x_arr.shape, dtype=bool)
+    x_min, x_max, y_min, y_max = _meta_bounds_xy(meta)
+    return (x_arr >= x_min) & (x_arr <= x_max) & (y_arr >= y_min) & (y_arr <= y_max)
 
 
 def sample_layer_bilinear_scalar(layer: LoadedDemLayer, x_m: float, y_m: float) -> float | None:
@@ -75,25 +99,39 @@ def sample_layer_bilinear_array(
 
 
 class TerrainService:
-    """Serves PGDA DEM mosaic metadata, layer binaries, point elevation, and cropped patches."""
+    """Serves PGDA DEM mosaic metadata, lazy-loaded layer binaries, elevation, and cropped patches."""
 
     def __init__(self, pilot_public_dir: Path) -> None:
         self._public_dir = pilot_public_dir
+        self._lock = threading.Lock()
         self._manifest: DemManifest | None = None
-        self._layers: list[LoadedDemLayer] | None = None
+        self._metas_by_id: dict[str, DemLayerMeta] = {}
         self._layers_by_id: dict[str, LoadedDemLayer] = {}
 
-    def _ensure_loaded(self) -> tuple[DemManifest, list[LoadedDemLayer]]:
-        if self._manifest is not None and self._layers is not None:
-            return self._manifest, self._layers
+    def _ensure_manifest(self) -> DemManifest:
+        if self._manifest is not None:
+            return self._manifest
+        with self._lock:
+            if self._manifest is None:
+                manifest_path = self._public_dir / "terrain_manifest.json"
+                raw_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                manifest = DemManifest.model_validate(raw_manifest)
+                self._metas_by_id = {meta.id: meta for meta in manifest.layers}
+                self._manifest = manifest
+            return self._manifest
 
-        manifest_path = self._public_dir / "terrain_manifest.json"
-        raw_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        manifest = DemManifest.model_validate(raw_manifest)
-
-        loaded: list[LoadedDemLayer] = []
-        by_id: dict[str, LoadedDemLayer] = {}
-        for meta in manifest.layers:
+    def _get_or_load_layer(self, layer_id: str) -> LoadedDemLayer | None:
+        cached = self._layers_by_id.get(layer_id)
+        if cached is not None:
+            return cached
+        manifest = self._ensure_manifest()
+        meta = self._metas_by_id.get(layer_id)
+        if meta is None:
+            return None
+        with self._lock:
+            cached = self._layers_by_id.get(layer_id)
+            if cached is not None:
+                return cached
             filename = Path(meta.url).name
             bin_path = self._public_dir / filename
             raw_bytes = bin_path.read_bytes()
@@ -108,31 +146,33 @@ class TerrainService:
                 raw_bytes=raw_bytes,
                 grid=arr.reshape((meta.rows, meta.cols)),
             )
-            loaded.append(layer)
-            by_id[meta.id] = layer
-
-        self._manifest = manifest
-        self._layers = loaded
-        self._layers_by_id = by_id
-        return manifest, loaded
+            self._layers_by_id[meta.id] = layer
+            return layer
 
     @property
     def coverage(self) -> CoverageBounds:
-        manifest, _ = self._ensure_loaded()
-        return manifest.coverage
+        return self._ensure_manifest().coverage
 
     @property
     def provenance(self) -> Provenance:
-        manifest, _ = self._ensure_loaded()
-        return manifest.provenance
+        return self._ensure_manifest().provenance
+
+    @property
+    def layer_count(self) -> int:
+        return len(self._ensure_manifest().layers)
 
     @property
     def layers(self) -> list[LoadedDemLayer]:
-        _, layers = self._ensure_loaded()
-        return layers
+        manifest = self._ensure_manifest()
+        loaded: list[LoadedDemLayer] = []
+        for meta in manifest.layers:
+            layer = self._get_or_load_layer(meta.id)
+            if layer is not None:
+                loaded.append(layer)
+        return loaded
 
     def get_manifest(self, layer_url_prefix: str = "/api/terrain/layers") -> DemManifest:
-        manifest, _ = self._ensure_loaded()
+        manifest = self._ensure_manifest()
         prefix = layer_url_prefix.rstrip("/")
         rewritten_layers = [
             layer.model_copy(update={"url": f"{prefix}/{layer.id}.bin"})
@@ -141,34 +181,44 @@ class TerrainService:
         return manifest.model_copy(update={"layers": rewritten_layers})
 
     def get_layer(self, layer_id: str) -> LoadedDemLayer | None:
-        self._ensure_loaded()
-        return self._layers_by_id.get(layer_id)
+        return self._get_or_load_layer(layer_id)
 
     def height_at(self, lat_deg: float, lon_deg_e: float) -> tuple[float | None, str | None]:
         """Hierarchical height lookup across priority-ordered layers. Returns (heightM, layerId)."""
         lat_v, lon_v = validate_coordinates(lat_deg, lon_deg_e)
-        manifest, layers = self._ensure_loaded()
+        manifest = self._ensure_manifest()
         if lat_v < manifest.coverage.southDeg or lat_v > manifest.coverage.northDeg:
             return None, None
 
         x_m, y_m = south_polar_forward(lat_v, lon_v)
-        for layer in layers:
-            value = sample_layer_bilinear_scalar(layer, float(x_m), float(y_m))
+        x_f, y_f = float(x_m), float(y_m)
+        for meta in manifest.layers:
+            if not _meta_contains_xy(meta, x_f, y_f):
+                continue
+            layer = self._get_or_load_layer(meta.id)
+            if layer is None:
+                continue
+            value = sample_layer_bilinear_scalar(layer, x_f, y_f)
             if value is not None:
-                return value, layer.meta.id
+                return value, meta.id
         return None, None
 
     def height_array(self, lat_deg: np.ndarray, lon_deg_e: np.ndarray) -> np.ndarray:
-        """Vectorized hierarchical height lookup across all layers."""
-        manifest, layers = self._ensure_loaded()
+        """Vectorized hierarchical height lookup across overlapping layers only."""
+        manifest = self._ensure_manifest()
         x_m, y_m = south_polar_forward(lat_deg, lon_deg_e)
         result = np.full(np.asarray(lat_deg).shape, np.nan, dtype=np.float64)
         in_lat = (lat_deg >= manifest.coverage.southDeg) & (lat_deg <= manifest.coverage.northDeg)
 
-        for layer in layers:
+        for meta in manifest.layers:
             need = in_lat & np.isnan(result)
             if not np.any(need):
                 break
+            if not np.any(_meta_overlaps_xy(meta, x_m[need], y_m[need])):
+                continue
+            layer = self._get_or_load_layer(meta.id)
+            if layer is None:
+                continue
             sampled = sample_layer_bilinear_array(layer, x_m[need], y_m[need])
             result[need] = sampled
         return result
@@ -193,7 +243,7 @@ class TerrainService:
             raise ValueError("radiusM must be finite and between 0 and 100,000 m")
 
         lat_v, lon_v = validate_coordinates(lat_deg, lon_deg_e)
-        manifest, layers = self._ensure_loaded()
+        manifest = self._ensure_manifest()
         if lat_v < manifest.coverage.southDeg or lat_v > manifest.coverage.northDeg:
             return None
 
@@ -201,8 +251,11 @@ class TerrainService:
         x_f, y_f = float(x_m), float(y_m)
 
         selected: LoadedDemLayer | None = None
-        for layer in layers:
-            if sample_layer_bilinear_scalar(layer, x_f, y_f) is not None:
+        for meta in manifest.layers:
+            if not _meta_contains_xy(meta, x_f, y_f):
+                continue
+            layer = self._get_or_load_layer(meta.id)
+            if layer is not None and sample_layer_bilinear_scalar(layer, x_f, y_f) is not None:
                 selected = layer
                 break
         if selected is None:

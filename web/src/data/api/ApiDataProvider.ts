@@ -2,8 +2,7 @@ import type { WindowMetrics } from '../../analysis/visibility';
 import type { EphemerisSeries, HorizonMask, LunarDataProvider, SiteSummary, TerrainSource } from '../contract';
 import type { ScenarioInputs, ScenarioResult } from '../../state/scenario';
 import { validateCoordinates } from '../../geo/coordinates';
-import { WorkerTerrainMeshLoader } from '../../terrain/WorkerTerrainMeshLoader';
-import { createDemHeightAt, type DemLayerData, type DemManifest } from '../pilot/demTerrain';
+import { createLazyDemTerrainSource, type DemManifest } from '../pilot/demTerrain';
 
 type SiteLocation = Pick<SiteSummary, 'id' | 'latDeg' | 'lonDegE'>;
 
@@ -137,50 +136,7 @@ export class ApiDataProvider implements LunarDataProvider {
       throw new Error(await readErrorDetail(manifestResp, `Failed to load terrain manifest (${manifestResp.status})`));
     }
     const manifest = (await manifestResp.json()) as DemManifest;
-
-    const layers: DemLayerData[] = await Promise.all(
-      manifest.layers.map(async (meta) => {
-        const resp = await fetch(this.resolveUrl(meta.url));
-        if (!resp.ok) {
-          throw new Error(`Failed to load DEM layer ${meta.id} (${resp.status})`);
-        }
-        const buffer = await resp.arrayBuffer();
-        const data = new Float32Array(buffer);
-        if (data.length !== meta.rows * meta.cols) {
-          throw new Error(`DEM layer ${meta.id} size mismatch: expected ${meta.rows * meta.cols}, got ${data.length}`);
-        }
-        return {
-          xMinM: meta.xMinM,
-          yMaxM: meta.yMaxM,
-          spacingM: meta.spacingM,
-          rows: meta.rows,
-          cols: meta.cols,
-          data,
-        };
-      }),
-    );
-
-    const heightAt = createDemHeightAt(layers, manifest.coverage);
-
-    return {
-      type: 'heightFunction',
-      provenance: { ...manifest.provenance },
-      coverage: { ...manifest.coverage },
-      heightAt,
-      createMeshLoader: () =>
-        new WorkerTerrainMeshLoader(
-          () =>
-            new Worker(new URL('../../terrain/localMesh.worker.ts', import.meta.url), {
-              type: 'module',
-            }),
-          {
-            type: 'init',
-            layers,
-            coverage: manifest.coverage,
-            provenance: manifest.provenance,
-          },
-        ),
-    };
+    return createLazyDemTerrainSource(manifest, (meta) => this.resolveUrl(meta.url));
   }
 
   async getHorizonMask(site: SiteLocation, observerHeightM: number): Promise<HorizonMask | null> {
