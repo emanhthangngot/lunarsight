@@ -21,6 +21,7 @@ coverage/
 /web/dist/
 
 # Credentials and local configuration
+.vercel/
 .env
 .env.*
 !.env.example
