@@ -8,7 +8,7 @@
 
 ## Current phase
 
-On 13 November 2026 the user authorized building a **3D web app with mock data first**, connecting processed real data later ([ADR 0002](docs/decisions/0002-mock-first-3d-web.md)). Work is in progress on branch `feat/3d-mock-viewer`; the app lives in `web/` (Vite + React + TypeScript + CesiumJS + pnpm + Vitest). Documentation work continues alongside.
+On 13 November 2026 the user authorized building a **3D web app with mock data first**, connecting processed real data later ([ADR 0002](docs/decisions/0002-mock-first-3d-web.md)). On 14 November the user accepted **local Three.js terrain instead of the global Cesium viewer**. The local Three.js mock viewer is implemented; see [project state](docs/project-state.md) and [current handoff](docs/handoffs/current.md) for scoped verification and limitations; preserve the modern UI and mock 1.1.0 science. Work is on branch `feat/3d-mock-viewer` in `web/` (Vite + React + TypeScript + Three.js + pnpm + Vitest). Documentation work continues alongside.
 
 Still not authorized: acquiring or downloading datasets, processing/download scripts, deployment/provisioning, CI jobs, and any claim that displayed values are real, validated, or deployed. Every mock value must be labelled mock in data and in the UI.
 

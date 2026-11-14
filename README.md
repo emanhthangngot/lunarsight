@@ -31,8 +31,8 @@ The [original proposal transcription](docs/reference/proposal-v2.md) is a histor
 | Current work scope | Documentation, agent context, system design, and an in-progress mock-data 3D viewer prototype (ADR 0002). |
 | Product features | Proposal-derived requirements awaiting prioritization. |
 | Geography, products, data volume, and resolution | Candidate options; no team selection recorded. |
-| Backend, storage, hosting, and AI provider | Open decisions. The prototype stack (Vite, React, TypeScript, CesiumJS, pnpm, Vitest) is accepted for the mock prototype only. |
-| Architecture and API contracts | Proposed designs for review. |
+| Backend, storage, hosting, and AI provider | Open decisions. Vite, React, TypeScript, **local Three.js**, pnpm and Vitest are accepted for the mock prototype only; the 14 November renderer cutover is in progress and unverified. |
+| Architecture and API contracts | Broader system/service designs remain proposals; the mock client provider/mesh contract exists in `web/`. |
 | Real-data connection, acquisition, or deployment | Future work after a subsequent explicit instruction. |
 
 The roughly 56.2 GB figure previously researched is retained only as **one illustrative, unapproved acquisition scenario**. It is not a project requirement, an agreed download budget, or a statement of data acquired for this repository.
@@ -46,7 +46,7 @@ git clone https://github.com/emanhthangngot/lunarsight.git
 cd lunarsight
 ```
 
-Prototype commands are defined in `web/` (pnpm) once the scaffold exists; use only what `web/package.json` provides. No data download, CI, or deployment command is defined. The [agent workflow](docs/agent-workflow.md) explains how to keep durable project state, prepare a bounded task, hand work over, and report evidence without inventing completion.
+Prototype commands are defined in `web/` (pnpm); use only what `web/package.json` provides. No data download, CI, or deployment command is defined. The [agent workflow](docs/agent-workflow.md) explains how to keep durable project state, prepare a bounded task, hand work over, and report evidence without inventing completion.
 
 ## Repository organization
 

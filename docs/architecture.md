@@ -8,9 +8,9 @@ Basis: [LunarSight V2 proposal](reference/proposal-v2.md), especially sections 3
 
 Connect a lunar location and mission configuration to understandable, reproducible evidence. Interactive Map, Local Horizon, Mission Feasibility Assessment, Mission Timeline, Scenarios, Sensitivity, AI Advisor, and Reports should refer to the same identified scenario and result.
 
-The proposed starting shape is a modular application with clear internal boundaries. These boundaries do not require separate deployed services. An independent worker becomes useful only if measured computation or deployment constraints justify it. A framework, map engine, database, queue, or microservice topology has not been selected.
+The proposed starting shape is a modular application with clear internal boundaries, not necessarily separate deployed services. The broader backend, database and queue topology remains unselected.
 
-**Prototype boundary (in progress, not verified):** the mock viewer maps to FR-005/006/007/008/010. UI code depends only on a `LunarDataProvider` interface (sites, terrain, horizon mask, ephemeris, each with provenance `mock` or `processed`). A mock provider is first; processed real data connects later through the same interface. The client is Vite + React + TypeScript + CesiumJS ([ADR 0002](decisions/0002-mock-first-3d-web.md)); server, storage, and hosting remain open.
+**Prototype boundary (local-renderer cutover in progress, not verified):** the mock viewer maps to FR-005/006/007/008/010. UI code depends on `LunarDataProvider` (sites, terrain, horizon mask, ephemeris, with provenance). The accepted client is Vite + React + TypeScript + **local Three.js** ([ADR 0002](decisions/0002-mock-first-3d-web.md)). Terrain mesh generation runs in a dedicated browser Worker with transferred buffers; scalar heights remain available to unchanged science code. A finite curved patch replaces the global Cesium globe. A processed-data adapter, server, storage and hosting remain pending.
 
 ## Logical components
 

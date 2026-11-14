@@ -4,6 +4,8 @@
 
 **Trạng thái: tài liệu cùng bản prototype web 3D dùng dữ liệu giả (mock) đang được xây dựng trên nhánh `feat/3d-mock-viewer`, mã nguồn trong `web/`.** Ngày 13/11/2026 người dùng cho phép xây ứng dụng web 3D bằng dữ liệu mock có gắn nhãn rõ ràng trước, sau đó mới kết nối dữ liệu thật đã xử lý ([ADR 0002](docs/decisions/0002-mock-first-3d-web.md)). Nhóm chưa chốt bộ dữ liệu, dung lượng, độ phân giải hoặc phương án triển khai; chưa tải dữ liệu, chưa có script xử lý, CI hay triển khai, và prototype không hiển thị dữ liệu thật.
 
+Ngày 14/11/2026 người dùng chấp nhận chuyển từ Cesium toàn cầu sang **địa hình cục bộ bằng Three.js**; việc chuyển đổi đang thực hiện và **chưa được kiểm chứng khi chạy**. Giữ nguyên giao diện hiện đại và mô hình mock 1.1.0; kết quả kiểm thử Cesium trước đây không chứng nhận phiên bản Three.js.
+
 Tên **LunarSight** giữ sự nhất quán với proposal: Lunar là Mặt Trăng; Sight gợi việc quan sát và hiểu điều kiện tại một địa điểm.
 
 ## Các tài liệu đã tổ chức
@@ -25,7 +27,7 @@ Xem toàn bộ trong [mục lục tài liệu](docs/README.md).
 - Các phương án 0–90°S, 60–90°S và 80–90°S là lựa chọn để nhóm cân nhắc.
 - Khoảng **56,2 GB** chỉ là một kịch bản dữ liệu minh họa chưa được nhóm thông qua.
 - Các nguồn NASA/PDS được ghi là ứng viên; việc xác minh nguồn không đồng nghĩa nhóm đã chọn hoặc đã tải nguồn đó cho repo.
-- Kiến trúc, API, cơ sở dữ liệu, framework, hosting và AI provider đều còn là thiết kế đề xuất.
+- Kiến trúc hệ thống, API dịch vụ, cơ sở dữ liệu, hosting và AI provider còn là đề xuất. Stack prototype đã được chấp nhận: Vite + React + TypeScript + Three.js cục bộ + pnpm + Vitest (ADR 0002).
 - Những quan sát và số liệu demo trong proposal gốc không phải kết quả đã triển khai trong repo.
 
 ## Bắt đầu làm việc

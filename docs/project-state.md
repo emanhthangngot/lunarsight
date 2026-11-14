@@ -13,17 +13,19 @@ Updated: **14 November 2026**. This is the concise starting point for the team a
 
 ## Current scope
 
-**Implemented, mock-only:** a modern immersive web prototype exists in `web/` on branch `feat/3d-mock-viewer` (Vite + React + TypeScript + CesiumJS 1.147.x + pnpm + Vitest). The web workspace and repaired Cesium Orbital/Surface flows are independently verified within the exercised scope, not scientifically validated. Start with the [web guide and package commands](../web/README.md) and [App integration](../web/src/App.tsx); the data boundary is [LunarDataProvider](../web/src/data/contract.ts). The [terrain generator](../web/src/data/mock/terrain.ts) and [analytic mock provider](../web/src/data/mock/MockDataProvider.ts) remain **1.1.0**, with fictional data rather than JPL/LOLA measurements.
+**Implemented and independently verified within the exercised mock scope:** the accepted **local Three.js 0.187.0** renderer replaces the Cesium runtime on `feat/3d-mock-viewer` ([ADR 0002](decisions/0002-mock-first-3d-web.md)). The modern React workspace, scenario identity and mock **1.1.0** scientific behavior are preserved. The [provider contract](../web/src/data/contract.ts) supplies actual Worker-generated finite curved meshes with a bounded two-entry cache; [scalar terrain](../web/src/data/mock/terrainField.ts) remains shared with [science](../web/src/data/mock/MockDataProvider.ts). This is not a global globe. Processed real-data integration is pending; no dataset is selected/acquired. See the [web guide](../web/README.md) for existing commands and limits.
 
 Still unauthorized: dataset acquisition/download, processing scripts, deployment, CI, and any claim of real or validated data. The earlier exploratory processing material remains superseded; Git history does not establish approval or current capabilities.
 
 ## Current verification and remaining limits
 
-**Latest independent repair retest: F1 and F2 CLOSED; required gates PASS.** `pnpm typecheck`, `pnpm test` and `pnpm build` each exited **0**; **6 files / 54 tests passed**. The former undefined-`bodyBillboards` Surface crash and hidden 0.5 m eye-height clamp are closed by compiler/build evidence and real Ridge A/Rim D mode, cursor, FOV and height checks. Production bundling passed; separate production-browser execution remains untested. Earlier failure/success reports are superseded by this current-tree retest; see the [handoff](handoffs/current.md).
+**Independent production acceptance: PASS; V1 CLOSED for default Ridge/Rim views.** Round 18 passed the engine/Worker/science integration but found insufficient default relief clarity. Final round 20 closed that visual finding at Ridge **1600×1000** and Rim **1280×900**, and passed typecheck, production build and **7 files / 57 tests** (all exit 0). The production app was exercised; the existing large-chunk warning remains. No runtime gates were rerun for this documentation reconciliation.
 
-**Known limit L1 remains:** at Ridge cursor 533, the provider labels the Sun centre hidden while the rendered centre ray is clear by about **0.000133°**. The measured view maximum skyline residual was **0.056673453°**, below the proposed 0.1° sampled diagnostic, not proof of exact/global centre agreement or lunar accuracy. The independent Surface movement observation (**27.0689 rendered frames/s**, one shared-host trial) is not universal ≥24 fps certification. Mock provenance, missing/unknown distinctions and scientific wording remain required.
+Actual production evidence covers native off-main Worker generation and detached-buffer transfer, usable bounded-cache return after GPU disposal, stale-build cancellation, curved geometry/normals, requested **0 / 0.25 / 2.5 m** eye heights, Sun/Earth directions, timeline/comparison/state behavior and explicit unknown/coverage recovery. Round 20 reused unchanged round-18 paths after source-hash comparison and freshly checked the visual repair. **Fill is labelled view-relative inspection lighting, not physical sunlight**; its toggle does not change science, the Sun or mesh generation.
 
-The user-authorized transfer to **coder-sol** superseded sonnet-only ownership and the earlier agent-authentication delivery blocker **for this repair**; **tester remains read-only**. Continuation of this repaired work does not need to wait for sonnet authorization or authentication. **Credentials were not tested or repaired.** Any new coding scope still requires a bounded authorized task.
+**Retained limits:** finite mesh/horizon approximations can disagree near centre-visibility thresholds, including Ridge cursor 533; V1 closure is not scientific validation. The final first terrain-bearing render of **616.3 ms** is one local production observation at **1600×1000**, on a shared host, not universal latency/FPS or an inter-engine speedup. Other sites/dates, global skyline equality, repeated cold startup, mobile/no-WebGL and full unmount/heap retention remain unverified; see [the handoff](handoffs/current.md).
+
+The old sonnet-only/authentication-dependent restriction no longer blocks user-approved work; **credentials were not tested or repaired**. Independent verification is complete for the stated paths, not a grant for further code, tuning, real-data work or deployment.
 
 ## Decisions not yet made
 
@@ -37,7 +39,7 @@ The approximately **56.2 GB** acquisition scenario is an unapproved example from
 
 ## Next useful work
 
-Use the mock prototype through the existing [web guide and package commands](../web/README.md); the [handoff](handoffs/current.md) records the verified scope and remaining limits. F1/F2 need no further pending repair dispatch on the current retested tree. Retain L1 and shared-host performance uncertainty rather than starting an unapproved tuning/certification loop. Real-data acquisition/integration, processing, CI and deployment remain deferred and require separate authorization; see [open decisions](open-decisions.md).
+Use the verified mock prototype through the existing [web commands](../web/README.md); [the handoff](handoffs/current.md) records current acceptance and limits. No pending V1 repair, fixture migration or old authentication wait remains. Any next implementation or acceptance expansion needs a bounded authorized task; do not turn limited local timing into a tuning/certification loop. Real-data acquisition/integration, processing, CI and deployment remain deferred.
 
 ## Status vocabulary
 
