@@ -1,7 +1,8 @@
 /*
  * Viewer chrome (contract-2). Consumes the app's `--ls-*` design tokens with fallbacks so the
- * harness still works standalone. Every overlay sits inside `.lunar-viewer__safe`, which is
+ * viewer still works standalone. Every overlay sits inside `.lunar-viewer__safe`, which is
  * inset by the App-provided `--viewer-safe-*` lengths so floating 2D panels never cover it.
+ * Layers: WebGL canvas (0) → CSS2D labels/markers (1) → safe-area HUD (2) → failure (4).
  */
 .lunar-viewer {
   --lv-font: var(--ls-font-sans, Inter, ui-sans-serif, system-ui, sans-serif);
@@ -22,18 +23,31 @@
   position: relative; width: 100%; height: 100%; min-height: 320px; background: #000; overflow: hidden;
   font-family: var(--lv-font); color: var(--lv-text); font-variant-numeric: tabular-nums;
 }
-.lunar-viewer__canvas { position: absolute; inset: 0; }
-.lunar-viewer__canvas .cesium-viewer, .lunar-viewer__canvas .cesium-viewer-cesiumWidgetContainer, .lunar-viewer__canvas .cesium-widget { width: 100%; height: 100%; }
-/* Cesium attribution: required, kept small and inside the safe area. Cesium sets inline
-   left/bottom on resize, hence !important. */
-.lunar-viewer__canvas .cesium-viewer-bottom {
-  left: auto !important; right: calc(var(--viewer-safe-right, 0px) + 12px) !important; bottom: calc(var(--viewer-safe-bottom, 0px) + 12px) !important;
-  padding: 0; opacity: 0.6;
-}
-.lunar-viewer__canvas .cesium-widget-credits, .lunar-viewer__canvas .cesium-credit-expand-link { font: 500 12px var(--lv-font); color: var(--lv-muted); text-shadow: none; }
-.lunar-viewer__canvas .cesium-credit-logoContainer img { height: 18px; width: auto; }
-.lunar-viewer[data-camera-mode='surface'] canvas { cursor: grab; }
-.lunar-viewer canvas:focus-visible { outline: 2px solid var(--lv-accent); outline-offset: -2px; }
+.lunar-viewer__gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.lunar-viewer[data-camera-mode='surface'] .lunar-viewer__gl { cursor: grab; }
+.lunar-viewer__gl:focus-visible { outline: 2px solid var(--lv-accent); outline-offset: -2px; }
+/* Clipped to the App safe area so off-frame markers never draw over or beside floating panels. */
+.lunar-viewer__labels { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; clip-path: inset(var(--viewer-safe-top, 0px) var(--viewer-safe-right, 0px) var(--viewer-safe-bottom, 0px) var(--viewer-safe-left, 0px)); }
+
+/* Site markers (CSS2D, positioned by the 3D projection). Buttons: keyboard reachable, 44 px touch. */
+.lunar-viewer__site { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; color: var(--lv-text); font: 500 12px var(--lv-font); cursor: pointer; pointer-events: auto; text-shadow: 0 1px 2px #000; }
+.lunar-viewer__site-dot { width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--lv-accent); border: 2px solid #05070a; box-shadow: 0 0 0 1.5px var(--lv-accent); }
+.lunar-viewer__site[data-mock='true'] .lunar-viewer__site-dot { box-shadow: 0 0 0 1.5px var(--lv-mock); }
+.lunar-viewer__site[data-selected='true'] .lunar-viewer__site-dot { width: 14px; height: 14px; margin-left: -7px; background: #fff; }
+.lunar-viewer__site[data-selected='true'] .lunar-viewer__site-name { font-weight: 700; }
+.lunar-viewer__site:focus-visible { outline: 2px solid var(--lv-accent); outline-offset: 3px; border-radius: 4px; }
+@media (pointer: coarse) { .lunar-viewer__site { min-height: 44px; min-width: 44px; } }
+
+/* Sun/Earth tags: label and, when hidden or unknown, an always-on-top ring (the disc itself is
+   depth-tested by terrain). Visibility comes from props (horizon mask), not from the render. */
+.lunar-viewer__body-tag { position: relative; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.lunar-viewer__body-tag[data-body='sun'] { color: var(--lv-sun); }
+.lunar-viewer__body-tag[data-body='earth'] { color: var(--lv-earth); }
+.lunar-viewer__body-ring { width: 26px; height: 26px; border-radius: 50%; border: 2px dashed currentColor; opacity: 0.9; }
+.lunar-viewer__body-tag[data-state='unknown'] .lunar-viewer__body-ring { border-style: dotted; }
+.lunar-viewer__body-text { position: absolute; white-space: nowrap; font: 600 12px var(--lv-font); text-shadow: 0 1px 2px #000, 0 0 6px #000; }
+.lunar-viewer__body-tag[data-body='sun'] .lunar-viewer__body-text { left: 18px; bottom: 8px; }
+.lunar-viewer__body-tag[data-body='earth'] .lunar-viewer__body-text { right: 18px; top: 8px; }
 
 .lunar-viewer__safe {
   position: absolute; z-index: 2; pointer-events: none;
@@ -73,28 +87,27 @@
 .lunar-viewer__ramp { height: 6px; border-radius: 999px; margin-bottom: 4px; }
 .lunar-viewer__ticks { display: flex; justify-content: space-between; gap: 10px; white-space: nowrap; color: var(--lv-text); }
 
-.lunar-viewer__streaming, .lunar-viewer__loading { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; color: var(--lv-muted); font-size: 12px; border-radius: 999px; flex: none; }
-.lunar-viewer__loading { align-self: center; }
+.lunar-viewer__streaming, .lunar-viewer__loading, .lunar-viewer__error, .lunar-viewer__chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; color: var(--lv-muted); font-size: 12px; border-radius: 999px; flex: none; }
+.lunar-viewer__loading, .lunar-viewer__error, .lunar-viewer__chip { background: var(--lv-glass); border: 1px solid var(--lv-border); backdrop-filter: blur(var(--lv-blur)); -webkit-backdrop-filter: blur(var(--lv-blur)); }
+.lunar-viewer__error { color: var(--lv-danger); border-color: color-mix(in srgb, var(--lv-danger) 50%, transparent); }
+.lunar-viewer__center { display: flex; justify-content: center; }
 .lunar-viewer__spinner { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--lv-border); border-top-color: var(--lv-accent); animation: lunar-spin 0.9s linear infinite; }
 @keyframes lunar-spin { to { transform: rotate(360deg); } }
 
-/* One compact readout line, bottom-left; the Cesium credit keeps the bottom-right. */
-.lunar-viewer__readout-row { display: flex; align-items: center; gap: 6px; min-width: 0; padding-right: 180px; }
-.lunar-viewer__readout { min-width: 0; padding: 3px 10px; border-radius: 999px; font: 500 12px var(--lv-mono); letter-spacing: 0.01em; color: var(--lv-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* One compact readout line, bottom-left. */
+.lunar-viewer__readout-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.lunar-viewer__readout { flex: none; max-width: 100%; padding: 3px 10px; border-radius: 999px; font: 500 12px var(--lv-mono); letter-spacing: 0.01em; color: var(--lv-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lunar-viewer__readout:empty { display: none; }
 
 /* Touch: every control gets a ≥44 px hit area. */
 @media (pointer: coarse) {
   .lunar-viewer__toolbar button { min-height: 44px; min-width: 44px; padding-inline: 12px; }
-  .lunar-viewer__canvas .cesium-credit-expand-link, .lunar-viewer__canvas .cesium-credit-logoContainer a { display: inline-flex !important; align-items: center; min-height: 44px; min-width: 44px; }
 }
 
 .lunar-viewer__failure { position: absolute; inset: 0; z-index: 4; display: grid; place-items: center; padding: 2rem; text-align: center; color: var(--lv-mock); background: #0a1018; }
 
 @media (max-width: 900px) {
   .lunar-viewer__toolbar button { min-height: 44px; min-width: 44px; padding-inline: 10px; }
-  .lunar-viewer__readout-row { padding-right: 0; padding-bottom: 50px; }
-  .lunar-viewer__canvas .cesium-credit-expand-link, .lunar-viewer__canvas .cesium-credit-logoContainer a { display: inline-flex !important; align-items: center; min-height: 44px; min-width: 44px; }
   .lunar-viewer__compass { left: 4%; width: 92%; }
   .lunar-viewer__legend { width: min(280px, 100%); }
 }
