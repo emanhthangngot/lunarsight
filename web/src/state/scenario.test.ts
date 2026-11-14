@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { LunarDataProvider, SiteSummary } from '../data/contract';
+import { createMockTerrain } from '../data/mock/terrain';
 import { ScenarioComputer, defaultInputs, initialWorkspace, workspaceReducer, type ScenarioResult } from './scenario';
 
 const provenance = { kind: 'mock' as const, source: 'Scenario boundary fixture', version: '1', generatedAt: '2026-01-01T00:00:00Z' };
@@ -8,7 +9,7 @@ function fixtureProvider() {
   const maskRequests: number[] = [], ephemerisHeights: number[] = [];
   const provider: LunarDataProvider = {
     kind: 'mock', listSites: async () => [site],
-    getTerrain: async () => ({ type: 'heightFunction', coverage: { southDeg: -90, northDeg: -84, westDegE: 0, eastDegE: 360 }, heightAt: () => 0, provenance }),
+    getTerrain: async () => ({ type: 'heightFunction', coverage: { southDeg: -90, northDeg: -84, westDegE: 0, eastDegE: 360 }, heightAt: () => 0, createMeshLoader: createMockTerrain().createMeshLoader, provenance }),
     getHorizonMask: async (_site, height) => { maskRequests.push(height); return { siteId: site.id, observerHeightM: height, azimuthsDeg: [0, 180], elevationsDeg: [0, 0], maxRangeM: 1000, provenance }; },
     getEphemeris: async (_site, start, end, step, height = 0) => {
       ephemerisHeights.push(height);

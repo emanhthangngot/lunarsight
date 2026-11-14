@@ -23,11 +23,46 @@ export interface SiteSummary {
 
 export interface CoverageBounds { southDeg: number; northDeg: number; westDegE: number; eastDegE: number }
 
-export type TerrainSource =
-  | { type: 'heightFunction'; provenance: Provenance; coverage: CoverageBounds;
-      /** metres relative to R; null = no data at that point */
-      heightAt(latDeg: number, lonDegE: number): number | null }
-  | { type: 'quantizedMesh'; provenance: Provenance; coverage: CoverageBounds; url: string };
+export type TerrainMeshQuality = 'balanced' | 'high';
+
+export interface TerrainMeshRequest {
+  latDeg: number;
+  lonDegE: number;
+  quality: TerrainMeshQuality;
+}
+
+export interface TerrainMeshChunk {
+  id: string;
+  positions: Float32Array;
+  normals: Float32Array;
+  indices: Uint32Array;
+  heightsM: Float32Array;
+}
+
+export interface LocalTerrainMesh {
+  origin: { latDeg: number; lonDegE: number; heightM: number };
+  chunks: TerrainMeshChunk[];
+  maxRangeM: number;
+  partialCoverage: boolean;
+  minHeightM: number;
+  maxHeightM: number;
+  provenance: Provenance;
+}
+
+export interface TerrainMeshLoader {
+  load(request: TerrainMeshRequest, signal?: AbortSignal): Promise<LocalTerrainMesh>;
+  dispose(): void;
+}
+
+export interface TerrainSource {
+  type: 'heightFunction';
+  provenance: Provenance;
+  coverage: CoverageBounds;
+  /** Scientific CPU lookup; null=no data, heights metres above Moon sphere. */
+  heightAt(latDeg: number, lonDegE: number): number | null;
+  /** Consumer owns loader; Worker creation is lazy. */
+  createMeshLoader(): TerrainMeshLoader;
+}
 
 export interface HorizonMask {
   siteId: string;

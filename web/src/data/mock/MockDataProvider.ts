@@ -2,7 +2,8 @@ import type { EphemerisSeries, HorizonMask, LunarDataProvider, SiteSummary, Terr
 import { DEG_TO_RAD, MOON_RADIUS_M, RAD_TO_DEG, normalizeLongitude, southPolarInverse, validateCoordinates } from '../../geo/coordinates';
 import { horizonElevationDeg } from '../../geo/horizon';
 import { subPointToAzEl } from '../../geo/topocentric';
-import { createMockTerrain, mockProvenance } from './terrain';
+import { createMockTerrain } from './terrain';
+import { mockProvenance } from './terrainField';
 
 type SiteLocation = Pick<SiteSummary, 'id' | 'latDeg' | 'lonDegE'>;
 const EPOCH_MS = Date.parse('2026-01-01T00:00:00Z');
