@@ -7,3 +7,5 @@ Read [candidate sources](../docs/data-sources.md), [quality proposals](../docs/d
 The current phase does not create download scripts, processing pipelines, fixtures presented as observations, or data manifests that imply selection. A later authorized implementation can define its file-level manifest and storage layout after the relevant choices are made.
 
 This folder currently contains only this explanation. Large original products and generated outputs should remain outside ordinary Git history when future acquisition is authorized. The eventual storage backend and release method remain open.
+
+The authorized candidate-review notebook at [`notebooks/candidate-site-visual-review.ipynb`](../notebooks/candidate-site-visual-review.ipynb) embeds only small reference metadata and simplified outlines from four tiny ROI archives for plotting. It contains no raster pixels or full source datasets and does not imply that any candidate has been selected.

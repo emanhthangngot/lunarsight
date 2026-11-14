@@ -26,6 +26,8 @@ The 20 km profile comparison found mean absolute 80 m/20 m horizon differences o
 
 The [terrain-horizon decision packet](../open-decisions.md#terrain-horizon-comparison-decision-packet) now summarizes candidate inputs. **Three parts remain before a data-acquisition decision:** (1) the team confirms the candidate roster (including whether to include Site07/Site20/Site06/Site42/Haworth or other PGDA regions), observer points/ROI, the p95 angular-difference threshold, and the relief or maximum-ray-distance scenario; (2) profiles and metadata/ROI coverage are completed for those accepted candidates, then the scale, exact products and footprint are proposed; (3) an asset manifest, transfer/storage estimate and acquisition request are prepared. A subsequent acquisition/processing/validation phase is separate and needs its own explicit scope. No final data choice has been made.
 
+The rendered [candidate-site visual review notebook](../../notebooks/candidate-site-visual-review.ipynb) now provides the roster/ROI map, local ROI panels, data-volume bars and the original four-site p95 chart. Review these images with the group as part of step (1); they visualize metadata and ROI outlines, not full-resolution terrain.
+
 ## Verification and limits
 
 The setup has been checked for internal file links, status consistency, instruction/template references and clean diffs. The temporary setup-review report has been removed; enduring rules remain in the workflow and testing policy. No executable tests, CI jobs, dataset files or package dependencies were added to the repository; the temporary Rasterio reader and pixel windows were outside it. Agent-client loading and application/scientific behavior remain unverified.

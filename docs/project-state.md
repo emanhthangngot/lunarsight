@@ -29,7 +29,7 @@ The approximately **56.2 GB** acquisition scenario is an unapproved example from
 
 ## Next useful work
 
-The next decision is documented in the [terrain-horizon comparison packet](open-decisions.md#terrain-horizon-comparison-decision-packet): the team must confirm the candidate roster (including whether Site07/Site20/Site06/Site42/Haworth or other PGDA 78 regions belong), observer points/ROI, a p95 angular-difference threshold, and the relief or maximum-ray-distance scenario. Three pre-acquisition parts remain: team decision; final coverage/resolution/footprint analysis; and asset manifest plus transfer/storage estimate with an acquisition request. Acquisition, processing and validation are a separate later phase requiring explicit scope. No final data choice has been made.
+The next decision is documented in the [terrain-horizon comparison packet](open-decisions.md#terrain-horizon-comparison-decision-packet) and visualized in the [candidate-site notebook](../notebooks/candidate-site-visual-review.ipynb): the team must confirm the candidate roster (including whether Site07/Site20/Site06/Site42/Haworth or other PGDA 78 regions belong), observer points/ROI, a p95 angular-difference threshold, and the relief or maximum-ray-distance scenario. Three pre-acquisition parts remain: team decision; final coverage/resolution/footprint analysis; and asset manifest plus transfer/storage estimate with an acquisition request. Acquisition, processing and validation are a separate later phase requiring explicit scope. No final data choice has been made.
 
 ## Status vocabulary
 
