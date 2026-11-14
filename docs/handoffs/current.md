@@ -20,6 +20,10 @@ See [pilot ROI/datum review](../pilot-roi-datum-review.md). Site01 ROI is fully 
 
 See [Site04 ROI coverage](../site04-roi-coverage.md). The five PGDA 78 layers have 526/526 finite pixels under the ROI pixel-center mask; 468 LDEC pixels are zero. Projection parameters match but semantic CRS equality is false. Vertical datum and observer choice remain open. A point is proposed only for technical review, not landing selection.
 
+## Tái lập Site04 ROI
+
+Notebook [site04-roi-reproduction](../../notebooks/site04-roi-reproduction.ipynb) cung cấp quy trình tự chạy lại các cửa sổ raster có kiểm soát, mask, thống kê và lựa chọn điểm kỹ thuật; nguồn/cache được kiểm tra hash với evidence đã review. Không áp dụng giả định này cho datum đứng hay horizon.
+
 ## Current state
 
 The documentation and shared agent-guidance foundation is complete. ADR 0002 records the accepted initial data-mining feature priorities; [the pilot inventory](../data-mining-plan.md) retains the original Site01/04/11/23 cohort, adds bounded point checks for Site07/Site20, and metadata/size checks for Site06/Site42/Haworth. The six point-screened centers passed local 5 m and regional 80 m/20 m 9×9 windows; Site20v2 also passed a local 5 m read. The further alternatives have only product availability/size evidence, no pixel coverage checks. Site07's reference center is outside both polygons in its available ROI; no verified Site06/Site20/Site23 ROI was found at the checked paths. Site42/Haworth have no ROI links on the PGDA page. The candidate screen is not exhaustive. No site or product is selected for acquisition. Application implementation, bulk dataset acquisition, scientific validation and deployment have not started in this repository. Exact sites/products/footprints, cadence, validation targets, stack, and deployment remain open.

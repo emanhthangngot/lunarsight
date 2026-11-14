@@ -4,6 +4,10 @@ Ngày 14 November 2026. Mục đích: khảo sát coverage, chưa xác nhận n�
 
 ![Năm lớp raster bên trong ROI Site04](figures/site04-roi-coverage.png)
 
+## Tái lập
+
+Xem [notebook tái lập ROI Site04](../notebooks/site04-roi-reproduction.ipynb). Notebook kiểm tra hash archive ROI và các cửa sổ với evidence đã review, dựng lại mask và điểm minh họa. Output được nhúng để xem; chạy trên máy mới cần cài các thư viện nêu trong notebook và đặt `SITE04_FETCH_REMOTE=1` để đọc archive nhỏ cùng các HTTP Range có giới hạn. Cache nằm ngoài Git. Lượt chạy tái lập ngày 14 November 2026 đã tải lại archive và năm cửa sổ từ nguồn; hash và mask khớp evidence đã lưu, đồng thời chạy lại thành công từ cache. Nếu hash nguồn thay đổi, notebook dừng để yêu cầu review chứ không ghi đè evidence.
+
 ## Kết quả
 
 Dùng bốn polygon gốc `Site04_ROIs.tgz` (SHA-256 `8e8b788f9fdf6400f23fd36dad02138102bd1a905b4b71a5739a9a4fd8a0e07a`). Đọc cửa sổ quanh union bounding box cho năm GeoTIFF PGDA 78. Raster hóa bằng quy tắc **tâm pixel nằm trong polygon**, `all_touched=False`: 526 pixel. Các lớp có cùng grid/window và cả năm đều có **526/526 pixel hữu hạn** trong mask đó.
