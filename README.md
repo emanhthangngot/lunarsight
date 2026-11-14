@@ -4,7 +4,7 @@
 
 LunarSight is a proposed application for exploring lunar landing locations and understanding how terrain, sunlight, Earth visibility, and mission assumptions affect a preliminary assessment.
 
-**Repository stage: documentation and agent-ready project setup.** The team is still choosing the dataset scope, quantities, resolution, technology stack, and implementation priorities. This repository currently contains planning documents and contribution guidance. Application code, processing scripts, datasets, dependency manifests, and deployed infrastructure are outside this bootstrap phase.
+**Repository stage: documentation plus a mock-data 3D web prototype in progress (branch `feat/3d-mock-viewer`, app in `web/`).** On 13 November 2026 the user authorized building the 3D app with clearly labelled mock data first and connecting processed real data later ([ADR 0002](docs/decisions/0002-mock-first-3d-web.md)). The team is still choosing the dataset scope, quantities, resolution, hosting, and implementation priorities. Dataset acquisition, processing scripts, CI, and deployed infrastructure are not part of this step, and the prototype presents no real data.
 
 [Tiếng Việt](README.vi.md) · [Documentation index](docs/README.md) · [Current project state](docs/project-state.md) · [Open decisions](docs/open-decisions.md)
 
@@ -28,12 +28,12 @@ The [original proposal transcription](docs/reference/proposal-v2.md) is a histor
 | Item | Current status |
 | --- | --- |
 | Project name and repository | LunarSight; `emanhthangngot/lunarsight`. |
-| Current work scope | Documentation, project organization, agent context, and system design. |
+| Current work scope | Documentation, agent context, system design, and an in-progress mock-data 3D viewer prototype (ADR 0002). |
 | Product features | Proposal-derived requirements awaiting prioritization. |
 | Geography, products, data volume, and resolution | Candidate options; no team selection recorded. |
-| Frontend/backend, storage, hosting, and AI provider | Open decisions. |
+| Backend, storage, hosting, and AI provider | Open decisions. The prototype stack (Vite, React, TypeScript, CesiumJS, pnpm, Vitest) is accepted for the mock prototype only. |
 | Architecture and API contracts | Proposed designs for review. |
-| Implementation, acquisition, or deployment | Future work after a subsequent explicit implementation request. |
+| Real-data connection, acquisition, or deployment | Future work after a subsequent explicit instruction. |
 
 The roughly 56.2 GB figure previously researched is retained only as **one illustrative, unapproved acquisition scenario**. It is not a project requirement, an agreed download budget, or a statement of data acquired for this repository.
 
@@ -46,13 +46,14 @@ git clone https://github.com/emanhthangngot/lunarsight.git
 cd lunarsight
 ```
 
-No runtime installation, build command, data download, or application start command is defined yet. The [agent workflow](docs/agent-workflow.md) explains how to keep durable project state, prepare a bounded task, hand work over, and report evidence without inventing completion.
+Prototype commands are defined in `web/` (pnpm) once the scaffold exists; use only what `web/package.json` provides. No data download, CI, or deployment command is defined. The [agent workflow](docs/agent-workflow.md) explains how to keep durable project state, prepare a bounded task, hand work over, and report evidence without inventing completion.
 
 ## Repository organization
 
 | Location | Purpose |
 | --- | --- |
 | `docs/` | Product, requirements, system design, source proposals, and verification plans. |
+| `web/` | Mock-data 3D viewer prototype (in progress; not verified here). |
 | `docs/decisions/` | Decisions with explicit status, rationale, and authority. |
 | `docs/templates/` | Task briefs and handoff templates. |
 | `docs/handoffs/` | Concise current handoff, not a dump of chat transcripts. |

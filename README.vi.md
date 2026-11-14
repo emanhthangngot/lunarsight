@@ -2,7 +2,7 @@
 
 ## Khám phá địa điểm hạ cánh và lập kế hoạch nhiệm vụ Mặt Trăng
 
-**Trạng thái: khởi tạo dự án bằng tài liệu và chuẩn bị cách làm việc với agent.** Nhóm chưa chốt bộ dữ liệu, dung lượng, độ phân giải, công nghệ hoặc phương án triển khai. Nhánh hiện tại chỉ gồm tài liệu và cấu hình hướng dẫn; chưa triển khai ứng dụng, script xử lý hay pipeline tải dữ liệu.
+**Trạng thái: tài liệu cùng bản prototype web 3D dùng dữ liệu giả (mock) đang được xây dựng trên nhánh `feat/3d-mock-viewer`, mã nguồn trong `web/`.** Ngày 13/11/2026 người dùng cho phép xây ứng dụng web 3D bằng dữ liệu mock có gắn nhãn rõ ràng trước, sau đó mới kết nối dữ liệu thật đã xử lý ([ADR 0002](docs/decisions/0002-mock-first-3d-web.md)). Nhóm chưa chốt bộ dữ liệu, dung lượng, độ phân giải hoặc phương án triển khai; chưa tải dữ liệu, chưa có script xử lý, CI hay triển khai, và prototype không hiển thị dữ liệu thật.
 
 Tên **LunarSight** giữ sự nhất quán với proposal: Lunar là Mặt Trăng; Sight gợi việc quan sát và hiểu điều kiện tại một địa điểm.
 
@@ -37,4 +37,4 @@ cd lunarsight
 
 Mở thư mục bằng IDE hoặc agent đang dùng. Yêu cầu agent đọc `AGENTS.md`, `docs/project-state.md` và mục liên quan trong `docs/README.md`. Có [prompt khởi động](docs/agent-workflow.md#starter-prompt) để dùng trực tiếp.
 
-Hiện chưa cần cài runtime, package, dịch vụ hay tải dataset. Khi có yêu cầu triển khai cụ thể tiếp theo, agent sẽ cập nhật trạng thái và thực hiện đúng phạm vi đó; không tự biến các lựa chọn chưa chốt thành quyết định của nhóm.
+Lệnh chạy prototype (nếu có) nằm trong `web/` (pnpm); chỉ dùng những gì `web/package.json` cung cấp. Chưa có lệnh tải dataset, CI hay triển khai. Khi có yêu cầu tiếp theo (ví dụ kết nối dữ liệu thật), agent sẽ cập nhật trạng thái và thực hiện đúng phạm vi đó; không tự biến các lựa chọn chưa chốt thành quyết định của nhóm.

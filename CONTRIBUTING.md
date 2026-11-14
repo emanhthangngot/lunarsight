@@ -1,6 +1,6 @@
 # Contributing to LunarSight
 
-Current phase: documentation and project setup. Read [project state](docs/project-state.md) before starting; [AGENTS.md](AGENTS.md) also applies when using an agent.
+Current phase: documentation plus a mock-data 3D web prototype in `web/` ([ADR 0002](docs/decisions/0002-mock-first-3d-web.md)). Read [project state](docs/project-state.md) before starting; [AGENTS.md](AGENTS.md) also applies when using an agent.
 
 ## A useful change
 
@@ -20,10 +20,10 @@ Assign separate file ownership when agents work in parallel, then integrate and 
 - Current repository capabilities are separated from prototype observations and future intentions.
 - Dataset sizes and source selections remain proposals until decided.
 - Diagrams, units, terms, and statuses agree across related documents.
-- No application scripts, generated datasets, deployment configuration, credentials, or private transcripts are introduced.
+- No data downloads or processing scripts, generated datasets, deployment configuration, CI, credentials, or private transcripts are introduced; mock values stay labelled mock.
 - The change includes evidence of the checks actually performed and an updated handoff when needed.
 
-No runtime installation or test suite is configured. Future implementation tasks will define their own relevant checks in the [verification plan](docs/verification-plan.md).
+Application checks live in `web/` (pnpm) and are defined by its `package.json`; documentation changes need link and status checks. See the [verification plan](docs/verification-plan.md).
 
 ## Test changes in a later implementation phase
 

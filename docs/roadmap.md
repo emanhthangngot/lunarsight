@@ -1,8 +1,8 @@
 # Roadmap and open decisions
 
-Status: **13 November 2026 — documentation-only foundation**.
+Status: **13 November 2026 — documentation foundation plus an in-progress mock-data 3D prototype ([ADR 0002](decisions/0002-mock-first-3d-web.md))**.
 
-LunarSight's proposed purpose is to help users connect a lunar location, a mission configuration, and evidence for a preliminary site comparison. This repository currently records that direction, candidate data sources, proposed system design, open decisions, and quality expectations. Data acquisition, processing scripts, application implementation, provisioning, and final technology selection are outside the current scope. Conceptual architecture and API documentation are part of the current work.
+LunarSight's proposed purpose is to help users connect a lunar location, a mission configuration, and evidence for a preliminary site comparison. This repository records that direction, candidate data sources, proposed system design, open decisions, and quality expectations, and hosts a mock-data viewer prototype in `web/` (in progress, not verified). Data acquisition, processing scripts, provisioning, and real-data connection are outside the current scope. Conceptual architecture and API documentation are part of the current work.
 
 Earlier experiments or prototype behavior do not establish team approval of a dataset, calculation method, or implementation. Future stages below are proposals. A later explicit task may authorize one or several implementation stages; do not repeatedly request permission for work that instruction already covers. Record only decisions actually made.
 

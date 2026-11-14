@@ -1,6 +1,6 @@
 # Verification plan
 
-**Status: proposed plan; no application or scientific test suite is implemented by this document.** The current phase is documentation and repository setup. Future checks depend on the team's decisions about data, methods, scope, and implementation.
+**Status: proposed plan; no application or scientific test suite is implemented by this document.** The current phase is documentation plus a mock-data prototype in `web/` ([ADR 0002](decisions/0002-mock-first-3d-web.md)); its checks are defined and reported with the code. Future checks depend on the team's decisions about data, methods, scope, and implementation.
 
 The plan follows [requirements.md](requirements.md) and the historical findings in the [original proposal](reference/proposal-v2.md). Passing a repository-content check is separate from demonstrating model accuracy or usable application behavior.
 
@@ -10,7 +10,7 @@ The plan follows [requirements.md](requirements.md) and the historical findings 
 
 | Documentation check | Expected evidence |
 | --- | --- |
-| Scope consistency | README, agent instructions, project state, roadmap, and design documents all identify the current documentation-only phase. |
+| Scope consistency | README, agent instructions, project state, roadmap, and design documents all identify the current phase (documentation plus the mock-data prototype) and the still-unauthorized work. |
 | Proposal traceability | Intended features retain stable requirement IDs and reference the original proposal; newly proposed behavior is identified as such. |
 | Decision honesty | Dataset volumes, region, grid spacing, technology choices, providers, dates, and budgets are marked proposed or undecided unless an explicit team decision is recorded. |
 | Repository content | The current branch contains the agreed documentation/configuration only; no processing scripts, application implementation, installed dependencies, data downloads, or provisioning are implied. |

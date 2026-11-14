@@ -12,7 +12,7 @@ What useful result should this task produce?
 
 ## Scope and context
 
-List relevant requirements, decisions, sources, and files. The current repository phase is documentation-only; identify any later explicit authorization if the task changes that scope.
+List relevant requirements, decisions, sources, and files. The repository phase is documentation plus a mock-data 3D prototype in `web/` ([ADR 0002](../../docs/decisions/0002-mock-first-3d-web.md)); identify any later explicit authorization if the task goes beyond that scope (for example real-data acquisition).
 
 ## Decisions still open
 

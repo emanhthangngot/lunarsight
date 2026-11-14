@@ -1,6 +1,6 @@
 # Proposed system architecture
 
-**Status: design proposal for team review.** This repository is currently a documentation foundation. No application, analysis pipeline, runtime, database, queue, or cloud service is implemented or provisioned by this design. Dataset scope, technology stack, providers, budgets, and delivery dates remain undecided.
+**Status: design proposal for team review.** The repository holds documentation and an in-progress mock-data viewer prototype in `web/`; no analysis pipeline, database, queue, or cloud service is implemented or provisioned by this design. Dataset scope, backend, hosting, providers, budgets, and delivery dates remain undecided.
 
 Basis: [LunarSight V2 proposal](reference/proposal-v2.md), especially sections 3, 7–14 and the consistency issues in section 15. Related documents: [domain model](domain-model.md), [candidate API contracts](api-design.md), [data proposals](data-sources.md), and [operations](operations.md).
 
@@ -9,6 +9,8 @@ Basis: [LunarSight V2 proposal](reference/proposal-v2.md), especially sections 3
 Connect a lunar location and mission configuration to understandable, reproducible evidence. Interactive Map, Local Horizon, Mission Feasibility Assessment, Mission Timeline, Scenarios, Sensitivity, AI Advisor, and Reports should refer to the same identified scenario and result.
 
 The proposed starting shape is a modular application with clear internal boundaries. These boundaries do not require separate deployed services. An independent worker becomes useful only if measured computation or deployment constraints justify it. A framework, map engine, database, queue, or microservice topology has not been selected.
+
+**Prototype boundary (in progress, not verified):** the mock viewer maps to FR-005/006/007/008/010. UI code depends only on a `LunarDataProvider` interface (sites, terrain, horizon mask, ephemeris, each with provenance `mock` or `processed`). A mock provider is first; processed real data connects later through the same interface. The client is Vite + React + TypeScript + CesiumJS ([ADR 0002](decisions/0002-mock-first-3d-web.md)); server, storage, and hosting remain open.
 
 ## Logical components
 

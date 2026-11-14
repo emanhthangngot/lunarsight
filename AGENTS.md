@@ -8,11 +8,13 @@
 
 ## Current phase
 
-The user requested documentation and initial project setup only. Do not create application code, processing/download scripts, executable tests, package/lock files, infrastructure manifests, or CI jobs in this phase. Do not acquire datasets, provision services, or deploy.
+On 13 November 2026 the user authorized building a **3D web app with mock data first**, connecting processed real data later ([ADR 0002](docs/decisions/0002-mock-first-3d-web.md)). Work is in progress on branch `feat/3d-mock-viewer`; the app lives in `web/` (Vite + React + TypeScript + CesiumJS + pnpm + Vitest). Documentation work continues alongside.
 
-Dataset products, geographic extent, resolution, volume, stack, hosting, and AI provider remain proposals unless a decision with authority is recorded. The 56.2 GB scenario is illustrative and unapproved. Historical prototype observations or prior exploratory artifacts do not establish repository readiness or team approval.
+Still not authorized: acquiring or downloading datasets, processing/download scripts, deployment/provisioning, CI jobs, and any claim that displayed values are real, validated, or deployed. Every mock value must be labelled mock in data and in the UI.
 
-A later explicit user instruction can authorize a particular implementation step. Update the state and affected decisions when that happens; do not turn this phase rule into a permanent prohibition or repeatedly request permission for work already authorized.
+Dataset products, geographic extent, resolution, volume, hosting, backend, and AI provider remain proposals unless a decision with authority is recorded. The 56.2 GB scenario is illustrative and unapproved. Historical prototype observations or prior exploratory artifacts do not establish team approval.
+
+A later explicit user instruction can authorize further steps (for example connecting processed data). Update the state and affected decisions when that happens; do not repeatedly request permission for work already authorized.
 
 ## Sources of project truth
 
@@ -45,13 +47,13 @@ When evidence conflicts, preserve the distinction, identify the affected decisio
 
 ## Verification and handoff
 
-Follow [the shared testing policy](docs/testing-policy.md) before creating, changing, auditing, removing, or selecting tests. This applies to every agent and future implementation task; it does not authorize executable tests in the current documentation phase.
+Follow [the shared testing policy](docs/testing-policy.md) before creating, changing, auditing, removing, or selecting tests. This applies to every agent and implementation task in `web/`.
 
 - Before adding a test, identify the changed/required behavior and its authority, credible failure, existing protection, lowest reliable layer, and remaining gap. **Zero new tests is valid** when existing evidence is sufficient.
 - Protect observable contracts and scientific meaning. Do not mirror implementation, assert constants against themselves, or add tests merely to increase counts/coverage.
 - Investigate failures. Never weaken assertions, widen scientific tolerances, regenerate reference values, or skip/delete checks merely to get a green result. An audit reports findings without changing the suite.
 - Start with affected checks; include shared consumers and mandatory gates. Unknown impact broadens selection. Report actual outcomes, omissions, and limits; do not invent commands or successful runs.
 
-There are no install/build/test/run scripts in the current repository. For documentation edits, verify local links, consistent status labels, proposal traceability, readable diagrams, template syntax, absence of executable artifacts, and a clean diff. Record what was actually checked.
+Application commands live in `web/` (pnpm); use only commands that exist in `web/package.json` and report their actual output. There is no repository-wide build, CI, or data pipeline. For documentation edits, verify local links, consistent status labels, proposal traceability, readable diagrams, template syntax, and a clean diff. Record what was actually checked.
 
 Update project state or the current handoff when the task changes them. Finish with the outcome, changed paths, evidence, and remaining decisions. Detailed workflow: `docs/agent-workflow.md`.

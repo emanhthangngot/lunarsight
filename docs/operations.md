@@ -8,7 +8,7 @@ Basis: the integrated workflow and reliability goals in the [LunarSight V2 propo
 
 | Proposed environment | Purpose | Decision still needed |
 | --- | --- | --- |
-| Documentation workspace | Review requirements, source candidates, architecture, decisions, and agent handoffs | This is the current phase; no application run command exists yet. |
+| Documentation workspace | Review requirements, source candidates, architecture, decisions, and agent handoffs | Current; plus a local mock-data prototype under `web/` whose commands come from its `package.json`. No deployment exists. |
 | Local development | Implement a bounded approved feature with controllable inputs and useful diagnostics | Runtime, package manager, rendering stack, and minimum machine resources. |
 | Shared preview or staging | Review integrated behavior, data coverage, accessibility, exports, and representative failures | Hosting, access, deployment trigger, test data policy, and cost limits. |
 | Production or public demo | Serve a reviewed release with declared capabilities, operating limits, and recovery procedures | Intended audience, uptime/cost targets, access model, release process, and support owner. |

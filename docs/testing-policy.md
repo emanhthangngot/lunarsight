@@ -103,6 +103,6 @@ The five-question admission gate and workflow are project policy requested by th
 
 - [Google: Test Behavior, Not Implementation](https://testing.googleblog.com/2013/08/testing-on-toilet-test-behavior-not.html) — stable observable contracts.
 - [Google: What Makes a Good End-to-End Test?](https://testing.googleblog.com/2016/09/testing-on-toilet-what-makes-good-end.html) — justify expensive system-level checks.
-- [NASA Space Apps: Lunar Landing Site Navigator](https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/) — official indexed summary used for comparison/geometry focus; direct page retrieval returned HTTP 502 during this review. No additional competition rules are asserted.
+- [NASA Space Apps: Lunar Landing Site Navigator](https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/) — official challenge; an earlier direct page retrieval returned HTTP 502, and the full text was later retrieved through the site's GraphQL API on 13 November 2026 (see [challenge summary](reference/challenge-2026.md)). No additional competition rules are asserted.
 - [NASA GSFC: High-Resolution LOLA Topography](https://pgda.gsfc.nasa.gov/products/78) — source grid/frame, interpolation and uncertainty limitations.
 - [JPL NAIF: Using SPICE Data](https://naif.jpl.nasa.gov/naif/using_spice_data.html) — kernel applicability, coverage and metadata must be inspected if SPICE is selected.

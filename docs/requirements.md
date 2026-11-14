@@ -1,8 +1,10 @@
 # Requirements and proposal traceability
 
-**Status: draft requirements for discussion. No implementation is claimed.** The current authorized scope is repository setup and documentation. Dataset selection, data quantities, geographic coverage, technology stack, providers, dates, and storage budgets remain team decisions.
+**Status: draft requirements for discussion. No requirement is marked implemented.** The authorized scope is documentation plus a mock-data viewer prototype in progress ([ADR 0002](decisions/0002-mock-first-3d-web.md)). Dataset selection, data quantities, geographic coverage, hosting, providers, dates, and storage budgets remain team decisions.
 
 The source of product intent is the [LunarSight V2 proposal](reference/proposal-v2.md), 5 November 2026. Section numbers below refer to that document. Acceptance conditions describe future behavior to verify; they are not records of passing tests.
+
+**Mock prototype mapping (in progress, not verified, not implemented):** the mock viewer on branch `feat/3d-mock-viewer` is intended to exercise FR-005 (3D terrain navigation), FR-006 (overlays/mode context, mock-labelled), FR-007 (local horizon and Sun/Earth direction), FR-008 (timeline) and FR-010 (site comparison) against a `LunarDataProvider` boundary. Mock values satisfy none of these requirements' scientific acceptance conditions.
 
 ## Functional requirements
 
@@ -70,6 +72,6 @@ Source: proposal sections 5.3, 9, 11, 12, and 15. A later catalog audit may add 
 
 ## Decisions not made by this specification
 
-The feature matrix does not select the first release's region, candidate coordinates, source products, raster spacing, total download size, cache timespan, cloud service, AI provider, map library, framework, authentication model, database, or storage capacity. The prototype's named provider, dates, ranges, and defaults are reference material pending team review.
+The feature matrix does not select the first release's region, candidate coordinates, source products, raster spacing, total download size, cache timespan, cloud service, AI provider, authentication model, database, or storage capacity. The map/terrain engine and framework are accepted only for the mock prototype ([ADR 0002](decisions/0002-mock-first-3d-web.md)). The prototype's named provider, dates, ranges, and defaults are reference material pending team review.
 
 See [product.md](product.md) for proposed release ordering, [data-sources.md](data-sources.md) for candidate data, [architecture.md](architecture.md) for a proposed system structure, and [verification-plan.md](verification-plan.md) for how future evidence should be gathered.

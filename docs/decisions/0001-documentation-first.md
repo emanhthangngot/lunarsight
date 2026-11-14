@@ -1,6 +1,6 @@
 # ADR 0001 — Documentation-first bootstrap
 
-- Status: **Accepted for the current phase**
+- Status: **Accepted; scope limit partly superseded by [ADR 0002](0002-mock-first-3d-web.md)** (the mock-data 3D prototype is authorized from 13 November 2026; dataset acquisition and processing scripts remain unauthorized)
 - Date: **13 November 2026**
 - Authority: explicit user instruction in the project conversation.
 

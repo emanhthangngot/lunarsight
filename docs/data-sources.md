@@ -2,7 +2,7 @@
 
 Status: **13 November 2026 — proposals for team review only**.
 
-This repository currently provides a documentation foundation. The team has not selected data products, geographic coverage, resolutions, quantities, or a storage budget. Every candidate below has the status **not selected / not acquired for this repository**. Earlier exploratory work does not establish team approval or an implementation baseline.
+The repository holds documentation and a mock-data viewer prototype ([ADR 0002](decisions/0002-mock-first-3d-web.md)); the prototype uses no real data. The team has not selected data products, geographic coverage, resolutions, quantities, or a storage budget. Every candidate below has the status **not selected / not acquired for this repository**. Earlier exploratory work does not establish team approval or an implementation baseline.
 
 Archive descriptions and approximate sizes help compare options. They do not commit the team to downloading, processing, or using those products. Selection would require a recorded team decision and a subsequent implementation request.
 
@@ -40,6 +40,21 @@ The proposed application domain, the footprint of an individual product, and the
 | [USGS/IAU planetary nomenclature](https://planetarynames.wr.usgs.gov/) | Review names and coordinates | Named-feature records may support an agreed site catalog | A feature center or historical mission association does not establish the intended analysis location. Review names and coordinates explicitly. |
 
 The [ODE REST API documentation](https://ode.rsl.wustl.edu/moon/pagehelp/Content/Additional_Resources/ODE_REST_API.htm) is a possible discovery reference. No acquisition mechanism, tool, processing script, or storage technology is selected here.
+
+## Challenge-listed tools and Trek services (candidate, not selected)
+
+Source: the official [challenge resources](reference/challenge-2026.md) name these tools. Probes were run on **13 November 2026** from one host with `curl`; the URLs below are the evidence, and no responses are stored in this repository. Status of every row: **candidate / not selected / nothing acquired**. Items marked [INFERENCE] were not confirmed.
+
+| Candidate | What was observed | Questions and limitations |
+| --- | --- | --- |
+| [Moon Trek](https://trek.nasa.gov/moon/) app config, [`config.json`](https://trek.nasa.gov/moon/jpl/config/config.json) | Lists tools (sun angle, lighting, line of sight, elevation profile, subset, STL export) and `ellipsoidRadius=1737400`; sun-angle service `https://trek.nasa.gov/getAzElfromT1`. | Service terms, rate limits and stability not established. |
+| Trek quantized-mesh terrain, [`moon_v14/layer.json`](https://marshub.s3.amazonaws.com/moon_v14/layer.json) | quantized-mesh-1.0, EPSG:4326, zoom 0–16 (global through z9, sparse regional above), vertex normals; CORS `*`. | [INFERENCE] directly usable by a Cesium terrain provider on a Moon ellipsoid; not load-tested; reuse terms to confirm. |
+| Trek WMTS tiles | `https://trek.nasa.gov/tiles/Moon/SP/<label>/1.0.0/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.png`; capabilities at `.../1.0.0/WMTSCapabilities.xml`; south-polar stereographic (Moon2000_spole, sphere 1737.4 km); CORS `*`. | Colourised tiles are display products, not measurements. |
+| Trek ArcGIS ImageServer, e.g. [`LRO_LOLA_DEM_SPole875_5mp_v04`](https://trek.nasa.gov/moon/trekarcgis/rest/services/LRO_LOLA_DEM_SPole875_5mp_v04/ImageServer) | `exportImage` with `format=tiff&pixelType=F32` returned a 256×256 Float32 GeoTIFF; CORS `*`. | [INFERENCE] heights are relative to the 1737.4 km sphere; check the product label. |
+| Trek layer catalog (south pole) | [`searchItems`](https://trek.nasa.gov/moon/TrekServices/ws/index/polar/searchItems?proj=urn:ogc:def:crs:IAU2000::30120&start=0&rows=2000) returned 890 docs / 396 products; per-item services via `getLayerServices?uuid=<item_UUID>` on the same host. | Catalog contents may change. |
+| Trek-served south-pole layers | DEM `LRO_LOLA_DEM_SPole875_5mp_v04` (5 m, ±75,840 m polar-stereo, ~87.5–90°S, 3.69 GB full file); `..._SPole75_30mp_v04` (30 m, ~75–90°S); `..._SPole45_100mp_v04` (100 m). Earth visibility `AVGVISIB_85S_060M_201608_EARTH_SP` (60 m), `..._75S_120M_...`, `..._65S_240M_...` (18.6-year hourly average, finite disc). `SKYV_65S_240M_SP` sky visibility; `LRO_LOLA_Illumination_SPole65S_240m`; `WAC_POLE_ILL_PCT_SOUTH_100M` and `..._TWI_...`; `A3_Named_regions_SP` (13 Artemis III candidate regions). | Long-term visibility/illumination maps are not mission-window results. Layer sets, extents and volumes are options, not agreed. Extents above are as reported by the catalog. |
+| [LROC QuickMap](https://quickmap.lroc.im-ldi.com/) (`quickmap.lroc.asu.edu` redirects with 301) | SPA bundle loads CesiumJS and OpenLayers and contains Sun/Earth visibility, elevation and time-availability analysis strings; terrain from `https://dem-tiles.b-cdn.net/lunar/qts_demstack/`. | No public API documentation found; tile hosts are internal to the app; reuse terms not established. Treat as a reference/validation tool, not a data backend. |
+| [JPL Horizons API](https://ssd-api.jpl.nasa.gov/doc/horizons.html) at `https://ssd.jpl.nasa.gov/api/horizons.api` | Probe with `CENTER='coord@301'`, `COORD_TYPE='GEODETIC'`, `SITE_COORD='<E-lon>,<lat>,<alt_km>'`, `QUANTITIES='4,14,15'` returned airless apparent azimuth/elevation (no refraction) relative to a 1737.4 km sphere, MEAN_ME frame, east-positive longitude. | Elevation is relative to the smooth-sphere horizon, without terrain; limb-vs-center convention must be chosen; request and rate limits not confirmed. |
 
 ## Volume is an open decision
 

@@ -1,6 +1,6 @@
 # Product brief
 
-**Status: proposal for team review — documentation phase only.** This document describes the intended product. It does not state that the repository contains a working application, processing pipeline, selected dataset, or agreed deployment stack.
+**Status: proposal for team review.** This document describes the intended product. It does not state that the repository contains a verified application, processing pipeline, selected dataset, or agreed deployment stack; a mock-data viewer prototype is in progress ([ADR 0002](decisions/0002-mock-first-3d-web.md)).
 
 The product basis is the team's [LunarSight V2 proposal](reference/proposal-v2.md), dated 5 November 2026. Prototype observations in that document are historical evidence of interaction ideas; they are not independent verification of scientific calculations or a specification of the current repository.
 

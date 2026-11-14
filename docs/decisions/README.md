@@ -6,9 +6,10 @@ An architecture decision record (ADR) captures one consequential choice, its rat
 
 | ID | Decision | Status | Authority |
 | --- | --- | --- | --- |
-| [0001](0001-documentation-first.md) | Keep the current bootstrap documentation-only; data and implementation remain proposals. | Accepted for the current phase | Explicit user clarification, 13 November 2026. |
+| [0001](0001-documentation-first.md) | Keep the initial bootstrap documentation-only; data and implementation remain proposals. | Accepted; scope limit partly superseded by 0002 for the mock prototype | Explicit user clarification, 13 November 2026. |
+| [0002](0002-mock-first-3d-web.md) | Build a 3D web viewer on labelled mock data behind a `LunarDataProvider` contract; real processed data connects later. Stack: Vite + React + TypeScript + CesiumJS + pnpm + Vitest. | Accepted for the mock prototype | User instruction, 13 November 2026; stack selected by the orchestrating agent under that instruction. |
 
-Product, data, stack, provider, and operational choices remain in [open decisions](../open-decisions.md). No technology or dataset ADR has been accepted.
+Dataset, hosting, backend, and provider choices remain in [open decisions](../open-decisions.md). No dataset ADR has been accepted.
 
 ## Lifecycle
 

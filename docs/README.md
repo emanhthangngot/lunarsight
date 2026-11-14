@@ -1,6 +1,6 @@
 # Documentation index
 
-Read [project state](project-state.md) first. Documents labeled **proposed** describe options or intended behavior; they do not establish team approval or implementation. The repository is currently a documentation foundation.
+Read [project state](project-state.md) first. Documents labeled **proposed** describe options or intended behavior; they do not establish team approval or implementation. The repository holds documentation plus a mock-data 3D viewer prototype in progress under `web/` ([ADR 0002](decisions/0002-mock-first-3d-web.md)).
 
 ## Product and requirements
 
@@ -9,6 +9,7 @@ Read [project state](project-state.md) first. Documents labeled **proposed** des
 | [Product direction](product.md) | Problem, user assumptions, feature direction, and proposed priorities. |
 | [Requirements register](requirements.md) | Stable functional/nonfunctional IDs, proposal traceability, and future acceptance criteria. |
 | [Original proposal reference](reference/proposal-v2.md) | Historical transcription of the team's proposal; observations and demo values remain unverified reference content. |
+| [Challenge summary (2026)](reference/challenge-2026.md) | Paraphrased official Lunar Landing Site Navigator statement, resources tab, and retrieval method/date. |
 
 ## Proposed system
 
