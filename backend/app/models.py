@@ -1,4 +1,4 @@
-"""Pydantic schemas aligned with web/src/data/contract.ts and docs/api-design.md."""
+"""Pydantic schemas aligned with web/src/data/contract.ts, visibility.ts, and docs/api-design.md."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 DataKind = Literal["mock", "processed"]
 SiteCategory = Literal["mock", "custom", "apollo", "clps", "artemis-candidate", "international"]
+JobStatus = Literal["queued", "running", "succeeded", "failed", "cancelled"]
 
 
 class Provenance(BaseModel):
@@ -111,9 +112,96 @@ class CoverageCheckResponse(BaseModel):
     layers: list[LayerCoverageItem] = Field(default_factory=list)
 
 
+class WindowMetrics(BaseModel):
+    windowHours: float
+    sunlitPercent: float | None
+    earthVisiblePercent: float | None
+    bothPercent: float | None
+    sunlitHours: float | None
+    earthVisibleHours: float | None
+    bothHours: float | None
+    longestDarknessHours: float | None
+    longestEarthBlackoutHours: float | None
+
+
+class VisibilityAnalysis(BaseModel):
+    sunVisible: list[bool | None]
+    earthVisible: list[bool | None]
+    both: list[bool | None]
+    metrics: WindowMetrics
+
+
+class ScenarioInputsModel(BaseModel):
+    site: SiteSummary
+    startUtcMs: int
+    durationDays: float
+    stepSeconds: int
+    observerHeightM: float
+
+
+class AnalysisResultModel(BaseModel):
+    id: str
+    calcHash: str
+    inputs: ScenarioInputsModel
+    ephemeris: EphemerisSeries
+    mask: HorizonMask | None
+    analysis: VisibilityAnalysis
+    createdAt: str
+
+
+class AnalysisRequest(BaseModel):
+    inputs: ScenarioInputsModel
+    idempotencyKey: str | None = None
+
+
+class AnalysisJobModel(BaseModel):
+    id: str
+    calcHash: str
+    status: JobStatus
+    progress: float
+    resultId: str | None = None
+    errorMessage: str | None = None
+    outsideCoverage: bool = False
+    createdAt: str
+    updatedAt: str
+
+
+class AnalysisSubmitResponse(BaseModel):
+    status: Literal["cached", "accepted"]
+    result: AnalysisResultModel | None = None
+    job: AnalysisJobModel | None = None
+
+
+class SaveScenarioRequest(BaseModel):
+    title: str = Field(..., min_length=1, max_length=120)
+    notes: str | None = Field(default=None, max_length=1000)
+    inputs: ScenarioInputsModel
+    resultId: str | None = None
+
+
+class SavedScenarioSummary(BaseModel):
+    id: str
+    title: str
+    notes: str | None = None
+    inputs: ScenarioInputsModel
+    resultId: str | None = None
+    metrics: WindowMetrics | None = None
+    createdAt: str
+
+
+class SavedScenarioDetail(BaseModel):
+    id: str
+    title: str
+    notes: str | None = None
+    inputs: ScenarioInputsModel
+    result: AnalysisResultModel | None = None
+    createdAt: str
+
+
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: str = "lunarsight-backend"
-    stage: str = "stage-1-core-api"
+    stage: str = "stage-2-persistence-jobs"
     terrainLayers: int
     catalogSites: int
+    savedScenarios: int = 0

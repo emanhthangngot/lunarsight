@@ -271,4 +271,11 @@ tfoot button { width: 100%; }
   .conventions { grid-template-columns: 1fr; }
   .command-option span { font-size: 11px; }
 }
+.saved-scenarios-section { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--ls-border); display: grid; gap: 12px; }
+.saved-scenario-form { display: flex; gap: 8px; flex-wrap: wrap; }
+.saved-scenario-form input { flex: 1; min-width: 180px; }
+.saved-scenario-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.saved-scenario-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 12px; border: 1px solid var(--ls-border); border-radius: var(--ls-radius-control); background: var(--ls-surface); }
+.saved-scenario-item strong { display: block; font-size: var(--ls-type-sm); }
+.saved-scenario-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto; } }

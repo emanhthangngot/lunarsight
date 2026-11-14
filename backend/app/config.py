@@ -8,6 +8,7 @@ from pathlib import Path
 
 MOON_RADIUS_M = 1_737_400.0
 HORIZON_MAX_RANGE_M = 150_000.0
+METHOD_VERSION = "visibility-v1"
 DEFAULT_HORIZONS_URL = "https://ssd.jpl.nasa.gov/api/horizons.api"
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -15,11 +16,12 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 @dataclass(frozen=True)
 class Settings:
-    """Resolved filesystem paths and network/CORS settings."""
+    """Resolved filesystem paths, SQLite path, and network/CORS settings."""
 
     pilot_public_dir: Path
     pilot_src_dir: Path
     cache_dir: Path
+    db_path: Path
     cors_origins: tuple[str, ...]
     horizons_url: str
     horizons_timeout_s: float
@@ -34,6 +36,7 @@ def load_settings() -> Settings:
         os.environ.get("LUNARSIGHT_PILOT_SRC_DIR", REPO_ROOT / "web" / "src" / "data" / "pilot")
     )
     cache_dir = Path(os.environ.get("LUNARSIGHT_CACHE_DIR", REPO_ROOT / "backend" / "cache"))
+    db_path = Path(os.environ.get("LUNARSIGHT_DB_PATH", cache_dir / "lunarsight.db"))
     raw_origins = os.environ.get(
         "LUNARSIGHT_CORS_ORIGINS",
         "http://127.0.0.1:5173,http://localhost:5173,https://lunarsight.vercel.app",
@@ -45,6 +48,7 @@ def load_settings() -> Settings:
         pilot_public_dir=public_dir,
         pilot_src_dir=src_dir,
         cache_dir=cache_dir,
+        db_path=db_path,
         cors_origins=cors_origins,
         horizons_url=horizons_url,
         horizons_timeout_s=horizons_timeout_s,

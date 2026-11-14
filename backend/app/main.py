@@ -1,14 +1,20 @@
-"""FastAPI entrypoint for the LunarSight Stage 1 Scientific Backend."""
+"""FastAPI entrypoint for the LunarSight Scientific Backend (Stage 1 + Stage 2)."""
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from .config import Settings, load_settings
 from .geo import CoordinateValidationError
 from .models import (
+    AnalysisJobModel,
+    AnalysisRequest,
+    AnalysisResultModel,
+    AnalysisSubmitResponse,
     CoverageCheckRequest,
     CoverageCheckResponse,
     DemManifest,
@@ -16,12 +22,17 @@ from .models import (
     EphemerisSeries,
     HealthResponse,
     HorizonMask,
+    SavedScenarioDetail,
+    SavedScenarioSummary,
+    SaveScenarioRequest,
     SiteSummary,
 )
+from .services.analysis_jobs import AnalysisJobService
 from .services.coverage import CoverageService
 from .services.ephemeris import EphemerisService, OutsideCoverageError, UpstreamEphemerisError
 from .services.horizon import HorizonService
 from .services.sites import SiteCatalogService
+from .services.storage import SQLiteStorage
 from .services.terrain import TerrainService
 
 
@@ -33,6 +44,8 @@ class AppServices:
     horizon: HorizonService
     ephemeris: EphemerisService
     coverage: CoverageService
+    storage: SQLiteStorage
+    jobs: AnalysisJobService
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -48,11 +61,25 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         horizons_timeout_s=cfg.horizons_timeout_s,
     )
     coverage_svc = CoverageService(terrain_svc, ephemeris_svc)
+    storage_svc = SQLiteStorage(cfg.db_path)
+    jobs_svc = AnalysisJobService(storage_svc, terrain_svc, horizon_svc, ephemeris_svc)
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI):
+        try:
+            yield
+        finally:
+            jobs_svc.shutdown()
+            storage_svc.close()
 
     app = FastAPI(
         title="LunarSight Scientific API",
-        version="0.1.0",
-        description="Stage 1 modular backend serving PGDA DEMs, horizon masks, and JPL Horizons ephemeris.",
+        version="0.2.0",
+        description=(
+            "Modular backend serving PGDA DEMs, horizon masks, JPL Horizons ephemeris, "
+            "SQLite-backed immutable analysis results, jobs, and saved scenarios."
+        ),
+        lifespan=lifespan,
     )
     app.state.services = AppServices(
         settings=cfg,
@@ -61,13 +88,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         horizon=horizon_svc,
         ephemeris=ephemeris_svc,
         coverage=coverage_svc,
+        storage=storage_svc,
+        jobs=jobs_svc,
     )
 
     app.add_middleware(
         CORSMiddleware,
         allow_origins=list(cfg.cors_origins),
         allow_credentials=False,
-        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
         allow_headers=["*"],
         expose_headers=["X-Dem-Meta"],
     )
@@ -77,6 +106,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return HealthResponse(
             terrainLayers=len(terrain_svc.layers),
             catalogSites=len(sites_svc.list_sites()),
+            savedScenarios=storage_svc.count_scenarios(),
         )
 
     @app.get("/api/sites", response_model=list[SiteSummary])
@@ -185,6 +215,63 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
         except UpstreamEphemerisError as exc:
             raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    # --- Stage 2: Immutable Analyses, Jobs, and Saved Scenarios ---
+
+    @app.post("/api/analyses", response_model=AnalysisSubmitResponse)
+    def submit_analysis(req: AnalysisRequest) -> Response:
+        try:
+            outcome = jobs_svc.submit_analysis(req)
+        except (CoordinateValidationError, ValueError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        status_code = 200 if outcome.status == "cached" else 202
+        return JSONResponse(content=outcome.model_dump(mode="json"), status_code=status_code)
+
+    @app.get("/api/analysis-jobs/{job_id}", response_model=AnalysisJobModel)
+    def get_analysis_job(job_id: str) -> AnalysisJobModel:
+        job = jobs_svc.get_job(job_id)
+        if job is None:
+            raise HTTPException(status_code=404, detail=f"Analysis job '{job_id}' not found")
+        return job
+
+    @app.post("/api/analysis-jobs/{job_id}/cancel", response_model=AnalysisJobModel)
+    def cancel_analysis_job(job_id: str) -> AnalysisJobModel:
+        job = jobs_svc.cancel_job(job_id)
+        if job is None:
+            raise HTTPException(status_code=404, detail=f"Analysis job '{job_id}' not found")
+        return job
+
+    @app.get("/api/analysis-results/{result_id}", response_model=AnalysisResultModel)
+    def get_analysis_result(result_id: str) -> AnalysisResultModel:
+        result = storage_svc.get_result_by_id(result_id)
+        if result is None:
+            raise HTTPException(status_code=404, detail=f"Analysis result '{result_id}' not found")
+        return result
+
+    @app.get("/api/scenarios", response_model=list[SavedScenarioSummary])
+    def list_scenarios() -> list[SavedScenarioSummary]:
+        return storage_svc.list_scenarios()
+
+    @app.post("/api/scenarios", response_model=SavedScenarioSummary, status_code=201)
+    def create_scenario(req: SaveScenarioRequest) -> SavedScenarioSummary:
+        try:
+            return storage_svc.create_scenario(req)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.get("/api/scenarios/{scenario_id}", response_model=SavedScenarioDetail)
+    def get_scenario(scenario_id: str) -> SavedScenarioDetail:
+        scenario = storage_svc.get_scenario(scenario_id)
+        if scenario is None:
+            raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found")
+        return scenario
+
+    @app.delete("/api/scenarios/{scenario_id}", status_code=204)
+    def delete_scenario(scenario_id: str) -> Response:
+        deleted = storage_svc.delete_scenario(scenario_id)
+        if not deleted:
+            raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found")
+        return Response(status_code=204)
 
     return app
 

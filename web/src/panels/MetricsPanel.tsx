@@ -11,9 +11,10 @@ export function MetricsPanel({ result, cursorIndex, stale }: { result: ScenarioR
   const { metrics } = result.analysis;
   const events = eventsAtCursor(result.ephemeris.timesUtcMs, result.analysis, cursorIndex);
   const unknown = result.mask === null;
+  const isProcessed = result.ephemeris.provenance.kind === 'processed';
   return <section className="panel metrics-panel" aria-labelledby="metrics-title" aria-busy={stale}>
-    <div className="section-heading"><h2 id="metrics-title">Visibility window</h2><span className="tag">{result.id} · mock</span></div>
-    <p className="muted">{result.inputs.site.name} · {number(metrics.windowHours, ' h')}<br />Visible above terrain horizon (mock)</p>
+    <div className="section-heading"><h2 id="metrics-title">Visibility window</h2><span className="tag">{result.id} · {isProcessed ? 'NASA data' : 'mock'}</span></div>
+    <p className="muted">{result.inputs.site.name} · {number(metrics.windowHours, ' h')}<br />Visible above terrain horizon ({isProcessed ? 'PGDA + Horizons' : 'mock'})</p>
     {stale && <p className="notice">Stale result — recomputing. Values below belong to {result.id}.</p>}
     {unknown && <p className="notice">Horizon mask unavailable. Visibility and event countdowns are unknown.</p>}
     <div className="solar-elevation"><span>Current Sun elevation</span><strong>{number(result.ephemeris.sunElDeg[cursorIndex], '°')}</strong><span>{visibility(result.analysis.sunVisible[cursorIndex])} · {result.analysis.sunVisible[cursorIndex] === true ? 'centre above terrain horizon' : result.analysis.sunVisible[cursorIndex] === false ? 'centre at or below terrain horizon' : 'terrain visibility unavailable'}</span></div>

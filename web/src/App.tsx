@@ -16,8 +16,27 @@ import { SiteCommand } from './components/SiteCommand';
 import { utc } from './panels/format';
 
 export function App({ provider }: { provider: LunarDataProvider }) {
-  const { state, dispatch, sites, terrain, bootError, submit } = useWorkspace(provider);
+  const {
+    state,
+    dispatch,
+    sites,
+    terrain,
+    bootError,
+    submit,
+    hasPersistence,
+    savedScenarios,
+    scenarioBusy,
+    scenarioError,
+    saveScenarioToServer,
+    loadScenarioFromServer,
+    deleteScenarioFromServer,
+  } = useWorkspace(provider);
   const { draft, result, pendingId, cursorIndex } = state;
+  useEffect(() => {
+    document.title = provider.kind === 'processed'
+      ? 'LunarSight — NASA Data Explorer'
+      : 'LunarSight — Mock Explorer';
+  }, [provider.kind]);
   const pending = pendingId !== null;
   const dirty = !!draft && (!result || scenarioKey(draft) !== scenarioKey(result.inputs));
   const viewerSites = useMemo(() => {
@@ -142,7 +161,7 @@ export function App({ provider }: { provider: LunarDataProvider }) {
       <TimelinePanel result={result} cursorIndex={cursorIndex} playing={state.playing} speed={state.speed} disabled={pending} dispatch={dispatch} />
     </div>
     <SiteCommand open={commandOpen} onClose={() => setCommandOpen(false)} sites={viewerSites} selectedSiteId={draft?.site.id ?? null} onChoose={(site) => { selectSite(site); setShowInputs(true); if (compact) setShowResults(false); }} />
-    <OverlayDialog open={comparisonOpen} onClose={() => setComparisonOpen(false)} title="Scenario comparison" description="Independent site-date snapshots. Differences are relative to the first saved scenario." className="comparison-dialog"><ComparisonPanel comparisons={state.comparisons} result={result} pending={pending} dispatch={dispatch} /></OverlayDialog>
+    <OverlayDialog open={comparisonOpen} onClose={() => setComparisonOpen(false)} title="Scenario comparison" description="Independent site-date snapshots. Differences are relative to the first saved scenario." className="comparison-dialog"><ComparisonPanel comparisons={state.comparisons} result={result} pending={pending} dispatch={dispatch} hasPersistence={hasPersistence} savedScenarios={savedScenarios} scenarioBusy={scenarioBusy} scenarioError={scenarioError} onSaveToServer={saveScenarioToServer} onLoadFromServer={async (id) => { await loadScenarioFromServer(id); setComparisonOpen(false); }} onDeleteFromServer={deleteScenarioFromServer} /></OverlayDialog>
     <OverlayDialog open={provenanceOpen} onClose={() => setProvenanceOpen(false)} title="Data provenance" description="Data sources, scientific conventions and finite-range limitations." className="provenance-dialog"><ProvenancePanel kind={provider.kind} terrain={terrain} result={result} /></OverlayDialog>
   </main>;
 }

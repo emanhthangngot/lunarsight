@@ -14,18 +14,20 @@ from app.main import create_app
 
 
 @pytest.fixture()
-def client(tmp_path: Path) -> TestClient:
+def client(tmp_path: Path):
     base = load_settings()
     settings = Settings(
         pilot_public_dir=base.pilot_public_dir,
         pilot_src_dir=base.pilot_src_dir,
         cache_dir=tmp_path / "cache",
+        db_path=tmp_path / "cache" / "test.db",
         cors_origins=("http://127.0.0.1:5173",),
         horizons_url=base.horizons_url,
         horizons_timeout_s=10.0,
     )
     app = create_app(settings)
-    return TestClient(app)
+    with TestClient(app) as tc:
+        yield tc
 
 
 def test_health_and_sites(client: TestClient) -> None:

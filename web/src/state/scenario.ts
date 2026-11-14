@@ -11,6 +11,7 @@ export interface ScenarioInputs {
 }
 export interface ScenarioResult {
   id: string;
+  serverResultId?: string;
   inputs: ScenarioInputs;
   ephemeris: EphemerisSeries;
   mask: HorizonMask | null;
@@ -55,17 +56,24 @@ export function validateScenario(inputs: ScenarioInputs): void {
   if (Math.ceil(inputs.durationDays * 86400 / inputs.stepSeconds) + 1 > 25_000) throw new RangeError('At most 25,000 samples per scenario; increase the step or shorten the duration');
 }
 
+export interface BackendAnalysisProvider extends LunarDataProvider {
+  runAnalysis?(inputs: ScenarioInputs, id: string, signal?: AbortSignal): Promise<ScenarioResult>;
+}
+
 /** Bounded one-entry caches: date/step edits reuse terrain; height also changes
  * finite-distance ephemeris. Each computation captures its own immutable inputs.
  */
 export class ScenarioComputer {
   private maskCache: { key: string; promise: Promise<HorizonMask | null> } | null = null;
   private ephemerisCache: { key: string; promise: Promise<EphemerisSeries> } | null = null;
-  constructor(private readonly provider: LunarDataProvider) {}
+  constructor(private readonly provider: BackendAnalysisProvider) {}
 
   async compute(draft: ScenarioInputs, id: string): Promise<ScenarioResult> {
     const inputs = copyInputs(draft);
     validateScenario(inputs);
+    if (typeof this.provider.runAnalysis === 'function') {
+      return this.provider.runAnalysis(inputs, id);
+    }
     const { site, startUtcMs, durationDays, stepSeconds, observerHeightM } = inputs;
     const maskKey = JSON.stringify([site.id, site.latDeg, site.lonDegE, observerHeightM]);
     if (this.maskCache?.key !== maskKey) {

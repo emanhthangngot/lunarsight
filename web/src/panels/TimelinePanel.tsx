@@ -29,6 +29,7 @@ export function TimelinePanel({ result, cursorIndex, playing, speed, disabled, d
   const times = ephemeris.timesUtcMs;
   const events = eventsAtCursor(times, analysis, cursorIndex);
   function jump(index: number) { dispatch({ type: 'playing', playing: false }); dispatch({ type: 'cursor', index }); }
+  const isProcessed = ephemeris.provenance.kind === 'processed';
   return <section className="panel timeline-panel" aria-labelledby="timeline-title">
     <div className="timeline-heading"><div className="timeline-identity"><h2 id="timeline-title">Mission timeline <span className="tag">{result.id}</span></h2><p className="cursor-time" data-cursor-utc>{utc(times[cursorIndex])} UTC</p></div>
       <div className="timeline-controls">
@@ -43,6 +44,6 @@ export function TimelinePanel({ result, cursorIndex, playing, speed, disabled, d
     <label className="scrubber-label">UTC time cursor<input name="cursorIndex" type="range" min="0" max={Math.max(0, times.length - 1)} value={cursorIndex} disabled={disabled} onChange={(e) => jump(Number(e.target.value))} aria-valuetext={utc(times[cursorIndex]) + ' UTC'} /></label>
     <div className="tracks"><VisibilityBand times={times} track={analysis.sunVisible} title="Sun" /><VisibilityBand times={times} track={analysis.earthVisible} title="Earth" /><VisibilityBand times={times} track={analysis.both} title="Both" /></div>
     <div className="timeline-extent"><span>{utc(times[0])}</span><span>{utc(times.at(-1))}</span></div>
-    <details className="timeline-method"><summary>Centre visibility · ±{ephemeris.stepSeconds / 3600} h sampling</summary><p className="track-legend"><span className="legend-visible">Visible above terrain horizon (mock)</span><span className="legend-hidden">Hidden</span><span className="legend-unknown">Unknown</span> · States held until the next sample; not exact transition times.</p></details>
+    <details className="timeline-method"><summary>Centre visibility · ±{ephemeris.stepSeconds / 3600} h sampling</summary><p className="track-legend"><span className="legend-visible">Visible above terrain horizon ({isProcessed ? 'PGDA + Horizons' : 'mock'})</span><span className="legend-hidden">Hidden</span><span className="legend-unknown">Unknown</span> · States held until the next sample; not exact transition times.</p></details>
   </section>;
 }

@@ -1,9 +1,58 @@
+import type { WindowMetrics } from '../../analysis/visibility';
 import type { EphemerisSeries, HorizonMask, LunarDataProvider, SiteSummary, TerrainSource } from '../contract';
+import type { ScenarioInputs, ScenarioResult } from '../../state/scenario';
 import { validateCoordinates } from '../../geo/coordinates';
 import { WorkerTerrainMeshLoader } from '../../terrain/WorkerTerrainMeshLoader';
 import { createDemHeightAt, type DemLayerData, type DemManifest } from '../pilot/demTerrain';
 
 type SiteLocation = Pick<SiteSummary, 'id' | 'latDeg' | 'lonDegE'>;
+
+export interface AnalysisJobModel {
+  id: string;
+  calcHash: string;
+  status: 'queued' | 'running' | 'succeeded' | 'failed' | 'cancelled';
+  progress: number;
+  resultId: string | null;
+  errorMessage: string | null;
+  outsideCoverage: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ServerAnalysisResult {
+  id: string;
+  calcHash: string;
+  inputs: ScenarioInputs;
+  ephemeris: EphemerisSeries;
+  mask: HorizonMask | null;
+  analysis: ScenarioResult['analysis'];
+  createdAt: string;
+}
+
+export interface AnalysisSubmitResponse {
+  status: 'cached' | 'accepted';
+  result: ServerAnalysisResult | null;
+  job: AnalysisJobModel | null;
+}
+
+export interface SavedScenarioSummary {
+  id: string;
+  title: string;
+  notes: string | null;
+  inputs: ScenarioInputs;
+  resultId: string | null;
+  metrics: WindowMetrics | null;
+  createdAt: string;
+}
+
+export interface SavedScenarioDetail {
+  id: string;
+  title: string;
+  notes: string | null;
+  inputs: ScenarioInputs;
+  result: ServerAnalysisResult | null;
+  createdAt: string;
+}
 
 async function readErrorDetail(response: Response, fallback: string): Promise<string> {
   try {
@@ -17,9 +66,20 @@ async function readErrorDetail(response: Response, fallback: string): Promise<st
   return fallback;
 }
 
+function toScenarioResult(serverResult: ServerAnalysisResult, localId: string): ScenarioResult {
+  return {
+    id: localId,
+    serverResultId: serverResult.id,
+    inputs: serverResult.inputs,
+    ephemeris: serverResult.ephemeris,
+    mask: serverResult.mask,
+    analysis: serverResult.analysis,
+  };
+}
+
 /**
  * ApiDataProvider connects the Three.js workspace to the LunarSight FastAPI backend
- * without changing UI or Worker contracts.
+ * (Stage 1 scientific endpoints + Stage 2 immutable analysis jobs & SQLite scenario persistence).
  */
 export class ApiDataProvider implements LunarDataProvider {
   readonly kind = 'processed' as const;
@@ -171,5 +231,118 @@ export class ApiDataProvider implements LunarDataProvider {
       throw new Error(await readErrorDetail(resp, `Failed to load ephemeris (${resp.status})`));
     }
     return (await resp.json()) as EphemerisSeries;
+  }
+
+  /** Stage 2: submit immutable scenario analysis via POST /api/analyses + background job polling. */
+  async runAnalysis(inputs: ScenarioInputs, localId: string, signal?: AbortSignal): Promise<ScenarioResult> {
+    const signalInit: RequestInit = signal ? { signal } : {};
+    const submitResp = await fetch(this.resolveUrl('/api/analyses'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inputs }),
+      ...signalInit,
+    });
+    if (submitResp.status === 422 || submitResp.status === 404) {
+      throw new RangeError(await readErrorDetail(submitResp, 'Scenario inputs are invalid or outside coverage'));
+    }
+    if (!submitResp.ok) {
+      throw new Error(await readErrorDetail(submitResp, `Failed to submit analysis (${submitResp.status})`));
+    }
+
+    const submitted = (await submitResp.json()) as AnalysisSubmitResponse;
+    if (submitted.status === 'cached' && submitted.result) {
+      return toScenarioResult(submitted.result, localId);
+    }
+    if (!submitted.job) {
+      throw new Error('Backend did not return a cached result or job receipt');
+    }
+
+    let job = submitted.job;
+    while (job.status === 'queued' || job.status === 'running') {
+      await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(resolve, 150);
+        if (signal) {
+          if (signal.aborted) {
+            clearTimeout(timer);
+            reject(new DOMException('Aborted', 'AbortError'));
+            return;
+          }
+          signal.addEventListener('abort', () => {
+            clearTimeout(timer);
+            void fetch(this.resolveUrl(`/api/analysis-jobs/${job.id}/cancel`), { method: 'POST' }).catch(() => {});
+            reject(new DOMException('Aborted', 'AbortError'));
+          }, { once: true });
+        }
+      });
+
+      const pollResp = await fetch(this.resolveUrl(`/api/analysis-jobs/${job.id}`), signalInit);
+      if (!pollResp.ok) {
+        throw new Error(await readErrorDetail(pollResp, `Failed to poll job ${job.id} (${pollResp.status})`));
+      }
+      job = (await pollResp.json()) as AnalysisJobModel;
+    }
+
+    if (job.status === 'failed') {
+      const msg = job.errorMessage || 'Analysis job failed';
+      if (job.outsideCoverage) {
+        throw new RangeError(msg);
+      }
+      throw new Error(msg);
+    }
+    if (job.status === 'cancelled') {
+      throw new Error(job.errorMessage || 'Analysis job was cancelled');
+    }
+    if (!job.resultId) {
+      throw new Error('Succeeded job is missing resultId');
+    }
+
+    const resResp = await fetch(this.resolveUrl(`/api/analysis-results/${job.resultId}`), signalInit);
+    if (!resResp.ok) {
+      throw new Error(await readErrorDetail(resResp, `Failed to load analysis result ${job.resultId}`));
+    }
+    const serverResult = (await resResp.json()) as ServerAnalysisResult;
+    return toScenarioResult(serverResult, localId);
+  }
+
+  async listSavedScenarios(): Promise<SavedScenarioSummary[]> {
+    const resp = await fetch(this.resolveUrl('/api/scenarios'));
+    if (!resp.ok) {
+      throw new Error(await readErrorDetail(resp, `Failed to load saved scenarios (${resp.status})`));
+    }
+    return (await resp.json()) as SavedScenarioSummary[];
+  }
+
+  async saveScenario(
+    title: string,
+    inputs: ScenarioInputs,
+    resultId?: string,
+    notes?: string,
+  ): Promise<SavedScenarioSummary> {
+    const resp = await fetch(this.resolveUrl('/api/scenarios'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, inputs, resultId: resultId ?? null, notes: notes ?? null }),
+    });
+    if (!resp.ok) {
+      throw new Error(await readErrorDetail(resp, `Failed to save scenario (${resp.status})`));
+    }
+    return (await resp.json()) as SavedScenarioSummary;
+  }
+
+  async getSavedScenario(scenarioId: string): Promise<SavedScenarioDetail> {
+    const resp = await fetch(this.resolveUrl(`/api/scenarios/${encodeURIComponent(scenarioId)}`));
+    if (!resp.ok) {
+      throw new Error(await readErrorDetail(resp, `Failed to load scenario (${resp.status})`));
+    }
+    return (await resp.json()) as SavedScenarioDetail;
+  }
+
+  async deleteSavedScenario(scenarioId: string): Promise<void> {
+    const resp = await fetch(this.resolveUrl(`/api/scenarios/${encodeURIComponent(scenarioId)}`), {
+      method: 'DELETE',
+    });
+    if (!resp.ok && resp.status !== 204) {
+      throw new Error(await readErrorDetail(resp, `Failed to delete scenario (${resp.status})`));
+    }
   }
 }
