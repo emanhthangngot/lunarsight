@@ -1,0 +1,9 @@
+{
+  "status": "conditional binned 5m/80m diagnostic; not full horizon or visibility",
+  "changed_bins": 106,
+  "max_combined_increase_deg": 2.113087341,
+  "near_csv_sha256": "875ca08d4ed4efc6eae915dcecb7254ba705c7a069967d1f6123afdf006e70cf",
+  "previous_csv_sha256": "242131d4db2f4ed9558943b6f2a45c3731919f188e031d1e161e95aefdcd06ac",
+  "far_csv_sha256": "c8ac841024826c32a05666ee9e583439458495f7a342640087b17fd39fc39d7e",
+  "result_csv_sha256": "6568cc1e8e36da7e1e7bd0ae13bde3eadc78fa71338901fce944d73f460301df"
+}

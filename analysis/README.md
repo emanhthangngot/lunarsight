@@ -14,6 +14,9 @@ python analysis/check_site04_area_overlap.py
 python analysis/site04_spherical_crosscheck.py
 python analysis/site04_50km_diagnostic.py
 python analysis/site04_combine_50km.py
+python analysis/site04_100km_diagnostic.py
+python analysis/site04_combine_100km.py
+python analysis/check_site04_100km.py
 python analysis/check_site04_convergence.py
 ```
 
@@ -30,3 +33,7 @@ The 5 m and 80 m diagnostic scripts save bounded raw windows only inside ignored
 The 50 km window is bounded with the same 24 MiB HTTP cap and must reproduce the frozen inner 25 km profile. Area averaging matches geometric support only; the spherical-vector cross-check reuses the same terrain and is not an external reference.
 
 The 50 km script writes to ignored `artifacts/site04-50km/` and checks its 25 km inner profile against frozen evidence. The GDAL comparison checks area-weighting arithmetic, while the spherical-vector comparison uses the same DEM and is not an independent terrain truth.
+
+For the seam-quality layers, run `SITE04_FETCH_QUALITY=1 python analysis/site04_seam_quality.py` once to obtain bounded windows, then rerun without the variable to use the ignored cache. Source-window fingerprints are compared to frozen evidence. The five layers are counts/errors/resolution evidence, not an uncertainty propagation. After populating the cache, `python analysis/check_site04_seam_quality.py` checks the 111 area-weighted values with GDAL average resampling.
+
+The 100 km diagnostic (`analysis/site04_100km_diagnostic.py`) is a bounded 80 m investigation with a 48 MiB cap; it does not establish convergence by itself.
