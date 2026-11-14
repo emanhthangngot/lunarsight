@@ -1,0 +1,363 @@
+{
+  "site": "Site04",
+  "roi_sha256": "8e8b788f9fdf6400f23fd36dad02138102bd1a905b4b71a5739a9a4fd8a0e07a",
+  "mask_rule": "pixel center within polygon, all_touched=False",
+  "crs_comparison": "pyproj semantic equality false; PROJ parameters match; authoritative frame identity not established",
+  "layers": [
+    {
+      "layer": "surface",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_surf.tif",
+      "head": {
+        "Content-Length": "40980806",
+        "ETag": "W/\"2715146-17285c863d0\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:40:02 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "roi_crs_wkt": "PROJCRS[\"unknown\",BASEGEOGCRS[\"unknown\",DATUM[\"unknown\",ELLIPSOID[\"unknown\",1737400,0,LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]],PRIMEM[\"Reference meridian\",0,ANGLEUNIT[\"Degree\",0.0174532925199433]]],CONVERSION[\"unnamed\",METHOD[\"Polar Stereographic (variant B)\",ID[\"EPSG\",9829]],PARAMETER[\"Latitude of standard parallel\",-90,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8832]],PARAMETER[\"Longitude of origin\",0,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8833]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting\",north,ORDER[1],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]],AXIS[\"northing\",north,ORDER[2],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]]",
+      "crs_equivalent": false,
+      "resolution_m": [
+        5.0,
+        5.0
+      ],
+      "window": [
+        1229,
+        1378,
+        47,
+        184
+      ],
+      "window_transform": [
+        5.0,
+        0.0,
+        -2855.0,
+        0.0,
+        -5.0,
+        -5890.0
+      ],
+      "nodata": "nan",
+      "scale": 1.0,
+      "offset": 0.0,
+      "roi_cells": 526,
+      "valid_roi_cells": 526,
+      "min": 1723.327880859375,
+      "max": 1739.121826171875,
+      "median": 1732.627685546875,
+      "http_body_bytes": 3670016,
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          17301504,
+          17825791
+        ],
+        [
+          17825792,
+          18350079
+        ],
+        [
+          18350080,
+          18874367
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ]
+      ],
+      "window_sha256": "7a7c89d48cf7481fb672f20352220a831c5d2d2b62145f78cc4bee490c45bf80"
+    },
+    {
+      "layer": "count",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_ldec.tif",
+      "head": {
+        "Content-Length": "40980740",
+        "ETag": "W/\"2715104-17285c87b40\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:40:08 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "roi_crs_wkt": "PROJCRS[\"unknown\",BASEGEOGCRS[\"unknown\",DATUM[\"unknown\",ELLIPSOID[\"unknown\",1737400,0,LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]],PRIMEM[\"Reference meridian\",0,ANGLEUNIT[\"Degree\",0.0174532925199433]]],CONVERSION[\"unnamed\",METHOD[\"Polar Stereographic (variant B)\",ID[\"EPSG\",9829]],PARAMETER[\"Latitude of standard parallel\",-90,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8832]],PARAMETER[\"Longitude of origin\",0,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8833]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting\",north,ORDER[1],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]],AXIS[\"northing\",north,ORDER[2],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]]",
+      "crs_equivalent": false,
+      "resolution_m": [
+        5.0,
+        5.0
+      ],
+      "window": [
+        1229,
+        1378,
+        47,
+        184
+      ],
+      "window_transform": [
+        5.0,
+        0.0,
+        -2855.0,
+        0.0,
+        -5.0,
+        -5890.0
+      ],
+      "nodata": "nan",
+      "scale": 1.0,
+      "offset": 0.0,
+      "roi_cells": 526,
+      "valid_roi_cells": 526,
+      "min": 0.0,
+      "max": 2.0,
+      "median": 0.0,
+      "http_body_bytes": 3670016,
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          17301504,
+          17825791
+        ],
+        [
+          17825792,
+          18350079
+        ],
+        [
+          18350080,
+          18874367
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ]
+      ],
+      "window_sha256": "e1059f201db8ba6c56619b0c85e979c650a43630eac7932683477b8fca07b8ed"
+    },
+    {
+      "layer": "slope",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_slp.tif",
+      "head": {
+        "Content-Length": "40980772",
+        "ETag": "W/\"2715124-17295f7ede8\"",
+        "Last-Modified": "Mon, 08 Jun 2020 22:05:53 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "roi_crs_wkt": "PROJCRS[\"unknown\",BASEGEOGCRS[\"unknown\",DATUM[\"unknown\",ELLIPSOID[\"unknown\",1737400,0,LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]],PRIMEM[\"Reference meridian\",0,ANGLEUNIT[\"Degree\",0.0174532925199433]]],CONVERSION[\"unnamed\",METHOD[\"Polar Stereographic (variant B)\",ID[\"EPSG\",9829]],PARAMETER[\"Latitude of standard parallel\",-90,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8832]],PARAMETER[\"Longitude of origin\",0,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8833]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting\",north,ORDER[1],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]],AXIS[\"northing\",north,ORDER[2],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]]",
+      "crs_equivalent": false,
+      "resolution_m": [
+        5.0,
+        5.0
+      ],
+      "window": [
+        1229,
+        1378,
+        47,
+        184
+      ],
+      "window_transform": [
+        5.0,
+        0.0,
+        -2855.0,
+        0.0,
+        -5.0,
+        -5890.0
+      ],
+      "nodata": "nan",
+      "scale": 1.0,
+      "offset": 0.0,
+      "roi_cells": 526,
+      "valid_roi_cells": 526,
+      "min": 0.05233915522694588,
+      "max": 10.325005531311035,
+      "median": 2.860504627227783,
+      "http_body_bytes": 3670016,
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          17301504,
+          17825791
+        ],
+        [
+          17825792,
+          18350079
+        ],
+        [
+          18350080,
+          18874367
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ]
+      ],
+      "window_sha256": "6cbcdfb5dc1351da5402e876b2fe26c7343daf7a52ed52d8675867f1788b2d1b"
+    },
+    {
+      "layer": "z_rms",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_toterr.tif",
+      "head": {
+        "Content-Length": "40980808",
+        "ETag": "W/\"2715148-17285c89698\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:40:15 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "roi_crs_wkt": "PROJCRS[\"unknown\",BASEGEOGCRS[\"unknown\",DATUM[\"unknown\",ELLIPSOID[\"unknown\",1737400,0,LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]],PRIMEM[\"Reference meridian\",0,ANGLEUNIT[\"Degree\",0.0174532925199433]]],CONVERSION[\"unnamed\",METHOD[\"Polar Stereographic (variant B)\",ID[\"EPSG\",9829]],PARAMETER[\"Latitude of standard parallel\",-90,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8832]],PARAMETER[\"Longitude of origin\",0,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8833]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting\",north,ORDER[1],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]],AXIS[\"northing\",north,ORDER[2],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]]",
+      "crs_equivalent": false,
+      "resolution_m": [
+        5.0,
+        5.0
+      ],
+      "window": [
+        1229,
+        1378,
+        47,
+        184
+      ],
+      "window_transform": [
+        5.0,
+        0.0,
+        -2855.0,
+        0.0,
+        -5.0,
+        -5890.0
+      ],
+      "nodata": "nan",
+      "scale": 1.0,
+      "offset": 0.0,
+      "roi_cells": 526,
+      "valid_roi_cells": 526,
+      "min": 0.08836071193218231,
+      "max": 0.9623488783836365,
+      "median": 0.34461116790771484,
+      "http_body_bytes": 3670016,
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          17301504,
+          17825791
+        ],
+        [
+          17825792,
+          18350079
+        ],
+        [
+          18350080,
+          18874367
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ]
+      ],
+      "window_sha256": "16de7dc3c53b12ab96fc42ce7e66de7dd9d52f76f2ffb37590ebca88adffb79a"
+    },
+    {
+      "layer": "slope_rms",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_slperr.tif",
+      "head": {
+        "Content-Length": "40980806",
+        "ETag": "W/\"2715146-17285c8b1f0\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:40:22 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "roi_crs_wkt": "PROJCRS[\"unknown\",BASEGEOGCRS[\"unknown\",DATUM[\"unknown\",ELLIPSOID[\"unknown\",1737400,0,LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]],PRIMEM[\"Reference meridian\",0,ANGLEUNIT[\"Degree\",0.0174532925199433]]],CONVERSION[\"unnamed\",METHOD[\"Polar Stereographic (variant B)\",ID[\"EPSG\",9829]],PARAMETER[\"Latitude of standard parallel\",-90,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8832]],PARAMETER[\"Longitude of origin\",0,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8833]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting\",north,ORDER[1],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]],AXIS[\"northing\",north,ORDER[2],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]]",
+      "crs_equivalent": false,
+      "resolution_m": [
+        5.0,
+        5.0
+      ],
+      "window": [
+        1229,
+        1378,
+        47,
+        184
+      ],
+      "window_transform": [
+        5.0,
+        0.0,
+        -2855.0,
+        0.0,
+        -5.0,
+        -5890.0
+      ],
+      "nodata": "nan",
+      "scale": 1.0,
+      "offset": 0.0,
+      "roi_cells": 526,
+      "valid_roi_cells": 526,
+      "min": 0.6434584856033325,
+      "max": 4.817509651184082,
+      "median": 1.6138933897018433,
+      "http_body_bytes": 3670016,
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          17301504,
+          17825791
+        ],
+        [
+          17825792,
+          18350079
+        ],
+        [
+          18350080,
+          18874367
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ]
+      ],
+      "window_sha256": "101473d07e596ead8f8ade50597f7556a7245111c7b41b58d3de45504e3db31d"
+    }
+  ]
+}
