@@ -1,12 +1,12 @@
 # Pilot data-mining inventory
 
-Status: **research proposal, checked 14 November 2026**. This inventory narrows the accepted feature scope in [ADR 0002](decisions/0002-data-mining-feature-scope.md). It is not approval for bulk raster acquisition. Four small ROI shapefile bundles were downloaded temporarily to inspect their geometry. Six reference centers now have bounded 9×9 reads at local 5 m and PGDA 90 80 m/20 m; Site20v2 also had a local 5 m point read. The original four centers were profiled to 25 km at both scales and 131.8 km at 80 m for an illustrative 5 km-relief case. All completed profile-circle reads were valid, and no full raster was saved. The profile runs transferred about 414.4 MB in total, including overlapping/repeated tile ranges and an interrupted read. The temporary ROI bundles and Rasterio reader are outside the repository.
+Status: **research proposal, checked 14 November 2026**. This inventory narrows the accepted feature scope in [ADR 0002](decisions/0002-data-mining-feature-scope.md). It is not approval for bulk raster acquisition. Four small ROI shapefile bundles were downloaded temporarily to inspect their geometry. Six reference centers have bounded 9×9 reads at local 5 m and PGDA 90 80 m/20 m; Site20v2 also had a local 5 m point read. A broader alternative screen checked metadata and HTTP HEAD sizes for Site06, Site42 and Haworth, without reading raster pixels. The original four centers were profiled to 25 km at both scales and 131.8 km at 80 m for an illustrative 5 km-relief case. All completed profile-circle reads were valid, and no full raster was saved. The profile runs transferred about 414.4 MB in total, including overlapping/repeated tile ranges and an interrupted read. The temporary ROI bundles and Rasterio reader are outside the repository.
 
 ## Recommended pilot sites for coverage review
 
-The original comparison cohort is **Site01 (Connecting Ridge), Site04 (Shackleton rim), Site11 (de Gerlache rim 1), and Site23 (Malapert massif)**. Site04/11/23 came from the initial PGDA 78 shortlist; the team-provided `Resource.docx` also named Site01. A lightweight screen now adds **Site07 (Peak near Shackleton)** and **Site20 (Leibnitz Beta Plateau)** because PGDA 78 also provides products for them. This six-center set is still not exhaustive: PGDA 78 lists other regional products such as Site06, Site42, Haworth, and DM/NP/LM areas. The four previously analyzed sites were not the only technically available candidates; the earlier choice reflected the team references and bounded initial scope. These are data-coverage candidates, not validated landing coordinates.
+The original comparison cohort is **Site01 (Connecting Ridge), Site04 (Shackleton rim), Site11 (de Gerlache rim 1), and Site23 (Malapert massif)**. Site04/11/23 came from the initial PGDA 78 shortlist; the team-provided `Resource.docx` also named Site01. Bounded point checks added **Site07 (Peak near Shackleton)** and **Site20 (Leibnitz Beta Plateau)**. A further metadata-only screen covered **Site06 (Nobile Rim 1), Site42 (de Gerlache-Kocher Massif), and Haworth**. The official PGDA page lists 27 product entries, including Site20v2 as an alternate version and many named regional products. These nine geographic candidates are still only a subset; the earlier four-site comparison reflected team references and bounded initial scope, not an exhaustive technical shortlist. These are data-coverage candidates, not validated landing coordinates.
 
-The Site07 and Site20 screen confirms point-window coverage, but does not promote them into the analysis cohort. Site07 has a small ROI bundle, although its Data Book reference center falls outside both ROI polygons. Site20 and its larger Site20v2 raster set have no ROI link on the PGDA page, and the expected ROI paths return a not-found HTML page. Check each selected analysis point against a verified ROI before assigning a site to the pilot.
+The Site07 and Site20 screen confirms point-window coverage, but does not promote them into the analysis cohort. Site07 has a small ROI bundle, although its Data Book reference center falls outside both ROI polygons. Site20 and its larger Site20v2 raster set have no ROI link on the PGDA page. The PGDA page lists a Site06 ROI link, but that link currently returns a not-found page; no ROI link is listed for Site42 or Haworth. The alternative screen checked only file availability and size for Site06/Site42/Haworth; it did not read raster pixels. Check each selected analysis point against a verified ROI and raster coverage before assigning a site to the pilot.
 
 NASA's 2025 Lunar Surface Data Book provides reference centers generated from the PGDA DEM polygons (the source reports 5–10 m center-point accuracy). Use these only as reproducible metadata/test points until the team chooses analysis points; a polygon center is not a landing authorization or a selected landing coordinate.
 
@@ -14,10 +14,13 @@ NASA's 2025 Lunar Surface Data Book provides reference centers generated from th
 | --- | --- |
 | Site01 — Connecting Ridge | −89.4632, −137.49 |
 | Site04 — Shackleton Rim | −89.7668, −171.87 |
+| Site06 — Nobile Rim 1 | −85.4381, 37.36667 |
 | Site07 — Peak near Shackleton | −88.811, 123.6901 |
 | Site11 — de Gerlache Rim 1 | −88.6834, −67.9321 |
 | Site20 — Leibnitz Beta Plateau | −85.4266, 31.74276 |
 | Site23 — Malapert Massif | −85.9948, −0.23578 |
+| Site42 — de Gerlache-Kocher Massif | −85.8296, −116.322 |
+| Haworth | −86.7639, −22.777 |
 
 If schedule or local-product volume is restrictive, compare Site04 and Site11 as the initial pair, with Site01 as the resource-document alternative; Site23 remains a candidate after locating a verified ROI and checking its shorter margin to the 80S regional-data edge. Site07 and Site20 are newly screened coverage candidates only; ROI verification and team relevance remain open. This is a review order, not an approved site selection. Mission associations remain proposals until reviewed against authoritative coordinates and nomenclature.
 
@@ -25,7 +28,7 @@ If schedule or local-product volume is restrictive, compare Site04 and Site11 as
 
 | Feature / priority | Candidate product or service | Required contents | Known conventions / coverage | Planning volume | Decision still needed |
 | --- | --- | --- | --- | --- | --- |
-| Site catalog — P0 | NASA PGDA 78 site/ROI metadata; NASA mission records and USGS/IAU nomenclature for independent identity checks | Site ID, name, point/ROI geometry, elevation source, mission status, citations | PGDA 78 contains multiple named regions and versions; Site01/04/07/11/20/23 are the current screened subset, not the complete catalog | Tiny metadata table (KB-scale, estimate) | Confirm the pilot sites, representative analysis points, and naming policy |
+| Site catalog — P0 | NASA PGDA 78 site/ROI metadata; NASA mission records and USGS/IAU nomenclature for independent identity checks | Site ID, name, point/ROI geometry, elevation source, mission status, citations | The current comparison covers six point-screened sites plus metadata-only Site06/Site42/Haworth; PGDA 78 lists 27 product entries including Site20v2, not a complete mission landing-site catalog | Tiny metadata table (KB-scale, estimate) | Confirm the pilot sites, representative analysis points, and naming policy |
 | Local high-resolution terrain — P0/P1 | NASA PGDA 78 | Nominal LDEM, slope, LDEC, elevation and slope RMS uncertainty; a small clone subset for P1 | 5 m/pixel GeoTIFFs in south polar stereographic X/Y metres, MOON_ME frame with DE421; PGDA reports about 90% interpolated 5 m pixels. Base products exist for all six screened references; Site20v2 is a larger alternate product set. | HTTP HEAD sizes for five core TIFFs per screened center are shown below. 9×9 LDEM point reads passed for Site01/04/07/11/20/23 and Site20v2; no full raster was saved. All 100 clones and XYZI point clouds are excluded. | Choose locations/layers/clones; check actual selected analysis points and verified ROI polygons before selecting |
 | Surrounding terrain — P0 | NASA PGDA 90; compare 80S 80MPP and 80S 20MPP | LDEM, LDEC, elevation error, slope and slope error for horizon context | COG GeoTIFFs in south polar stereographic X/Y metres, MOON_ME / DE421. Nominal pixel scale is not effective resolution; evaluate the published effective-resolution layer separately if useful. | HTTP HEAD totals for the five full rasters are **1,051,288,835 bytes** at 80 m and **15,617,598,506 bytes** at 20 m. Four 9×9 point windows and 20 km/25 km profiles were read at both scales; all four centers were then profiled to 131.8 km at 80 m in a provisional relief scenario. | Determine full horizon extent and compare profiles against an accepted angular tolerance before selecting a scale |
 | Sun/Earth ephemeris — P0 | JPL Horizons API; Astroquery is a possible client library, not a selected dependency | Time-tagged Sun and Earth geometry for each selected lunar observer/site; preserve query settings and returned metadata | `Resource.docx` suggests Sun target 10, Earth target 399, and a lunar-centered observer (301) with site coordinates. Treat these as candidate query settings to validate. Horizons geometry does not include terrain obstruction. | Small per site/date response; estimate after choosing cadence and scenario count | Validate CENTER/observer coordinates, coordinate convention, UTC/time scale, reference frame, aberration/refraction settings and cadence with a saved sample response |
@@ -54,7 +57,19 @@ Sizes are the NASA endpoint `Content-Length` values read with HTTP HEAD on 13 No
 
 Site20v2's five-layer total is about 2.64× the original Site20 set. It is listed as an alternate product version, not a seventh site or an approved replacement.
 
-These are file-transfer totals, not evidence that the site footprints are spatially comparable or sufficient for horizon work. One 9×9 LDEM window at each reference center was read and had 81/81 valid pixels. The exact team-selected analysis points and ROI geometries still need inspection against each raster's coverage; no full raster was retained.
+### Additional PGDA alternatives: metadata-only screen
+
+The official page also lists Site06, Site42 and Haworth products. Their NASA Data Book centers are included in the candidate table above, but none received a point-window read in this screen. HEAD requests returned HTTP 200 for each of the five core GeoTIFF layers; totals are exact `Content-Length` sums checked 14 November 2026. Site06's listed ROI link returns a PGDA not-found page. The product page does not list an ROI link for Site42 or Haworth.
+
+| Candidate | Five-layer total (bytes) | Available ROI evidence | Screen status |
+| --- | ---: | --- | --- |
+| Site06 — Nobile Rim 1 | 320,127,929 | PGDA page lists ROI link; link currently returns not-found HTML | Metadata/size only; no pixel window |
+| Site42 — de Gerlache-Kocher Massif | 320,127,973 | No ROI link listed on PGDA page | Metadata/size only; no pixel window |
+| Haworth | 710,618,745 | No ROI link listed on PGDA page | Metadata/size only; no pixel window |
+
+This suggests Site06 as the next candidate to check if the team wants another named site near the already screened Leibnitz/Nobile area, but its ROI link must be repaired or replaced with a verified analysis footprint. Site42 or Haworth are geographically distinct alternatives with larger five-layer transfer totals. This is a screening order based on available metadata, not a site recommendation or an approved cohort.
+
+These are file-transfer totals, not evidence that the site footprints are spatially comparable or sufficient for horizon work. The six screened centers each had a 9×9 LDEM window with 81/81 valid pixels; this does not include Site06, Site42 or Haworth. The exact team-selected analysis points and ROI geometries still need inspection against each raster's coverage; no full raster was retained.
 
 ### ROI geometry inspection
 
@@ -64,11 +79,14 @@ Four compressed ROI bundles were retrieved temporarily from the PGDA 78 site pat
 | --- | --- | ---: | --- | --- |
 | Site01 — Connecting ridge | Valid TGZ, 2,934 bytes | 7 | X −11,657.5 to −10,167.5; Y −12,637.5 to −11,492.5 | 1,490 × 1,145 m |
 | Site04 — Shackleton rim | Valid TGZ, 1,712 bytes | 4 | X −2,842.5 to −2,627.5; Y −6,802.5 to −5,902.5 | 215 × 900 m |
+| Site06 — Nobile Rim 1 | PGDA page lists ROI link, but link currently returns not-found HTML | Unknown | Not available | Needs a verified ROI or analysis area |
 | Site07 — Peak near Shackleton | Valid TGZ, 1,312 bytes | 2 | X 29,962.5 to 30,202.5; Y −20,167.5 to −19,962.5 | 240 × 205 m |
 | Site11 — de Gerlache rim | Valid TGZ, 1,719 bytes | 4 | X −37,672.5 to −36,477.5; Y 14,312.5 to 14,927.5 | 1,195 × 615 m |
 | Site20 — Leibnitz Beta Plateau | No ROI link; expected `Site20/Site20_ROIs.tgz` path returns PGDA not-found HTML | Unknown | Not available | Needs a verified ROI or raster-derived analysis area |
 | Site20v2 — alternate Site20 product | No ROI link; expected `Site20v2/Site20v2_ROIs.tgz` path returns PGDA not-found HTML | Unknown | Not available | No verified ROI found |
 | Site23 — Malapert massif | No valid TGZ at the expected `Site23/Site23_ROIs.tgz` path; request returned an HTML not-found page | Unknown | Not available from that bundle | Needs a verified ROI definition or raster-derived coverage check |
+| Site42 — de Gerlache-Kocher Massif | No ROI link listed on PGDA page | Unknown | Not checked | Needs a verified ROI or analysis area |
+| Haworth | No ROI link listed on PGDA page | Unknown | Not checked | Needs a verified ROI or analysis area |
 
 The Site01/04/07/11 archive DBF records expose projected X/Y attributes, but their semantic role is not sufficiently documented to call them approved analysis points. The Site07 Data Book reference center projects inside the union envelope but outside both Site07 polygons. Site20 and Site23 therefore cannot be compared against verified ROI polygons. Their Data Book reference centers do have valid pixels in the small LDEM window checks below; coverage for a team-selected point or polygon remains to be checked. The temporary ROI bundles remain outside the repository and are not part of the project data store.
 
