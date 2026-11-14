@@ -278,4 +278,11 @@ tfoot button { width: 100%; }
 .saved-scenario-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 12px; border: 1px solid var(--ls-border); border-radius: var(--ls-radius-control); background: var(--ls-surface); }
 .saved-scenario-item strong { display: block; font-size: var(--ls-type-sm); }
 .saved-scenario-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.advisor-panel { display: grid; gap: 14px; }
+.advisor-result { display: grid; gap: 12px; }
+.advisor-list { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 6px; font-size: var(--ls-type-sm); }
+.advisor-citations { margin: 6px 0 0; display: grid; gap: 8px; }
+.advisor-citations > div { padding: 8px 10px; border: 1px solid var(--ls-border); border-radius: var(--ls-radius-control); background: var(--ls-surface); }
+.advisor-citations dt { font-size: var(--ls-type-xs); color: var(--ls-text-muted); }
+.advisor-citations dd { margin: 2px 0 0; font-size: var(--ls-type-sm); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto; } }

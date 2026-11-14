@@ -54,6 +54,23 @@ export interface SavedScenarioDetail {
   createdAt: string;
 }
 
+export interface AdvisorCitation {
+  label: string;
+  value: string;
+  source: string;
+}
+
+export interface AdvisorResponse {
+  resultId: string;
+  mode: 'llm' | 'deterministic' | 'deterministic_fallback';
+  summary: string;
+  recommendations: string[];
+  limitations: string[];
+  citations: AdvisorCitation[];
+  providerUnavailable: boolean;
+  providerError: string | null;
+}
+
 async function readErrorDetail(response: Response, fallback: string): Promise<string> {
   try {
     const payload = (await response.json()) as { detail?: unknown };
@@ -344,5 +361,22 @@ export class ApiDataProvider implements LunarDataProvider {
     if (!resp.ok && resp.status !== 204) {
       throw new Error(await readErrorDetail(resp, `Failed to delete scenario (${resp.status})`));
     }
+  }
+
+  /** Stage 3: request evidence-linked AI Advisor explanation grounded in an immutable resultId. */
+  async askAdvisor(
+    resultId: string,
+    question = 'Summarize solar illumination, Earth visibility, and key operational risks for this site.',
+    language: 'vi' | 'en' = 'vi',
+  ): Promise<AdvisorResponse> {
+    const resp = await fetch(this.resolveUrl('/api/advisor-responses'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resultId, question, language }),
+    });
+    if (!resp.ok) {
+      throw new Error(await readErrorDetail(resp, `Failed to load advisor response (${resp.status})`));
+    }
+    return (await resp.json()) as AdvisorResponse;
   }
 }

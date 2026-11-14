@@ -172,4 +172,32 @@ describe('ApiDataProvider backend integration contract', () => {
     expect(list).toHaveLength(1);
     await expect(provider.deleteSavedScenario('scn_1')).resolves.toBeUndefined();
   });
+
+  it('requests Stage 3 AI Advisor grounded in immutable resultId', async () => {
+    vi.stubGlobal('fetch', async (input: string | URL | Request, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+      if (url.endsWith('/api/advisor-responses') && init?.method === 'POST') {
+        return new Response(
+          JSON.stringify({
+            resultId: 'res_abc123',
+            mode: 'deterministic',
+            summary: 'Grounded summary for res_abc123.',
+            recommendations: ['Verify 0.25 m mast height.'],
+            limitations: ['Geometric visibility only.'],
+            citations: [{ label: 'Sunlit', value: '100.0%', source: 'JPL Horizons' }],
+            providerUnavailable: false,
+            providerError: null,
+          }),
+          { status: 200 },
+        );
+      }
+      return new Response('Not Found', { status: 404 });
+    });
+
+    const provider = new ApiDataProvider('http://127.0.0.1:8000');
+    const advice = await provider.askAdvisor('res_abc123', 'Summarize risks', 'en');
+    expect(advice.resultId).toBe('res_abc123');
+    expect(advice.mode).toBe('deterministic');
+    expect(advice.citations).toHaveLength(1);
+  });
 });

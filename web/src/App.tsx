@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { Activity, ArrowLeftRight, ChevronDown, Clock3, Info, MapPin, Moon, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, ScanLine, X } from 'lucide-react';
+import { Activity, ArrowLeftRight, ChevronDown, Clock3, Info, MapPin, Moon, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, ScanLine, Sparkles, X } from 'lucide-react';
 import type { LunarDataProvider, SiteSummary } from './data/contract';
 import { LunarViewer, type BodyDirection } from './viewer/LunarViewer';
 import { SkyHorizonView } from './viewer/SkyHorizonView';
@@ -11,6 +11,7 @@ import { MetricsPanel } from './panels/MetricsPanel';
 import { ComparisonPanel } from './panels/ComparisonPanel';
 import { TimelinePanel } from './panels/TimelinePanel';
 import { ProvenancePanel } from './panels/ProvenancePanel';
+import { AdvisorPanel } from './panels/AdvisorPanel';
 import { OverlayDialog } from './components/OverlayDialog';
 import { SiteCommand } from './components/SiteCommand';
 import { utc } from './panels/format';
@@ -24,12 +25,14 @@ export function App({ provider }: { provider: LunarDataProvider }) {
     bootError,
     submit,
     hasPersistence,
+    hasAdvisor,
     savedScenarios,
     scenarioBusy,
     scenarioError,
     saveScenarioToServer,
     loadScenarioFromServer,
     deleteScenarioFromServer,
+    askAdvisor,
   } = useWorkspace(provider);
   const { draft, result, pendingId, cursorIndex } = state;
   useEffect(() => {
@@ -59,12 +62,13 @@ export function App({ provider }: { provider: LunarDataProvider }) {
   const [commandOpen, setCommandOpen] = useState(false);
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [provenanceOpen, setProvenanceOpen] = useState(false);
+  const [advisorOpen, setAdvisorOpen] = useState(false);
   const [insets, setInsets] = useState({ instrumentTop: 88, top: 120, bottom: 320 });
   const commandRef = useRef<HTMLElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
 
   const openCommands = useCallback(() => {
-    setComparisonOpen(false); setProvenanceOpen(false); setCommandOpen(true);
+    setComparisonOpen(false); setProvenanceOpen(false); setAdvisorOpen(false); setCommandOpen(true);
   }, []);
   useEffect(() => {
     const breakpoint = window.matchMedia('(max-width: 1199px)');
@@ -152,7 +156,7 @@ export function App({ provider }: { provider: LunarDataProvider }) {
     <aside id="inspector-drawer" className="instrument-drawer inspector-drawer glass-surface" data-open={showResults} inert={!showResults} aria-hidden={!showResults} aria-label="Visibility inspector">
       <header className="instrument-heading"><div><Activity size={17} aria-hidden="true" /><h2>Inspector</h2></div><button className="icon-button" type="button" aria-label="Collapse Inspector drawer" onClick={() => setShowResults(false)}><X size={17} aria-hidden="true" /></button></header>
       <div className="instrument-scroll"><MetricsPanel result={result} cursorIndex={cursorIndex} stale={pending} />
-        <div className="inspector-actions"><button type="button" disabled={!result || pending || saved || state.comparisons.length === 3} onClick={() => { dispatch({ type: 'compare' }); setComparisonOpen(true); }}><ArrowLeftRight size={16} aria-hidden="true" />{saved ? 'Saved to comparison' : 'Save comparison'}</button><button type="button" onClick={() => setProvenanceOpen(true)}><Info size={16} aria-hidden="true" />Data provenance</button></div>
+        <div className="inspector-actions"><button type="button" disabled={!result || pending || saved || state.comparisons.length === 3} onClick={() => { dispatch({ type: 'compare' }); setComparisonOpen(true); }}><ArrowLeftRight size={16} aria-hidden="true" />{saved ? 'Saved to comparison' : 'Save comparison'}</button>{hasAdvisor && <button type="button" disabled={!result?.serverResultId || pending} onClick={() => setAdvisorOpen(true)}><Sparkles size={16} aria-hidden="true" />AI Advisor</button>}<button type="button" onClick={() => setProvenanceOpen(true)}><Info size={16} aria-hidden="true" />Data provenance</button></div>
       </div>
     </aside>
     <div ref={dockRef} className="timeline-dock glass-surface">
@@ -163,5 +167,6 @@ export function App({ provider }: { provider: LunarDataProvider }) {
     <SiteCommand open={commandOpen} onClose={() => setCommandOpen(false)} sites={viewerSites} selectedSiteId={draft?.site.id ?? null} onChoose={(site) => { selectSite(site); setShowInputs(true); if (compact) setShowResults(false); }} />
     <OverlayDialog open={comparisonOpen} onClose={() => setComparisonOpen(false)} title="Scenario comparison" description="Independent site-date snapshots. Differences are relative to the first saved scenario." className="comparison-dialog"><ComparisonPanel comparisons={state.comparisons} result={result} pending={pending} dispatch={dispatch} hasPersistence={hasPersistence} savedScenarios={savedScenarios} scenarioBusy={scenarioBusy} scenarioError={scenarioError} onSaveToServer={saveScenarioToServer} onLoadFromServer={async (id) => { await loadScenarioFromServer(id); setComparisonOpen(false); }} onDeleteFromServer={deleteScenarioFromServer} /></OverlayDialog>
     <OverlayDialog open={provenanceOpen} onClose={() => setProvenanceOpen(false)} title="Data provenance" description="Data sources, scientific conventions and finite-range limitations." className="provenance-dialog"><ProvenancePanel kind={provider.kind} terrain={terrain} result={result} /></OverlayDialog>
+    {hasAdvisor && <OverlayDialog open={advisorOpen} onClose={() => setAdvisorOpen(false)} title="AI Mission Advisor" description="Evidence-linked explanation grounded in the stored analysis result." className="advisor-dialog"><AdvisorPanel resultId={result?.serverResultId} siteName={result?.inputs.site.name} onAsk={askAdvisor} /></OverlayDialog>}
   </main>;
 }

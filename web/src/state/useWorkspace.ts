@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import type { SavedScenarioDetail, SavedScenarioSummary } from '../data/api/ApiDataProvider';
+import type { AdvisorResponse, SavedScenarioDetail, SavedScenarioSummary } from '../data/api/ApiDataProvider';
 import type { LunarDataProvider, SiteSummary, TerrainSource } from '../data/contract';
 import {
   defaultInputs,
@@ -21,6 +21,7 @@ interface PersistenceProvider extends BackendAnalysisProvider {
   ): Promise<SavedScenarioSummary>;
   getSavedScenario?(scenarioId: string): Promise<SavedScenarioDetail>;
   deleteSavedScenario?(scenarioId: string): Promise<void>;
+  askAdvisor?(resultId: string, question?: string, language?: 'vi' | 'en'): Promise<AdvisorResponse>;
 }
 
 export function useWorkspace(provider: LunarDataProvider) {
@@ -30,6 +31,7 @@ export function useWorkspace(provider: LunarDataProvider) {
     typeof persistence.saveScenario === 'function' &&
     typeof persistence.getSavedScenario === 'function' &&
     typeof persistence.deleteSavedScenario === 'function';
+  const hasAdvisor = typeof persistence.askAdvisor === 'function';
 
   const [state, dispatch] = useReducer(workspaceReducer, initialWorkspace);
   const [sites, setSites] = useState<SiteSummary[]>([]);
@@ -222,6 +224,16 @@ export function useWorkspace(provider: LunarDataProvider) {
     // Cursor ticks must not reset this elapsed-time baseline. Manual scrubbing pauses.
   }, [state.playing, state.speed, state.result]);
 
+  const askAdvisor = useCallback(
+    async (resultId: string, question?: string, language: 'vi' | 'en' = 'vi'): Promise<AdvisorResponse> => {
+      if (!persistence.askAdvisor) {
+        throw new Error('AI Advisor requires backend API mode');
+      }
+      return persistence.askAdvisor(resultId, question, language);
+    },
+    [persistence],
+  );
+
   return {
     state,
     dispatch,
@@ -230,11 +242,13 @@ export function useWorkspace(provider: LunarDataProvider) {
     bootError,
     submit,
     hasPersistence,
+    hasAdvisor,
     savedScenarios,
     scenarioBusy,
     scenarioError,
     saveScenarioToServer,
     loadScenarioFromServer,
     deleteScenarioFromServer,
+    askAdvisor,
   };
 }

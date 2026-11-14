@@ -198,10 +198,37 @@ class SavedScenarioDetail(BaseModel):
     createdAt: str
 
 
+class AdvisorRequest(BaseModel):
+    resultId: str = Field(..., min_length=1)
+    question: str = Field(
+        default="Summarize solar illumination, Earth visibility, and key operational risks for this site.",
+        min_length=1,
+        max_length=1000,
+    )
+    language: Literal["en", "vi"] = "vi"
+
+
+class AdvisorCitation(BaseModel):
+    label: str
+    value: str
+    source: str
+
+
+class AdvisorResponse(BaseModel):
+    resultId: str
+    mode: Literal["llm", "deterministic", "deterministic_fallback"]
+    summary: str
+    recommendations: list[str] = Field(default_factory=list)
+    limitations: list[str] = Field(default_factory=list)
+    citations: list[AdvisorCitation] = Field(default_factory=list)
+    providerUnavailable: bool = False
+    providerError: str | None = None
+
+
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: str = "lunarsight-backend"
-    stage: str = "stage-2-persistence-jobs"
+    stage: str = "stage-3-advisor-packaging"
     terrainLayers: int
     catalogSites: int
     savedScenarios: int = 0

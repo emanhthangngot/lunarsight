@@ -11,6 +11,8 @@ from fastapi.responses import JSONResponse
 from .config import Settings, load_settings
 from .geo import CoordinateValidationError
 from .models import (
+    AdvisorRequest,
+    AdvisorResponse,
     AnalysisJobModel,
     AnalysisRequest,
     AnalysisResultModel,
@@ -27,6 +29,7 @@ from .models import (
     SaveScenarioRequest,
     SiteSummary,
 )
+from .services.advisor import AdvisorService
 from .services.analysis_jobs import AnalysisJobService
 from .services.coverage import CoverageService
 from .services.ephemeris import EphemerisService, OutsideCoverageError, UpstreamEphemerisError
@@ -46,6 +49,7 @@ class AppServices:
     coverage: CoverageService
     storage: SQLiteStorage
     jobs: AnalysisJobService
+    advisor: AdvisorService
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -63,6 +67,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     coverage_svc = CoverageService(terrain_svc, ephemeris_svc)
     storage_svc = SQLiteStorage(cfg.db_path)
     jobs_svc = AnalysisJobService(storage_svc, terrain_svc, horizon_svc, ephemeris_svc)
+    advisor_svc = AdvisorService(cfg, storage_svc)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
@@ -90,6 +95,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         coverage=coverage_svc,
         storage=storage_svc,
         jobs=jobs_svc,
+        advisor=advisor_svc,
     )
 
     app.add_middleware(
@@ -272,6 +278,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if not deleted:
             raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found")
         return Response(status_code=204)
+
+    # --- Stage 3: Evidence-linked AI Advisor ---
+
+    @app.post("/api/advisor-responses", response_model=AdvisorResponse)
+    def advisor_response(req: AdvisorRequest) -> AdvisorResponse:
+        advice = advisor_svc.advise(req)
+        if advice is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Analysis result '{req.resultId}' not found for advisor grounding.",
+            )
+        return advice
 
     return app
 

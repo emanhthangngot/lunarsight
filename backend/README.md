@@ -1,6 +1,6 @@
-# LunarSight Backend (Stage 1 & Stage 2)
+# LunarSight Backend (Stage 1, 2 & 3)
 
-Modular FastAPI service providing PGDA LOLA DEM access, server-side spherical horizon ray-marching, coverage preflight, dynamic JPL Horizons ephemeris, SQLite-persisted immutable analysis results, background analysis jobs, and saved scenarios.
+Modular FastAPI service providing PGDA LOLA DEM access, server-side spherical horizon ray-marching, coverage preflight, dynamic JPL Horizons ephemeris, SQLite-persisted immutable analysis results, background analysis jobs, saved scenarios, and an evidence-linked AI Advisor.
 
 ## Run locally
 
@@ -19,6 +19,17 @@ cd web
 VITE_API_BASE_URL=http://127.0.0.1:8000 pnpm dev
 ```
 
+## Run with Docker (for Railway / Render / Fly.io)
+
+Build from the repository root so pilot DEM/ephemeris assets are bundled cleanly:
+
+```bash
+docker build -f backend/Dockerfile -t lunarsight-backend .
+docker run --rm -p 8000:8000 -v lunarsight_cache:/data/cache lunarsight-backend
+```
+
+See [backend/.env.example](.env.example) for CORS, SQLite/cache paths, and optional `LUNARSIGHT_LLM_API_KEY` configuration.
+
 ## Endpoints
 
 ### Stage 1 — Core Scientific API
@@ -36,6 +47,9 @@ VITE_API_BASE_URL=http://127.0.0.1:8000 pnpm dev
 - `GET /api/analysis-jobs/{jobId}` & `POST /api/analysis-jobs/{jobId}/cancel` — inspect progress or cancel an active job.
 - `GET /api/analysis-results/{resultId}` — retrieve immutable analysis result (`inputs`, `ephemeris`, `mask`, `analysis`).
 - `GET /api/scenarios`, `POST /api/scenarios`, `GET /api/scenarios/{id}`, `DELETE /api/scenarios/{id}` — save, list, load/share, and delete scenarios in SQLite (`LUNARSIGHT_DB_PATH`).
+
+### Stage 3 — Evidence-linked AI Advisor
+- `POST /api/advisor-responses` — explains a stored `resultId` with citations and explicit limitations. Runs in deterministic grounded mode by default; uses an OpenAI-compatible LLM when `LUNARSIGHT_LLM_API_KEY` is configured and falls back cleanly if the external provider is unavailable.
 
 ## Run tests
 

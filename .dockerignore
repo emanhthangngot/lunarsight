@@ -1,0 +1,17 @@
+.git/
+.venv/
+venv/
+**/__pycache__/
+**/.pytest_cache/
+backend/cache/
+web/node_modules/
+web/dist/
+assets/
+notebooks/
+docs/
+context/
+*.tif
+*.TIF
+*.tiff
+.env
+.env.*
