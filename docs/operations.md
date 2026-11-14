@@ -1,23 +1,74 @@
-# Proposed development and operations model
+# Development and operations
 
-**Status: planning document.** No runtime, dependency installation, infrastructure, cloud account configuration, scheduled download, deployment, telemetry service, or operational budget has been created for this setup. All technologies, providers, limits, and retention periods remain to be agreed by the team.
+**Current scope:** user-authorized static **Vercel** hosting for the mock app, with current public health recorded in [project state](project-state.md) and [the handoff](handoffs/current.md). The broader backend, storage, telemetry and budget sections below remain proposals. No dataset, backend, CI, DNS change or paid service is authorized by this hosting exception.
 
 Basis: the integrated workflow and reliability goals in the [LunarSight V2 proposal](reference/proposal-v2.md). Related documents: [architecture](architecture.md), [API design](api-design.md), [data proposals](data-sources.md), and [roadmap](roadmap.md).
+
+## Vercel static mock deployment
+
+### Target and access
+
+The production route is project **`lunarsight`** in scope **`emanhthangngots-projects`**, with stable public alias **[lunarsight.vercel.app](https://lunarsight.vercel.app)**. Boss owns account access and future uploads; verify the intended scope/project/environment before acting. The client needs **no application secrets**; never read or print token/`.env` contents or request pasted tokens. Provider deployment protection may still apply to unique deployment/preview URLs: the public stable alias does not make every URL public. Do not create bypass secrets or disable protection.
+
+### Clean source upload — boss only
+
+The deployed route is **CLI source upload, not Git auto-deploy or a local Vercel project link**. Upload an archive of the explicitly reviewed committed `web/` revision, plus the reviewed local [vercel.json](../web/vercel.json). A live-worktree dry-run included `dist` and TypeScript build metadata despite Git ignores; do not treat `.gitignore` as the CLI upload filter.
+
+For an authorized subsequent Production release, the following recreates the clean layout from the repository, with **HEAD only if that is the intended reviewed revision**. These are owner-run instructions, not commands executed during documentation work:
+
+```bash
+set -euo pipefail
+repo=$(git rev-parse --show-toplevel)
+revision=$(git -C "$repo" rev-parse HEAD)
+snapshot=$(mktemp -d)
+git -C "$repo" archive "$revision" web | tar -xf - -C "$snapshot"
+cp "$repo/web/vercel.json" "$snapshot/web/vercel.json"
+sha256sum "$snapshot/web/vercel.json"
+```
+
+Before uploading, inspect the staged file names: no `node_modules`, `dist`, `*.tsbuildinfo`, `.env*` or `.vercel` metadata belongs in the source snapshot. An archive omits uncommitted source changes; stop if those are intended for the release. The explicit local config overlay is the exception, not a claim that every uploaded file is committed. Capture the selected revision/config hash and deployment receipt; clean up only the owned temporary snapshot afterward, never use its path as permanent navigation. No commit/push is implied.
+
+Only after reviewing that snapshot and confirming the Production target, run in the same shell:
+
+```bash
+(
+  cd "$snapshot/web"
+  pnpm dlx vercel@65.15.0 deploy --project lunarsight --scope emanhthangngots-projects --prod
+)
+```
+
+The **upload directory is `$snapshot/web`**, so the selected Vercel project's **Root Directory is `.`**: it already contains the app files. Do not configure `web` again and produce a `web/web` lookup. If a future authorized workflow instead Git-links the full repository, deliberately set Root Directory **`web`** for that different source layout; no such integration currently exists.
+
+In **Settings → Build and Deployment**, retain **Node.js 26.x**. [vercel.json](../web/vercel.json) and [package.json](../web/package.json) own the Vite preset, pinned **pnpm 11.3.0** frozen-lockfile install, `pnpm build` and `dist` output. No backend Functions, runtime secrets, custom headers/CSP, cross-origin policy or analytics are needed. Use explicit project/scope targeting rather than link/default-account prompts; if owner login has expired, stop for owner authentication rather than using a temporary/anonymous upload workaround.
+
+There is no pathname-based deep-link route in the current workspace; camera/site changes are application state. No wildcard rewrite is added: Worker and static-JS requests must resolve to their real files, not `index.html`.
+
+### Health and redeploy
+
+For each new deployment, open its actual stable alias anonymously in a fresh browser context: confirm readable Three.js terrain and persistent mock/display-aid labels, active module Worker delivery as JavaScript (not HTML), fonts/assets, Orbital/Surface, timeline play/scrub, Ridge/Rim selection and an observer-height update. Check runtime/network errors and mock provenance/unknown/partial-coverage meaning. A build marked READY, HTTP 200 or upload exit 0 alone is insufficient. Exact cache/job/transfer counters need their own valid instrumentation; successful site return or absence of module refetch does not certify them.
+
+New source revisions use the clean upload route above. To rebuild an existing deployment's source, select that deployment in the intended project's **Deployments** list and use **Redeploy**, checking revision/environment; this does not upload newer local edits. Inspect that deployment's build log for failures, limiting excerpts and redacting sensitive output. Recheck actual public health after any redeploy; do not silently create another project or change account/protection settings.
+
+### Recovery
+
+The initial healthy deployment has **no earlier hosted rollback target**. Keep its identity in [the handoff](handoffs/current.md) as a known-good candidate for recovery from a later regression, not as evidence that rollback has been exercised. When an eligible previous Production deployment exists, the authorized owner may use **Production Deployment → Instant Rollback**, verify the prior target/domains, confirm, then recheck the restored URL. Availability depends on permissions/plan; do not buy an upgrade or alter DNS. Rollback may disable automatic Production domain assignment; inspect the resulting state before the next intentional promotion. If no eligible prior target exists, retain failure evidence and plan an authorized clean-source redeploy rather than inventing a rollback target.
+
+Provider route references checked **14 November 2026**: [Vite](https://vercel.com/docs/frameworks/frontend/vite), [project configuration](https://vercel.com/docs/project-configuration), [package-manager selection](https://vercel.com/docs/package-managers), [Node versions](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions), [CLI deploy](https://vercel.com/docs/cli/deploy), [deployment management/redeploy](https://vercel.com/docs/deployments/managing-deployments), [Instant Rollback](https://vercel.com/docs/instant-rollback). Current deployment identity and bounded live evidence belong in project state/handoff, not a temporary upload path.
 
 ## Environment responsibilities
 
 | Proposed environment | Purpose | Decision still needed |
 | --- | --- | --- |
-| Documentation workspace | Review requirements, source candidates, architecture, decisions, and agent handoffs | Current; plus a local mock-data prototype under `web/` whose commands come from its `package.json`. No deployment exists. |
-| Local development | Implement a bounded approved feature with controllable inputs and useful diagnostics | Runtime, package manager, rendering stack, and minimum machine resources. |
-| Shared preview or staging | Review integrated behavior, data coverage, accessibility, exports, and representative failures | Hosting, access, deployment trigger, test data policy, and cost limits. |
-| Production or public demo | Serve a reviewed release with declared capabilities, operating limits, and recovery procedures | Intended audience, uptime/cost targets, access model, release process, and support owner. |
+| Documentation workspace | Review requirements, sources, decisions and handoffs | Current, alongside the implemented local mock app. |
+| Local development | Exercise the bounded mock prototype | Existing commands live in [the web guide](../web/README.md); broader target-device guarantees remain unproven. |
+| Shared preview or staging | Review integrated behavior | No separate preview environment or public-preview guarantee; deployment protection remains unchanged. |
+| Production or public demo | Serve the bounded static mock app | Stable Vercel alias is publicly healthy within the recorded smoke; see [current state](project-state.md). No backend or scientific certification. |
 
 These are responsibilities, not a requirement to create four separate hosted environments. A small team may combine stages if the chosen scope and risk permit it.
 
 ## Storage options to evaluate
 
-Keep repository documentation, future source code, small purposeful fixtures, and versioned metadata in Git. Large source products and generated scientific artifacts need an explicit storage decision before acquisition.
+Keep repository documentation, application source, small purposeful fixtures and versioned metadata in Git. Large source products and generated scientific artifacts need an explicit storage decision before acquisition.
 
 Local files may be sufficient for a bounded development example. Shared object storage could serve versioned assets and large outputs if a deployed application needs them. A metadata index may begin with files or use a database when query, concurrency, persistence, and ownership needs justify it. None of these options has been selected.
 
@@ -64,7 +115,7 @@ A future release should identify its application revision, scientific method ver
 
 Prefer changes that preserve prior result identities. If scientific results change, record why and retain enough inputs and metadata to explain the difference. Database or artifact-format migrations, if introduced, need a reversible or recoverable plan appropriate to their impact.
 
-Before deployment, demonstrate recovery from a source outage, interrupted job, unavailable advisor, and a stale client request. Define how the team disables a broken feature or returns to a known release. Backup and restore expectations depend on the persistence option ultimately selected.
+For future service-backed releases, demonstrate recovery from applicable source outages, interrupted jobs, unavailable advisors and stale requests before release. For the current static mock app, use the bounded Vercel health/recovery route above; unimplemented backend/advisor services are not requirements to provision them. Backup and restore expectations depend on any later accepted persistence option.
 
 ## Readiness questions before provisioning
 
@@ -76,4 +127,4 @@ Before deployment, demonstrate recovery from a source outage, interrupted job, u
 - Who manages secrets, source updates, release review, and spending limits?
 - What evidence permits a release to claim the supported scientific and product behavior?
 
-Resolve these questions through documented team decisions and subsequent implementation requests. This operations proposal prepares those decisions; it does not authorize unbounded downloads, paid services, or a deployment.
+Resolve the broader questions through documented decisions and explicit implementation requests. They do not revoke the bounded static Vercel authorization above or authorize downloads, paid services, other infrastructure or real-data claims.

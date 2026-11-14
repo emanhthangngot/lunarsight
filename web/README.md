@@ -21,6 +21,12 @@ pnpm preview
 
 `pnpm build` runs `tsc -b && vite build`. `pnpm test` runs the offline Vitest suite with one worker. No server, database, token, downloaded lunar data, environment variables or external service is required.
 
+## Public Vercel demo
+
+**[https://lunarsight.vercel.app](https://lunarsight.vercel.app) — healthy within the anonymous live smoke scope.** The cloud build passed on Node26.x with pinned pnpm11.3.0; actual Three.js terrain, Worker/static delivery, Surface, timeline, site changes, a **10 m** height update and mock provenance were exercised remotely. Exact remote cache/job/transfer counters remain **unverified**; local tests below do not become a remote counter certification.
+
+Deployment used an archived committed `web/` plus local [vercel.json](vercel.json), not a Git auto-deploy/link or a wholly committed artifact. The configuration was uncommitted at initial upload time; pushing setup/docs does not redeploy it. The uploaded app contents are root **`.`**; only a future Git-linked full repository would use Root Directory **`web`**. Follow [operations](../docs/operations.md#vercel-static-mock-deployment) for the clean-source upload/health/recovery route and [the handoff](../docs/handoffs/current.md) for exact identity. The stable alias is public; unique/preview URLs may remain protected. No runtime secrets, real datasets or scientific certification are implied.
+
 ## Local Three.js and terrain Worker
 
 Cesium, its static-copy plugin/assets, `CESIUM_BASE_URL` and widget CSS are removed from the active package/Vite/startup wiring. Three.js is pinned to **0.187.0** with matching types; Vite bundles the native module Worker from `src/terrain/localMesh.worker.ts`. No remote terrain, texture service or token is configured.

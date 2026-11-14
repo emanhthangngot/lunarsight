@@ -10,7 +10,7 @@
 
 On 13 November 2026 the user authorized building a **3D web app with mock data first**, connecting processed real data later ([ADR 0002](docs/decisions/0002-mock-first-3d-web.md)). On 14 November the user accepted **local Three.js terrain instead of the global Cesium viewer**. The local Three.js mock viewer is implemented; see [project state](docs/project-state.md) and [current handoff](docs/handoffs/current.md) for scoped verification and limitations; preserve the modern UI and mock 1.1.0 science. Work is on branch `feat/3d-mock-viewer` in `web/` (Vite + React + TypeScript + Three.js + pnpm + Vitest). Documentation work continues alongside.
 
-Still not authorized: acquiring or downloading datasets, processing/download scripts, deployment/provisioning, CI jobs, and any claim that displayed values are real, validated, or deployed. Every mock value must be labelled mock in data and in the UI.
+The user authorizes **Vercel deployment of this static mock app only**; account login, project/environment selection and upload belong to the boss. Follow [operations](docs/operations.md) for the bounded route. Still not authorized: acquiring/downloading datasets, processing/download scripts, other hosting/provisioning, backend services, DNS changes, paid services, CI jobs, or claims of real/validated data. Every mock value must remain labelled mock in data and UI; preparation alone is not a verified deployment.
 
 Dataset products, geographic extent, resolution, volume, hosting, backend, and AI provider remain proposals unless a decision with authority is recorded. The 56.2 GB scenario is illustrative and unapproved. Historical prototype observations or prior exploratory artifacts do not establish team approval.
 
@@ -43,7 +43,7 @@ When evidence conflicts, preserve the distinction, identify the affected decisio
 - Hydrogen, PSR membership, modeled ice stability, and local water-ice percentage are different quantities.
 - Long-term maps differ from mission-window results. Earth visibility differs from radio-link performance; sunlight differs from available electrical power.
 - A point's name does not verify its coordinates. Retain the catalog naming questions until resolved.
-- Do not call a proposed or unexecuted check passed. Do not claim scientific certification or a deployed application.
+- Do not call a proposed or unexecuted check passed. Do not claim scientific certification. Claim a deployed application only with verified deployment evidence.
 
 ## Verification and handoff
 

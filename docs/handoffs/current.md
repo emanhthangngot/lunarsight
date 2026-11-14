@@ -1,6 +1,6 @@
 # Current handoff
 
-Updated: **14 November 2026**. **Local Three.js production acceptance PASS; V1 CLOSED for the requested default Ridge/Rim views.** This is bounded mock-prototype evidence, not scientific or universal-performance certification.
+Updated: **14 November 2026**. **Public Vercel Production healthy within the anonymous browser smoke scope.** Prior local Three.js acceptance remains PASS with V1 CLOSED for default Ridge/Rim. Neither result is scientific or universal-performance certification.
 
 ## Current implementation and authority
 
@@ -8,9 +8,27 @@ The user accepted mock-first development on 13 November and a **local Three.js 0
 
 Use the existing [web commands](../../web/README.md#run-locally). The [provider contract](../../web/src/data/contract.ts), [terrain Worker/client](../../web/src/terrain/) and [viewer notes](../../web/src/viewer/README.md) own implementation details. A processed-data adapter remains pending; no real dataset is selected or acquired.
 
-The fixture migration and implementation handoffs are complete. The old sonnet-only/authentication-dependent repair restriction does not block user-approved work; **credentials were not tested or repaired**. Tester remained read-only. Further implementation requires its own bounded scope and ownership.
+The fixture migration and implementation handoffs are complete; the historical viewer-owner restriction no longer blocks approved work. Current hosting access is evidenced by the completed deployment, not a claim that unrelated credentials were repaired. Further implementation/upload remains bounded and owner-authorized.
 
-## Independent production evidence
+## Current public deployment
+
+**[https://lunarsight.vercel.app](https://lunarsight.vercel.app)** is anonymously reachable and **healthy** in the final round-24 smoke, observed **2026-11-14 04:49:29–04:54:03 UTC**. Provider state is READY. Identity comes from sanitized provider/deployment receipts; the tester independently confirmed the public application, not a browser-readable Git SHA.
+
+| Deployment field | Recorded value |
+| --- | --- |
+| Target | Production; project `lunarsight`, scope `emanhthangngots-projects` |
+| Deployment | `dpl_DKV8zVX7bhtk6XHL7AZv1K7BbhkA` |
+| Base source revision | `67677c55946390b3030ea925a382086b18168d2b` |
+| Added deployment configuration SHA-256 | `f374277c5ab2b59d79061c5e2c5f39b21de0b8ee1fe8aca8cd6bbe8342faa916` |
+| Cloud build | Node26.x; pinned pnpm11.3.0 frozen install; `pnpm build`; `dist`; completed successfully, existing large-chunk warning retained |
+
+The CLI uploaded **54 files / 289,872 bytes** from an archived committed `web/` plus local `web/vercel.json`, with no `node_modules`, `dist`, tsbuildinfo or env files. This is **not** an automatic Git deployment, a local Vercel project link or a wholly committed artifact. The configuration was uncommitted at initial upload time; pushing setup/docs does not redeploy it. The upload root already contains app files, so project Root Directory is **`.`**, not `web`; a future Git-linked full repository would require deliberate root `web`. [Operations](../operations.md#vercel-static-mock-deployment) owns the reproducible clean-upload route without an expired snapshot path.
+
+The anonymous live check confirmed readable Three.js terrain, actual active dedicated Worker/module MIME, fonts/assets, Surface, native timeline play/pause/scrub, Ridge→Rim→Ridge, **10 m preset + Apply**, and mock/provenance/display-aid labels. No page/console errors, failed requests or unexpected external application calls were observed in the recorded segments. **Exact remote cache/transfer/job counts remain unverified**: a diagnostic observer did not see private transport, so empty counters prove nothing. Prior detailed cache/transfer/cancellation evidence below remains **local**, not a new remote certification. The remote smoke did not establish a 0.25 m result.
+
+The stable alias was public without login/bypass; unique deployment/preview protection was not disabled or bypassed, and those URLs are not certified public. No app runtime secrets or backend exist. This initial deployment has **no earlier rollback target**; retain it as the known-good candidate for a later eligible rollback, not an exercised recovery result. No rebuild, upload, auth, rollback or credential action was performed in this documentation task; localhost **5173** remains untouched.
+
+## Prior local production evidence
 
 Round 18 passed the cutover/Worker/scientific integration but failed default relief clarity (**V1**). Final round 20 tested the repaired production defaults, closed V1 and passed scoped regressions. Only viewer framing, lighting, styling and notes changed between those checks; matching source hashes justified reusing unchanged round-18 evidence rather than replaying its full matrix. These are tester-observed results, not checks rerun during documentation work.
 
@@ -46,4 +64,4 @@ Those are actual renderer calls, **not monitor-presented FPS**. Input transport/
 1. Read [project state](../project-state.md), [AGENTS.md](../../AGENTS.md), [documentation index](../README.md) and [testing policy](../testing-policy.md). Run only existing commands from the web guide when an authorized task requires them.
 2. Keep V1 closed for the exercised defaults; no old fixture/authentication/repair dispatch is pending. New source changes need their affected verification, not an automatic replay of every earlier screenshot or timing matrix.
 3. Retain unknowns: other sites/dates, whole-footprint framing, all coverage/threshold edges, global skyline, physical science, repeated cold startup, touch/mobile/no-WebGL, full React-unmount/heap soak and exclusive-hardware performance. Do not invent certification or start unbounded tuning.
-4. Real-data acquisition/integration, processing, CI and deployment require separate authorization. The **56.2 GB** example remains unapproved ([data sources](../data-sources.md), [open decisions](../open-decisions.md)).
+4. The public static Vercel demo is live; future uploads/recovery use the explicit clean-source operations route, not an assumed Git integration. Real-data acquisition/integration, processing, backend/CI/DNS/paid services and other hosting remain outside scope. The **56.2 GB** example remains unapproved ([data sources](../data-sources.md), [open decisions](../open-decisions.md)).
