@@ -19,6 +19,8 @@ Updated: **14 November 2026**. This is the concise starting point for the team a
 
 - A [conditional 5 m/80 m near/far diagnostic](site04-near-far-review.md) retains 360-bin fusion evidence. It assumes compatible vertical datum and frame; 1 km seam, true-north conversion, far convergence and independent validation remain open.
 
+- [Site04 seam and convergence review](site04-seam-convergence-review.md) compares area-weighted 5 m/80 m overlap and a conditional 50 km profile; 50 km is not established as converged, and datum/reference remain open.
+
 ## Current scope
 
 Documentation plus explicitly authorized analysis notebooks for pre-decision review. The current request authorizes bounded local DEM previews, visual comparison and a decision worksheet; native preview arrays are cached under ignored `data/preview/`. Rendered notebook outputs and source/window metadata are retained for review. No production ingestion pipeline, full raster acquisition, application implementation or deployment is authorized by this step.
