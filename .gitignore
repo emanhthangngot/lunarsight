@@ -16,6 +16,9 @@ node_modules/
 dist/
 build/
 coverage/
+.vite/
+*.tsbuildinfo
+/web/dist/
 
 # Credentials and local configuration
 .env
