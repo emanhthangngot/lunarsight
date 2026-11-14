@@ -12,6 +12,10 @@ Notebook executed with four rendered figures and no cell errors. Independent ana
 
 The user confirmed team acceptance of the provisional Site01/Site04 configuration. See [ADR 0003](../decisions/0003-pilot-working-agreement.md), [configuration](../../config/pilot-v1.json), and [sample evidence](../../notebooks/evidence/pilot-v1-samples.json). Cached preview hashes and valid counts were rechecked; full ROI, datum reconciliation, horizon reproduction and product selection remain open.
 
+## Pilot ROI and datum review
+
+See [pilot ROI/datum review](../pilot-roi-datum-review.md). Site01 ROI is fully inside reference preview bounds, Site04 ROI is entirely outside; both reference points fall outside ROI. Source elevation versus Horizons ellipsoid datum remains unverified; do not convert AGL until confirmed. Geometry uses interpreted shapefile projection, not authoritative CRS reconciliation.
+
 ## Current state
 
 The documentation and shared agent-guidance foundation is complete. ADR 0002 records the accepted initial data-mining feature priorities; [the pilot inventory](../data-mining-plan.md) retains the original Site01/04/11/23 cohort, adds bounded point checks for Site07/Site20, and metadata/size checks for Site06/Site42/Haworth. The six point-screened centers passed local 5 m and regional 80 m/20 m 9×9 windows; Site20v2 also passed a local 5 m read. The further alternatives have only product availability/size evidence, no pixel coverage checks. Site07's reference center is outside both polygons in its available ROI; no verified Site06/Site20/Site23 ROI was found at the checked paths. Site42/Haworth have no ROI links on the PGDA page. The candidate screen is not exhaustive. No site or product is selected for acquisition. Application implementation, bulk dataset acquisition, scientific validation and deployment have not started in this repository. Exact sites/products/footprints, cadence, validation targets, stack, and deployment remain open.
