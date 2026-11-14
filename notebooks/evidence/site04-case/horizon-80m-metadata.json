@@ -1,0 +1,111 @@
+{
+  "status": "diagnostic; conditional vertical datum; far field 1–25 km only",
+  "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_80MPP_ADJ.TIF",
+  "source_headers": {
+    "Content-Length": "189158392",
+    "ETag": "W/\"b4653f8-189326141f0\"",
+    "Last-Modified": "Fri, 07 Jul 2023 22:03:02 GMT",
+    "Content-Type": "image/tiff"
+  },
+  "http_body_bytes": 6291456,
+  "range_requests": [
+    [
+      0,
+      524287
+    ],
+    [
+      111673344,
+      112197631
+    ],
+    [
+      112197632,
+      112721919
+    ],
+    [
+      112721920,
+      113246207
+    ],
+    [
+      121110528,
+      121634815
+    ],
+    [
+      121634816,
+      122159103
+    ],
+    [
+      122159104,
+      122683391
+    ],
+    [
+      122683392,
+      123207679
+    ],
+    [
+      130547712,
+      131071999
+    ],
+    [
+      131072000,
+      131596287
+    ],
+    [
+      131596288,
+      132120575
+    ],
+    [
+      132120576,
+      132644863
+    ]
+  ],
+  "source_crs_wkt": "PROJCS[\"Moon (2015) - Sphere / Ocentric / South Polar\",GEOGCS[\"Moon (2015) - Sphere / Ocentric\",DATUM[\"Moon (2015) - Sphere\",SPHEROID[\"Moon (2015) - Sphere\",1737400,0,AUTHORITY[\"IAU\",\"30100\"]],AUTHORITY[\"IAU\",\"30100\"]],PRIMEM[\"Reference Meridian\",0,AUTHORITY[\"IAU\",\"30100\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"IAU\",\"30100\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH],AUTHORITY[\"IAU\",\"30135\"]]",
+  "source_shape": [
+    7600,
+    7600
+  ],
+  "window": [
+    3454,
+    3561,
+    626,
+    626
+  ],
+  "window_sha256": "ff5fcaf5bcbfb3d497da46587545ae3a96351f7ad7a6bcb8373eae30aa01343c",
+  "observer_xy_m": [
+    -2652.5,
+    -5952.5
+  ],
+  "observer_ground_m": 1737.1783447265625,
+  "observer_height_agl_m": 1,
+  "observer_vertical_datum_assumed": "same 1737400 m sphere as Horizons, not confirmed directly for PGDA 78",
+  "radii_m": [
+    5000,
+    10000,
+    25000
+  ],
+  "near_exclusion_m": 1000,
+  "formula": "atan2(z_cell-z_observer-d^2/(2R),d)",
+  "azimuth": "floor(degrees(atan2(dx,dy)) mod 360), clockwise from projection grid +Y; no convergence correction",
+  "radii_statistics": {
+    "5000": {
+      "footprint_cells": 11778,
+      "valid_cells": 11778,
+      "empty_bins": 0,
+      "bins_with_missing": 0
+    },
+    "10000": {
+      "footprint_cells": 48599,
+      "valid_cells": 48599,
+      "empty_bins": 0,
+      "bins_with_missing": 0
+    },
+    "25000": {
+      "footprint_cells": 306315,
+      "valid_cells": 306315,
+      "empty_bins": 0,
+      "bins_with_missing": 0
+    }
+  },
+  "rasterio": "1.5.2",
+  "gdal": "3.12.2",
+  "metadata_correction": "Window row corrected from last CSV row (variable shadowing) to 3561 after fresh-source reread; crop SHA256 matched unchanged. Profile CSV and hashes were not changed."
+}

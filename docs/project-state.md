@@ -15,6 +15,8 @@ Updated: **14 November 2026**. This is the concise starting point for the team a
 
 - The team accepted a revisable Site01/Site04 pilot working configuration: see [ADR 0003](decisions/0003-pilot-working-agreement.md) and [pilot-v1](../config/pilot-v1.json). Full acquisition, final ROI and p95 tolerance remain open.
 
+- A [conditional Site04 observer diagnostic](site04-observer-diagnostic.md) retains two Horizons responses and 80 m nested-radius per-azimuth evidence. It assumes datum compatibility, omits the inner 1 km and is not a validated full horizon or mission visibility result.
+
 ## Current scope
 
 Documentation plus explicitly authorized analysis notebooks for pre-decision review. The current request authorizes bounded local DEM previews, visual comparison and a decision worksheet; native preview arrays are cached under ignored `data/preview/`. Rendered notebook outputs and source/window metadata are retained for review. No production ingestion pipeline, full raster acquisition, application implementation or deployment is authorized by this step.
