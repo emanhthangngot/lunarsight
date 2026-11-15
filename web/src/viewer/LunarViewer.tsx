@@ -506,7 +506,7 @@ export function LunarViewer(props: LunarViewerProps) {
       if (labels) {
         const name = document.createElement('span');
         name.className = 'lunar-viewer__site-name';
-        name.textContent = site.category === 'mock' ? `${site.name} · mock` : site.nameVerified ? site.name : `${site.name} · name unverified`;
+        name.textContent = site.category === 'mock' ? `${site.name} · mock` : site.name;
         button.append(name);
       }
       button.addEventListener('click', () => latest.current.onSelectSite?.(site.id));

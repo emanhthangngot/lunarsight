@@ -2,11 +2,22 @@ import { useState, type FormEvent } from 'react';
 import type { SiteSummary, TerrainSource } from '../data/contract';
 import { validateCoordinates } from '../geo/coordinates';
 
+/**
+ * Where a catalog name comes from. This is about the place name only; the observer
+ * coordinates and landing suitability stay conditional and are stated in the site
+ * description (button tooltip) and Data provenance, not on the map label.
+ */
+function nameSourceNote(site: SiteSummary): string | null {
+  if (site.nameVerified) return null;
+  return site.description?.startsWith('PGDA 78') ? 'Name per PGDA 78' : 'Name not catalog-verified';
+}
+
 function SiteButton({ site, current, computing, onSelect }: { site: SiteSummary; current: boolean; computing: boolean; onSelect(): void }) {
-  return <button type="button" className="site-option" aria-pressed={current} onClick={onSelect}>
+  const note = nameSourceNote(site);
+  return <button type="button" className="site-option" aria-pressed={current} onClick={onSelect} title={site.description}>
     <span className="site-option-heading"><strong>{site.name}</strong>{computing ? <span className="tag">Computing…</span> : current ? <span className="tag">Shown</span> : null}</span>
     <span className="coordinate-text">{site.latDeg.toFixed(3)}° · {site.lonDegE.toFixed(3)}° E</span>
-    {!site.nameVerified && <small>Name not catalog-verified</small>}
+    {note && <small>{note}</small>}
   </button>;
 }
 
