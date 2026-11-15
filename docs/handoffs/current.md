@@ -20,6 +20,10 @@ See [pilot ROI/datum review](../pilot-roi-datum-review.md). Site01 ROI is fully 
 
 See [Site04 ROI coverage](../site04-roi-coverage.md). The five PGDA 78 layers have 526/526 finite pixels under the ROI pixel-center mask; 468 LDEC pixels are zero. Projection parameters match but semantic CRS equality is false. Vertical datum and observer choice remain open. A point is proposed only for technical review, not landing selection.
 
+## Tái lập Site04 ROI
+
+Notebook [site04-roi-reproduction](../../notebooks/site04-roi-reproduction.ipynb) cung cấp quy trình tự chạy lại các cửa sổ raster có kiểm soát, mask, thống kê và lựa chọn điểm kỹ thuật; nguồn/cache được kiểm tra hash với evidence đã review. Không áp dụng giả định này cho datum đứng hay horizon.
+
 ## Site04 observer and datum audit
 
 See [observer/datum audit](../site04-observer-datum-audit.md). The inside-ROI point is only a provisional technical observer; LOLA LDEM_64 documentation supports a 1737.4 km reference sphere but is not direct vertical-datum metadata for PGDA 78. At that audit stage, Horizons and horizon reproduction had not been run for this point because datum confirmation was missing. The later conditional diagnostics below do not settle that datum.
