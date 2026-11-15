@@ -2,7 +2,9 @@
 
 ## Khám phá địa điểm hạ cánh và lập kế hoạch nhiệm vụ Mặt Trăng
 
-**Trạng thái: khởi tạo dự án bằng tài liệu và chuẩn bị cách làm việc với agent.** Nhóm chưa chốt bộ dữ liệu, dung lượng, độ phân giải, công nghệ hoặc phương án triển khai. Nhánh hiện tại chỉ gồm tài liệu và cấu hình hướng dẫn; chưa triển khai ứng dụng, script xử lý hay pipeline tải dữ liệu.
+**Trạng thái: mã nguồn đã tích hợp các sửa lỗi pilot/backend được review và giao diện Three.js tập trung so sánh Site01/Site04; kiểm chứng phần mềm trong phạm vi task42 đã PASS.** Dữ liệu pilot đã xử lý được giữ nguyên và kết nối qua static provider hoặc FastAPI cục bộ. [Trạng thái dự án](docs/project-state.md) và [handoff nghiệm thu](docs/handoffs/current.md#final-bounded-acceptance-round42) phân biệt kết quả đã quan sát, raw log bị mất và bằng chứng được tái sử dụng; đây không phải xác nhận độ chính xác khoa học.
+
+Three.js địa hình cục bộ thay Cesium toàn cầu; giao diện hiện đại và mô hình mock 1.1.0 được giữ lại. Vercel vẫn phục vụ **snapshot mock cũ**, không phải mã nguồn pilot/backend vừa được nghiệm thu. Push/merge Git không tự triển khai lại. Phạm vi sản phẩm rộng hơn, datum/frame, hội tụ horizon và hosting vẫn cần quyết định riêng; không tự tải raster hoặc tái sinh dữ liệu khoa học.
 
 Tên **LunarSight** giữ sự nhất quán với proposal: Lunar là Mặt Trăng; Sight gợi việc quan sát và hiểu điều kiện tại một địa điểm.
 
@@ -25,7 +27,7 @@ Xem toàn bộ trong [mục lục tài liệu](docs/README.md).
 - Các phương án 0–90°S, 60–90°S và 80–90°S là lựa chọn để nhóm cân nhắc.
 - Khoảng **56,2 GB** chỉ là một kịch bản dữ liệu minh họa chưa được nhóm thông qua.
 - Các nguồn NASA/PDS được ghi là ứng viên; việc xác minh nguồn không đồng nghĩa nhóm đã chọn hoặc đã tải nguồn đó cho repo.
-- Kiến trúc, API, cơ sở dữ liệu, framework, hosting và AI provider đều còn là thiết kế đề xuất.
+- Stack Vite + React + TypeScript + Three.js cục bộ + pnpm + Vitest và backend FastAPI cục bộ đã có triển khai; kiến trúc rộng hơn, hosted backend, storage/provider và ngân sách vẫn là quyết định mở. Không có CI.
 - Những quan sát và số liệu demo trong proposal gốc không phải kết quả đã triển khai trong repo.
 
 ## Bắt đầu làm việc
@@ -37,4 +39,4 @@ cd lunarsight
 
 Mở thư mục bằng IDE hoặc agent đang dùng. Yêu cầu agent đọc `AGENTS.md`, `docs/project-state.md` và mục liên quan trong `docs/README.md`. Có [prompt khởi động](docs/agent-workflow.md#starter-prompt) để dùng trực tiếp.
 
-Hiện chưa cần cài runtime, package, dịch vụ hay tải dataset. Khi có yêu cầu triển khai cụ thể tiếp theo, agent sẽ cập nhật trạng thái và thực hiện đúng phạm vi đó; không tự biến các lựa chọn chưa chốt thành quyết định của nhóm.
+Lệnh ứng dụng nằm trong [hướng dẫn web](web/README.md#run-locally) và [backend](backend/README.md#run-locally). Việc tiếp theo là người dùng review trải nghiệm hai địa điểm và chốt phạm vi sản phẩm/hosting/khoa học, không chạy lại các gate đã hoàn tất chỉ để dựng lại log bị mất. Boss giữ quyền Git/merge/triển khai; không biến các lựa chọn chưa chốt thành quyết định của nhóm.

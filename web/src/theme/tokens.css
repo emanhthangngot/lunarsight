@@ -1,0 +1,53 @@
+:root {
+  --ls-font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --ls-font-mono: 'Geist Mono Variable', ui-monospace, monospace;
+  --ls-bg: #090a0b;
+  --ls-surface: #151719;
+  --ls-surface-glass: rgba(16, 18, 20, 0.94);
+  --ls-surface-raised: #232629;
+  --ls-control: #1c1f22;
+  --ls-border: #34383d;
+  --ls-text: #f3f3f1;
+  /* Metadata / units / helper text. Values and actions use --ls-text. */
+  --ls-text-muted: #c2c7cd;
+  /* Disabled controls: clearly lower emphasis than metadata, on a flat surface. */
+  --ls-text-disabled: #80868d;
+  --ls-disabled-surface: #17191b;
+  --ls-accent: #e2edf7;
+  --ls-sun: #f5c542;
+  --ls-earth: #79b9f3;
+  --ls-mock: #e8bd77;
+  --ls-danger: #ffc0b7;
+  --ls-danger-surface: #392724;
+  --ls-mock-surface: #332b20;
+  --ls-radius: 14px;
+  --ls-radius-control: 8px;
+  --ls-shadow: 0 14px 48px rgba(0, 0, 0, 0.3);
+  --ls-blur: 18px;
+  --ls-space-1: 4px;
+  --ls-space-2: 8px;
+  --ls-space-3: 12px;
+  --ls-space-4: 16px;
+  --ls-space-5: 20px;
+  --ls-space-6: 24px;
+  --ls-space-8: 32px;
+  /* Floor 13 px for any text; 15 px body; 14 px+ for decision labels. */
+  --ls-type-xs: 13px;
+  --ls-type-sm: 14px;
+  --ls-type-body: 15px;
+  --ls-type-md: 17px;
+  --ls-type-lg: 21px;
+  --ls-type-event: 28px;
+  --ls-type-metric: 26px;
+  --ls-motion: 200ms;
+  --ls-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ls-mission-width: 304px;
+  --ls-inspector-width: 316px;
+  --ls-gutter: 16px;
+  --ls-gap: 12px;
+  --ls-command-height: 56px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --ls-motion: 0ms; }
+}

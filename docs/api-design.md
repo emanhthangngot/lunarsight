@@ -1,6 +1,6 @@
 # Candidate API contracts
 
-**Status: proposed interface design.** No endpoint, service, authentication scheme, or API implementation exists in this documentation-only setup. Route names, transport, pagination, persistence, limits, and error codes require team review. The table below is a discussion aid, not a published API specification.
+**Status: proposed interface design.** No endpoint, service, authentication scheme, or API implementation exists. The only in-progress contract is the client-side `LunarDataProvider` interface of the mock prototype ([ADR 0002](decisions/0002-mock-first-3d-web.md)). Route names, transport, pagination, persistence, limits, and error codes require team review. The table below is a discussion aid, not a published API specification.
 
 Basis: [LunarSight V2 proposal](reference/proposal-v2.md), sections 5–14. Read [architecture](architecture.md) and [domain model](domain-model.md) for responsibilities and entity meanings.
 

@@ -95,7 +95,7 @@ Use the existing task/PR/handoff rather than adding a reporting framework. Recor
 - Passed, failed, blocked, skipped, and not-run evidence separately; reasons for relevant omissions and failure-sensitivity limitations.
 - Remaining scientific/product uncertainty, changed protection, and any unresolved decision.
 
-Stop expanding checks once affected behavior and mandatory gates have adequate evidence, unless a new change, failure, or risk warrants more. In the present phase report **documentation verified; application/scientific tests not implemented**, never a fabricated green test run.
+Stop expanding checks once affected behavior and mandatory gates have adequate evidence, unless a new change, failure or risk warrants more. Report documentation-only checks separately from actually executed application/scientific checks. Implemented tests are not passing evidence until run; explicitly deferred or unrun gates must never be described as green.
 
 ## Basis
 
@@ -103,6 +103,6 @@ The five-question admission gate and workflow are project policy requested by th
 
 - [Google: Test Behavior, Not Implementation](https://testing.googleblog.com/2013/08/testing-on-toilet-test-behavior-not.html) — stable observable contracts.
 - [Google: What Makes a Good End-to-End Test?](https://testing.googleblog.com/2016/09/testing-on-toilet-what-makes-good-end.html) — justify expensive system-level checks.
-- [NASA Space Apps: Lunar Landing Site Navigator](https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/) — official indexed summary used for comparison/geometry focus; direct page retrieval returned HTTP 502 during this review. No additional competition rules are asserted.
+- [NASA Space Apps: Lunar Landing Site Navigator](https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/) — official challenge; an earlier direct page retrieval returned HTTP 502, and the full text was later retrieved through the site's GraphQL API on 13 November 2026 (see [challenge summary](reference/challenge-2026.md)). No additional competition rules are asserted.
 - [NASA GSFC: High-Resolution LOLA Topography](https://pgda.gsfc.nasa.gov/products/78) — source grid/frame, interpolation and uncertainty limitations.
 - [JPL NAIF: Using SPICE Data](https://naif.jpl.nasa.gov/naif/using_spice_data.html) — kernel applicability, coverage and metadata must be inspected if SPICE is selected.

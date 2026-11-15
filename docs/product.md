@@ -1,6 +1,6 @@
 # Product brief
 
-**Status: product direction is proposed; initial data-mining feature scope accepted on 13 November 2026.** This document does not state that the repository contains a working application, processing pipeline, selected dataset, or agreed deployment stack. See [ADR 0002](decisions/0002-data-mining-feature-scope.md) for the accepted feature priorities.
+**Status: product direction is proposed; initial data-mining feature scope and mock-first 3D prototype accepted.** See [ADR 0002 (data-mining scope)](decisions/0002-data-mining-feature-scope.md) for the accepted feature priorities and [ADR 0002 (mock-first 3D web)](decisions/0002-mock-first-3d-web.md) for the mock viewer stack. Experimental pilot data and backend integration on `feat/pilot-data-pipeline` remain pending formal selection and scientific validation; see [project state](project-state.md).
 
 The product basis is the team's [LunarSight V2 proposal](reference/proposal-v2.md), dated 5 November 2026. Prototype observations in that document are historical evidence of interaction ideas; they are not independent verification of scientific calculations or a specification of the current repository.
 

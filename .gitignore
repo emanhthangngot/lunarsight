@@ -16,8 +16,12 @@ node_modules/
 dist/
 build/
 coverage/
+.vite/
+*.tsbuildinfo
+/web/dist/
 
 # Credentials and local configuration
+.vercel/
 .env
 .env.*
 !.env.example
@@ -62,3 +66,4 @@ CLAUDE.local.md
 context/private/
 assets/private/
 docs/handoffs/local/
+requirements/

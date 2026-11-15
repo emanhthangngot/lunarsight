@@ -1,6 +1,6 @@
 # Documentation index
 
-Read [project state](project-state.md) first. Documents labeled **proposed** describe options or intended behavior; they do not establish team approval or implementation. The repository is currently a documentation foundation.
+Read [project state](project-state.md) first. Documents labelled **proposed** do not establish approval or implementation. The source now integrates reviewed pilot/backend repairs and focused local Three.js comparison UX with [bounded final acceptance](handoffs/current.md#final-bounded-acceptance-round42); its lost-log/reused-evidence qualifications and the older public mock deployment remain distinct from scientific validation.
 
 ## Product and requirements
 
@@ -9,6 +9,7 @@ Read [project state](project-state.md) first. Documents labeled **proposed** des
 | [Product direction](product.md) | Problem, user assumptions, feature direction, and proposed priorities. |
 | [Requirements register](requirements.md) | Stable functional/nonfunctional IDs, proposal traceability, and future acceptance criteria. |
 | [Original proposal reference](reference/proposal-v2.md) | Historical transcription of the team's proposal; observations and demo values remain unverified reference content. |
+| [Challenge summary (2026)](reference/challenge-2026.md) | Paraphrased official Lunar Landing Site Navigator statement, resources tab, and retrieval method/date. |
 
 ## Proposed system
 
@@ -36,7 +37,7 @@ Read [project state](project-state.md) first. Documents labeled **proposed** des
 | [DE pipeline roadmap](de-pipeline-roadmap.md) | Milestones to a reproducible pilot input pipeline and separate science-validation work. |
 | [Team decision worksheet](predecision-review.md) | Comparison table, unresolved evidence, meeting agenda, decision fields and DE handoff responsibilities. |
 | [Data quality proposal](data-quality.md) | Scientific interpretation, provenance, missing data, and acceptance evidence. |
-| [Data boundary](../data/README.md) | Explains why this repository currently contains no acquired data. |
+| [Data boundary](../data/README.md) | Acquisition/preview boundary; retained pilot assets do not authorize fresh downloads. |
 
 ## Team and agent workflow
 
