@@ -73,6 +73,18 @@ export interface HorizonMask {
   provenance: Provenance;
 }
 
+/** Observer identity retained with source-derived ephemerides; null is unrecorded,
+ * not a height inferred retrospectively from a newer DEM. */
+export interface EphemerisObserver {
+  latDeg: number;
+  lonDegE: number;
+  observerHeightM: number;
+  groundHeightM: number | null;
+  ellipsoidAltitudeKm: number | null;
+  datumStatus: 'conditional';
+  metadataOrigin: 'legacy-pipeline-height' | 'pipeline-record' | 'runtime-dem-query';
+}
+
 export interface EphemerisSeries {
   siteId: string;
   frame: 'MOON_ME';
@@ -81,11 +93,14 @@ export interface EphemerisSeries {
   timesUtcMs: number[];
   sunAzDeg: number[]; sunElDeg: number[];
   earthAzDeg: number[]; earthElDeg: number[];
+  observer?: EphemerisObserver;
   provenance: Provenance;
 }
 
 export interface LunarDataProvider {
   readonly kind: DataKind;
+  /** Omitted only when requested observer heights are genuinely supported. */
+  readonly supportedObserverHeightsM?: readonly number[];
   listSites(): Promise<SiteSummary[]>;
   getTerrain(): Promise<TerrainSource>;
   getHorizonMask(site: Pick<SiteSummary, 'id' | 'latDeg' | 'lonDegE'>, observerHeightM: number): Promise<HorizonMask | null>;

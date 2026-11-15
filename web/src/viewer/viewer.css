@@ -30,7 +30,7 @@
 .lunar-viewer__labels { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; clip-path: inset(var(--viewer-safe-top, 0px) var(--viewer-safe-right, 0px) var(--viewer-safe-bottom, 0px) var(--viewer-safe-left, 0px)); }
 
 /* Site markers (CSS2D, positioned by the 3D projection). Buttons: keyboard reachable, 44 px touch. */
-.lunar-viewer__site { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; color: var(--lv-text); font: 500 12px var(--lv-font); cursor: pointer; pointer-events: auto; text-shadow: 0 1px 2px #000; }
+.lunar-viewer__site { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; color: var(--lv-text); font: 500 13px var(--lv-font); cursor: pointer; pointer-events: auto; text-shadow: 0 1px 2px #000; }
 .lunar-viewer__site-dot { width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--lv-accent); border: 2px solid #05070a; box-shadow: 0 0 0 1.5px var(--lv-accent); }
 .lunar-viewer__site[data-mock='true'] .lunar-viewer__site-dot { box-shadow: 0 0 0 1.5px var(--lv-mock); }
 .lunar-viewer__site[data-selected='true'] .lunar-viewer__site-dot { width: 14px; height: 14px; margin-left: -7px; background: #fff; }
@@ -45,7 +45,7 @@
 .lunar-viewer__body-tag[data-body='earth'] { color: var(--lv-earth); }
 .lunar-viewer__body-ring { width: 26px; height: 26px; border-radius: 50%; border: 2px dashed currentColor; opacity: 0.9; }
 .lunar-viewer__body-tag[data-state='unknown'] .lunar-viewer__body-ring { border-style: dotted; }
-.lunar-viewer__body-text { position: absolute; white-space: nowrap; font: 600 12px var(--lv-font); text-shadow: 0 1px 2px #000, 0 0 6px #000; }
+.lunar-viewer__body-text { position: absolute; white-space: nowrap; font: 600 13px var(--lv-font); text-shadow: 0 1px 2px #000, 0 0 6px #000; }
 .lunar-viewer__body-tag[data-body='sun'] .lunar-viewer__body-text { left: 18px; bottom: 8px; }
 .lunar-viewer__body-tag[data-body='earth'] .lunar-viewer__body-text { right: 18px; top: 8px; }
 
@@ -70,24 +70,24 @@
    site markers least often land (the camera frames the selected site in the centre). */
 .lunar-viewer__corner { align-self: flex-end; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; max-width: min(320px, 100%); }
 .lunar-viewer[data-camera-mode='surface'] .lunar-viewer__corner { margin-top: 62px; }
-.lunar-viewer__mock { padding: 3px 9px; border-radius: 999px; border-color: color-mix(in srgb, var(--lv-mock) 60%, transparent); color: var(--lv-mock); font-size: 12px; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
+.lunar-viewer__mock { padding: 3px 9px; border-radius: 999px; border-color: color-mix(in srgb, var(--lv-mock) 60%, transparent); color: var(--lv-mock); font-size: 13px; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
 
 .lunar-viewer__toolbar { display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; pointer-events: auto; box-shadow: var(--lv-shadow); }
 .lunar-viewer__segment { display: flex; gap: 2px; padding-right: 3px; margin-right: 1px; border-right: 1px solid var(--lv-border); }
 .lunar-viewer__toolbar button {
   min-height: 28px; min-width: 28px; padding: 3px 9px; border: 0; border-radius: 999px; background: transparent; color: var(--lv-muted);
-  font: 600 12px var(--lv-font); cursor: pointer; transition: background-color 150ms ease, color 150ms ease;
+  font: 600 13px var(--lv-font); cursor: pointer; transition: background-color 150ms ease, color 150ms ease;
 }
 .lunar-viewer__toolbar button:hover { color: var(--lv-text); background: rgba(255, 255, 255, 0.07); }
 .lunar-viewer__toolbar button[aria-pressed='true'], .lunar-viewer__toolbar button[aria-expanded='true'] { color: #04110f; background: var(--lv-accent); }
 .lunar-viewer__toolbar button:focus-visible { outline: 2px solid var(--lv-accent); outline-offset: 1px; }
 
-.lunar-viewer__legend { width: 280px; padding: 9px 11px; border-radius: var(--lv-radius); color: var(--lv-text); font-size: 12px; line-height: 1.45; box-shadow: var(--lv-shadow); pointer-events: auto; }
+.lunar-viewer__legend { width: 280px; padding: 9px 11px; border-radius: var(--lv-radius); color: var(--lv-text); font-size: 13px; line-height: 1.45; box-shadow: var(--lv-shadow); pointer-events: auto; }
 .lunar-viewer__legend-meta { margin-top: 4px; color: var(--lv-muted); }
 .lunar-viewer__ramp { height: 6px; border-radius: 999px; margin-bottom: 4px; }
 .lunar-viewer__ticks { display: flex; justify-content: space-between; gap: 10px; white-space: nowrap; color: var(--lv-text); }
 
-.lunar-viewer__streaming, .lunar-viewer__loading, .lunar-viewer__error, .lunar-viewer__chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; color: var(--lv-muted); font-size: 12px; border-radius: 999px; flex: none; }
+.lunar-viewer__streaming, .lunar-viewer__loading, .lunar-viewer__error, .lunar-viewer__chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; color: var(--lv-text); font-size: 13px; border-radius: 999px; flex: none; }
 .lunar-viewer__loading, .lunar-viewer__error, .lunar-viewer__chip { background: var(--lv-glass); border: 1px solid var(--lv-border); backdrop-filter: blur(var(--lv-blur)); -webkit-backdrop-filter: blur(var(--lv-blur)); }
 .lunar-viewer__error { color: var(--lv-danger); border-color: color-mix(in srgb, var(--lv-danger) 50%, transparent); }
 .lunar-viewer__center { display: flex; justify-content: center; }
@@ -96,7 +96,7 @@
 
 /* One compact readout line, bottom-left. */
 .lunar-viewer__readout-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
-.lunar-viewer__readout { flex: none; max-width: 100%; padding: 3px 10px; border-radius: 999px; font: 500 12px var(--lv-mono); letter-spacing: 0.01em; color: var(--lv-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lunar-viewer__readout { flex: none; max-width: 100%; padding: 3px 10px; border-radius: 999px; font: 500 13px var(--lv-mono); letter-spacing: 0.01em; color: var(--lv-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lunar-viewer__readout:empty { display: none; }
 
 /* Touch: every control gets a ≥44 px hit area. */
@@ -132,7 +132,7 @@
 .sky-horizon__plot { position: relative; min-height: 0; height: 100%; }
 .sky-horizon__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
 .sky-horizon__svg text { font-family: var(--sh-font); }
-.sky-horizon__caption { color: var(--sh-muted); font-size: 12px; line-height: 1.4; display: flex; gap: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.sky-horizon__caption { color: var(--sh-muted); font-size: 13px; line-height: 1.4; display: flex; gap: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .sky-horizon__caption > span { overflow: hidden; text-overflow: ellipsis; }
 .sky-horizon__caption > span:last-child { flex: 1; min-width: 0; }
 .sky-horizon__caption strong { font-weight: 600; }

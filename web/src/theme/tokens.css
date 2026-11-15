@@ -8,7 +8,11 @@
   --ls-control: #1c1f22;
   --ls-border: #34383d;
   --ls-text: #f3f3f1;
-  --ls-text-muted: #aeb3b9;
+  /* Metadata / units / helper text. Values and actions use --ls-text. */
+  --ls-text-muted: #c2c7cd;
+  /* Disabled controls: clearly lower emphasis than metadata, on a flat surface. */
+  --ls-text-disabled: #80868d;
+  --ls-disabled-surface: #17191b;
   --ls-accent: #e2edf7;
   --ls-sun: #f5c542;
   --ls-earth: #79b9f3;
@@ -27,17 +31,18 @@
   --ls-space-5: 20px;
   --ls-space-6: 24px;
   --ls-space-8: 32px;
-  --ls-type-xs: 12px;
-  --ls-type-sm: 13px;
-  --ls-type-body: 14px;
-  --ls-type-md: 16px;
-  --ls-type-lg: 20px;
+  /* Floor 13 px for any text; 15 px body; 14 px+ for decision labels. */
+  --ls-type-xs: 13px;
+  --ls-type-sm: 14px;
+  --ls-type-body: 15px;
+  --ls-type-md: 17px;
+  --ls-type-lg: 21px;
   --ls-type-event: 28px;
-  --ls-type-hero: 52px;
+  --ls-type-metric: 26px;
   --ls-motion: 200ms;
   --ls-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --ls-mission-width: 292px;
-  --ls-inspector-width: 300px;
+  --ls-mission-width: 304px;
+  --ls-inspector-width: 316px;
   --ls-gutter: 16px;
   --ls-gap: 12px;
   --ls-command-height: 56px;

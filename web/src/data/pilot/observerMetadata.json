@@ -1,0 +1,20 @@
+{
+  "version": "pilot-observer-metadata-v1",
+  "sites": {
+    "site-04": {"latDeg": -89.785092, "lonDegE": 204.018283, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "site-01": {"latDeg": -89.4632, "lonDegE": 222.51, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "site-06": {"latDeg": -85.4381, "lonDegE": 37.36667, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "site-07": {"latDeg": -88.81101, "lonDegE": 123.69007, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "site-11": {"latDeg": -88.68342, "lonDegE": 292.0679, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "site-20": {"latDeg": -85.42658, "lonDegE": 31.74276, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "site-23": {"latDeg": -85.99478, "lonDegE": 359.76422, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "haworth": {"latDeg": -86.76394, "lonDegE": 337.22298, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "shoemaker": {"latDeg": -87.18351, "lonDegE": 62.83501, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "dm2": {"latDeg": -83.95402, "lonDegE": 58.82205, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "amundsen-rim": {"latDeg": -84.22874, "lonDegE": 69.44395, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "faustini-rim-a": {"latDeg": -87.88965, "lonDegE": 90.0, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "de-gerlache-rim-2": {"latDeg": -88.22998, "lonDegE": 295.37156, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "connecting-ridge-ext": {"latDeg": -89.03242, "lonDegE": 258.00071, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"},
+    "de-gerlache-kocher": {"latDeg": -85.82955, "lonDegE": 243.67798, "observerHeightM": 1, "groundHeightM": null, "ellipsoidAltitudeKm": null, "datumStatus": "conditional", "metadataOrigin": "legacy-pipeline-height"}
+  }
+}

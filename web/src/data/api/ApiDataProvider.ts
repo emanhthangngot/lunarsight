@@ -1,4 +1,3 @@
-import type { WindowMetrics } from '../../analysis/visibility';
 import type { EphemerisSeries, HorizonMask, LunarDataProvider, SiteSummary, TerrainSource } from '../contract';
 import type { ScenarioInputs, ScenarioResult } from '../../state/scenario';
 import { validateCoordinates } from '../../geo/coordinates';
@@ -32,42 +31,8 @@ export interface AnalysisSubmitResponse {
   status: 'cached' | 'accepted';
   result: ServerAnalysisResult | null;
   job: AnalysisJobModel | null;
-}
-
-export interface SavedScenarioSummary {
-  id: string;
-  title: string;
-  notes: string | null;
-  inputs: ScenarioInputs;
-  resultId: string | null;
-  metrics: WindowMetrics | null;
-  createdAt: string;
-}
-
-export interface SavedScenarioDetail {
-  id: string;
-  title: string;
-  notes: string | null;
-  inputs: ScenarioInputs;
-  result: ServerAnalysisResult | null;
-  createdAt: string;
-}
-
-export interface AdvisorCitation {
-  label: string;
-  value: string;
-  source: string;
-}
-
-export interface AdvisorResponse {
-  resultId: string;
-  mode: 'llm' | 'deterministic' | 'deterministic_fallback';
-  summary: string;
-  recommendations: string[];
-  limitations: string[];
-  citations: AdvisorCitation[];
-  providerUnavailable: boolean;
-  providerError: string | null;
+  /** Submission-owned cancellation capability; never an administrator credential. */
+  cancelToken?: string | null;
 }
 
 async function readErrorDetail(response: Response, fallback: string): Promise<string> {
@@ -95,7 +60,7 @@ function toScenarioResult(serverResult: ServerAnalysisResult, localId: string): 
 
 /**
  * ApiDataProvider connects the Three.js workspace to the LunarSight FastAPI backend
- * (Stage 1 scientific endpoints + Stage 2 immutable analysis jobs & SQLite scenario persistence).
+ * (public science endpoints and bounded immutable analysis jobs; no administrative UI client).
  */
 export class ApiDataProvider implements LunarDataProvider {
   readonly kind = 'processed' as const;
@@ -208,131 +173,91 @@ export class ApiDataProvider implements LunarDataProvider {
 
   /** Stage 2: submit immutable scenario analysis via POST /api/analyses + background job polling. */
   async runAnalysis(inputs: ScenarioInputs, localId: string, signal?: AbortSignal): Promise<ScenarioResult> {
-    const signalInit: RequestInit = signal ? { signal } : {};
-    const submitResp = await fetch(this.resolveUrl('/api/analyses'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ inputs }),
-      ...signalInit,
+    if (signal?.aborted) throw new DOMException('Analysis aborted', 'AbortError');
+    const controller = new AbortController();
+    let jobId: string | null = null;
+    let cancelToken: string | null = null;
+    let rejectAborted!: (reason: unknown) => void;
+    const aborted = new Promise<never>((_resolve, reject) => { rejectAborted = reject; });
+    const cancelOwnedJob = () => {
+      if (!jobId || !cancelToken) return;
+      const cancellation = new AbortController();
+      const timer = setTimeout(() => cancellation.abort(), 5_000);
+      // Best effort and separately bounded: local abort never waits for server I/O.
+      void fetch(this.resolveUrl(`/api/analysis-jobs/${encodeURIComponent(jobId)}/cancel`), {
+        method: 'POST',
+        headers: { 'X-Analysis-Cancel-Token': cancelToken },
+        signal: cancellation.signal,
+      }).catch(() => {}).finally(() => clearTimeout(timer));
+    };
+    const onAbort = () => {
+      cancelOwnedJob();
+      rejectAborted(controller.signal.reason);
+    };
+    const onCallerAbort = () => controller.abort(new DOMException('Analysis aborted', 'AbortError'));
+    controller.signal.addEventListener('abort', onAbort, { once: true });
+    signal?.addEventListener('abort', onCallerAbort, { once: true });
+    const deadline = setTimeout(() => controller.abort(new Error('Analysis timed out after 120 seconds; server cancellation is cooperative.')), 120_000);
+    if (signal?.aborted) onCallerAbort();
+    const checkAbort = () => controller.signal.throwIfAborted();
+    const request = async (path: string, init: RequestInit = {}) => {
+      checkAbort();
+      const response = await fetch(this.resolveUrl(path), { ...init, signal: controller.signal });
+      checkAbort();
+      return response;
+    };
+    const pause = () => new Promise<void>((resolve, reject) => {
+      const cleanup = () => { clearTimeout(timer); controller.signal.removeEventListener('abort', onPauseAbort); };
+      const onPauseAbort = () => { cleanup(); reject(controller.signal.reason); };
+      const timer = setTimeout(() => { cleanup(); resolve(); }, 150);
+      controller.signal.addEventListener('abort', onPauseAbort, { once: true });
+      if (controller.signal.aborted) onPauseAbort();
     });
-    if (submitResp.status === 422 || submitResp.status === 404) {
-      throw new RangeError(await readErrorDetail(submitResp, 'Scenario inputs are invalid or outside coverage'));
-    }
-    if (!submitResp.ok) {
-      throw new Error(await readErrorDetail(submitResp, `Failed to submit analysis (${submitResp.status})`));
-    }
-
-    const submitted = (await submitResp.json()) as AnalysisSubmitResponse;
-    if (submitted.status === 'cached' && submitted.result) {
-      return toScenarioResult(submitted.result, localId);
-    }
-    if (!submitted.job) {
-      throw new Error('Backend did not return a cached result or job receipt');
-    }
-
-    let job = submitted.job;
-    while (job.status === 'queued' || job.status === 'running') {
-      await new Promise<void>((resolve, reject) => {
-        const timer = setTimeout(resolve, 150);
-        if (signal) {
-          if (signal.aborted) {
-            clearTimeout(timer);
-            reject(new DOMException('Aborted', 'AbortError'));
-            return;
-          }
-          signal.addEventListener('abort', () => {
-            clearTimeout(timer);
-            void fetch(this.resolveUrl(`/api/analysis-jobs/${job.id}/cancel`), { method: 'POST' }).catch(() => {});
-            reject(new DOMException('Aborted', 'AbortError'));
-          }, { once: true });
-        }
+    const perform = async (): Promise<ScenarioResult> => {
+      const submitResp = await request('/api/analyses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inputs }),
       });
-
-      const pollResp = await fetch(this.resolveUrl(`/api/analysis-jobs/${job.id}`), signalInit);
-      if (!pollResp.ok) {
-        throw new Error(await readErrorDetail(pollResp, `Failed to poll job ${job.id} (${pollResp.status})`));
+      if (submitResp.status === 422 || submitResp.status === 404) {
+        throw new RangeError(await readErrorDetail(submitResp, 'Scenario inputs are invalid or outside coverage'));
       }
-      job = (await pollResp.json()) as AnalysisJobModel;
-    }
-
-    if (job.status === 'failed') {
-      const msg = job.errorMessage || 'Analysis job failed';
-      if (job.outsideCoverage) {
-        throw new RangeError(msg);
+      if (!submitResp.ok) throw new Error(await readErrorDetail(submitResp, `Failed to submit analysis (${submitResp.status})`));
+      const submitted = (await submitResp.json()) as AnalysisSubmitResponse;
+      checkAbort();
+      if (submitted.status === 'cached' && submitted.result) return toScenarioResult(submitted.result, localId);
+      if (!submitted.job) throw new Error('Backend did not return a cached result or job receipt');
+      let job = submitted.job;
+      jobId = job.id;
+      cancelToken = submitted.cancelToken ?? null;
+      while (job.status === 'queued' || job.status === 'running') {
+        await pause();
+        const pollResp = await request(`/api/analysis-jobs/${encodeURIComponent(job.id)}`);
+        if (!pollResp.ok) throw new Error(await readErrorDetail(pollResp, `Failed to poll job ${job.id} (${pollResp.status})`));
+        job = (await pollResp.json()) as AnalysisJobModel;
+        checkAbort();
       }
-      throw new Error(msg);
-    }
-    if (job.status === 'cancelled') {
-      throw new Error(job.errorMessage || 'Analysis job was cancelled');
-    }
-    if (!job.resultId) {
-      throw new Error('Succeeded job is missing resultId');
-    }
-
-    const resResp = await fetch(this.resolveUrl(`/api/analysis-results/${job.resultId}`), signalInit);
-    if (!resResp.ok) {
-      throw new Error(await readErrorDetail(resResp, `Failed to load analysis result ${job.resultId}`));
-    }
-    const serverResult = (await resResp.json()) as ServerAnalysisResult;
-    return toScenarioResult(serverResult, localId);
-  }
-
-  async listSavedScenarios(): Promise<SavedScenarioSummary[]> {
-    const resp = await fetch(this.resolveUrl('/api/scenarios'));
-    if (!resp.ok) {
-      throw new Error(await readErrorDetail(resp, `Failed to load saved scenarios (${resp.status})`));
-    }
-    return (await resp.json()) as SavedScenarioSummary[];
-  }
-
-  async saveScenario(
-    title: string,
-    inputs: ScenarioInputs,
-    resultId?: string,
-    notes?: string,
-  ): Promise<SavedScenarioSummary> {
-    const resp = await fetch(this.resolveUrl('/api/scenarios'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, inputs, resultId: resultId ?? null, notes: notes ?? null }),
-    });
-    if (!resp.ok) {
-      throw new Error(await readErrorDetail(resp, `Failed to save scenario (${resp.status})`));
-    }
-    return (await resp.json()) as SavedScenarioSummary;
-  }
-
-  async getSavedScenario(scenarioId: string): Promise<SavedScenarioDetail> {
-    const resp = await fetch(this.resolveUrl(`/api/scenarios/${encodeURIComponent(scenarioId)}`));
-    if (!resp.ok) {
-      throw new Error(await readErrorDetail(resp, `Failed to load scenario (${resp.status})`));
-    }
-    return (await resp.json()) as SavedScenarioDetail;
-  }
-
-  async deleteSavedScenario(scenarioId: string): Promise<void> {
-    const resp = await fetch(this.resolveUrl(`/api/scenarios/${encodeURIComponent(scenarioId)}`), {
-      method: 'DELETE',
-    });
-    if (!resp.ok && resp.status !== 204) {
-      throw new Error(await readErrorDetail(resp, `Failed to delete scenario (${resp.status})`));
+      if (job.status === 'failed') {
+        const message = job.errorMessage || 'Analysis job failed';
+        if (job.outsideCoverage) throw new RangeError(message);
+        throw new Error(message);
+      }
+      if (job.status === 'cancelled') throw new Error(job.errorMessage || 'Analysis job was cancelled');
+      if (job.status !== 'succeeded' || !job.resultId) throw new Error('Succeeded job is missing resultId or has an invalid terminal state');
+      const resResp = await request(`/api/analysis-results/${encodeURIComponent(job.resultId)}`);
+      if (!resResp.ok) throw new Error(await readErrorDetail(resResp, `Failed to load analysis result ${job.resultId}`));
+      const serverResult = (await resResp.json()) as ServerAnalysisResult;
+      checkAbort();
+      return toScenarioResult(serverResult, localId);
+    };
+    try {
+      // The deadline also covers a stalled response body or a non-cooperative transport.
+      return await Promise.race([perform(), aborted]);
+    } finally {
+      clearTimeout(deadline);
+      controller.signal.removeEventListener('abort', onAbort);
+      signal?.removeEventListener('abort', onCallerAbort);
     }
   }
 
-  /** Stage 3: request evidence-linked AI Advisor explanation grounded in an immutable resultId. */
-  async askAdvisor(
-    resultId: string,
-    question = 'Summarize solar illumination, Earth visibility, and key operational risks for this site.',
-    language: 'vi' | 'en' = 'vi',
-  ): Promise<AdvisorResponse> {
-    const resp = await fetch(this.resolveUrl('/api/advisor-responses'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ resultId, question, language }),
-    });
-    if (!resp.ok) {
-      throw new Error(await readErrorDetail(resp, `Failed to load advisor response (${resp.status})`));
-    }
-    return (await resp.json()) as AdvisorResponse;
-  }
 }

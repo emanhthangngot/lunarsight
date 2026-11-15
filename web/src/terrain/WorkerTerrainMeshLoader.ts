@@ -12,6 +12,7 @@ const abortError = (message: string) => new DOMException(message, 'AbortError');
  */
 export class WorkerTerrainMeshLoader implements TerrainMeshLoader {
   private worker: MeshWorker | null = null;
+  private workerIdentity: string | null = null;
   private pending: PendingMesh | null = null;
   private readonly cache = new Map<string, LocalTerrainMesh>();
   private nextId = 0;
@@ -19,8 +20,7 @@ export class WorkerTerrainMeshLoader implements TerrainMeshLoader {
 
   constructor(
     private readonly createWorker: () => MeshWorker,
-    private readonly initMessage?: DemInitMessage,
-    private readonly prepareForRequest?: (request: TerrainMeshRequest) => Promise<DemInitMessage | null>,
+    private readonly prepareForRequest?: (request: TerrainMeshRequest) => Promise<DemInitMessage>,
   ) {}
 
   load(request: TerrainMeshRequest, signal?: AbortSignal): Promise<LocalTerrainMesh> {
@@ -32,80 +32,82 @@ export class WorkerTerrainMeshLoader implements TerrainMeshLoader {
       if (request.quality !== 'balanced' && request.quality !== 'high') throw new RangeError('Unknown mesh quality');
       normalized = { ...point, quality: request.quality };
     } catch (reason) { return Promise.reject(reason); }
-    const key = JSON.stringify([normalized.latDeg, normalized.lonDegE, normalized.quality]);
     this.pending?.cancel('Terrain mesh request superseded');
-    const cached = this.cache.get(key);
-    if (cached) {
-      this.cache.delete(key); this.cache.set(key, cached);
-      // No postMessage/transfer on cache hits: returned client arrays remain usable.
-      return Promise.resolve(cached);
-    }
-    let worker: MeshWorker;
-    const isNewWorker = this.worker === null;
-    try { worker = this.worker ?? this.createWorker(); this.worker = worker; }
-    catch (reason) { return Promise.reject(reason); }
-    if (isNewWorker && this.initMessage) {
-      try { worker.postMessage(this.initMessage); }
-      catch (reason) { this.worker = null; worker.terminate(); return Promise.reject(reason); }
-    }
     const id = ++this.nextId;
-    // The project targets ES2022; Worker event completion uses its Promise executor.
     return new Promise<LocalTerrainMesh>((resolve, reject) => {
-      const current = () => this.pending?.id === id && this.worker === worker;
+      let worker: MeshWorker | null = null;
+      let key = '';
+      const current = () => this.pending?.id === id;
       const cleanup = () => {
         signal?.removeEventListener('abort', onAbort);
-        worker.removeEventListener('message', onMessage);
-        worker.removeEventListener('error', onError);
-        worker.removeEventListener('messageerror', onMessageError);
+        worker?.removeEventListener('message', onMessage);
+        worker?.removeEventListener('error', onError);
+        worker?.removeEventListener('messageerror', onMessageError);
       };
       const fail = (reason: unknown) => {
         if (!current()) return;
-        cleanup(); this.pending = null; this.worker = null;
-        worker.terminate();
+        cleanup();
+        this.pending = null;
+        (worker ?? this.worker)?.terminate();
+        this.worker = null;
+        this.workerIdentity = null;
         reject(reason);
       };
       const onAbort = () => fail(abortError('Terrain mesh request aborted'));
       const onError = (event: ErrorEvent) => fail(new Error(event.message || 'Terrain mesh Worker failed'));
       const onMessageError = () => fail(new Error('Terrain mesh Worker response could not be decoded'));
       const onMessage = (event: MessageEvent<MeshBuildResponse>) => {
-        if (!current() || event.data.id !== id) return;
+        if (!current() || this.worker !== worker || event.data.id !== id) return;
         if (event.data.type === 'error') {
           const error = event.data.name === 'RangeError' ? new RangeError(event.data.message) : new Error(event.data.message);
           error.name = event.data.name;
-          fail(error); return;
+          fail(error);
+          return;
         }
         if (event.data.type !== 'mesh') return;
-        cleanup(); this.pending = null;
+        cleanup();
+        this.pending = null;
         this.cache.set(key, event.data.mesh);
         while (this.cache.size > 2) this.cache.delete(this.cache.keys().next().value!);
         resolve(event.data.mesh);
       };
+      const build = (init?: DemInitMessage) => {
+        if (!current()) return;
+        const identity = init?.identity ?? 'mock-1.1.0';
+        key = JSON.stringify([normalized.latDeg, normalized.lonDegE, normalized.quality, identity]);
+        const cached = this.cache.get(key);
+        if (cached) {
+          this.cache.delete(key);
+          this.cache.set(key, cached);
+          cleanup();
+          this.pending = null;
+          resolve(cached);
+          return;
+        }
+        try {
+          worker = this.worker ?? this.createWorker();
+          this.worker = worker;
+          worker.addEventListener('message', onMessage);
+          worker.addEventListener('error', onError);
+          worker.addEventListener('messageerror', onMessageError);
+          // Every new/recreated Worker receives the freshly prepared complete
+          // snapshot, even when no layer fetch occurred.
+          if (init && this.workerIdentity !== identity) worker.postMessage(init);
+          this.workerIdentity = identity;
+          const message: MeshBuildRequest = { type: 'build', id, request: normalized };
+          worker.postMessage(message);
+        } catch (reason) { fail(reason); }
+      };
       this.pending = { id, cancel: (message) => fail(abortError(message)) };
-      worker.addEventListener('message', onMessage);
-      worker.addEventListener('error', onError);
-      worker.addEventListener('messageerror', onMessageError);
       signal?.addEventListener('abort', onAbort, { once: true });
       if (signal?.aborted) { onAbort(); return; }
-      const message: MeshBuildRequest = { type: 'build', id, request: normalized };
-      const postBuild = () => {
-        if (!current()) return;
-        try { worker.postMessage(message); }
-        catch (reason) { fail(reason); }
-      };
       if (this.prepareForRequest) {
-        void this.prepareForRequest(normalized).then(
-          (updatedInit) => {
-            if (!current()) return;
-            if (updatedInit) {
-              try { worker.postMessage(updatedInit); }
-              catch (reason) { fail(reason); return; }
-            }
-            postBuild();
-          },
-          fail,
-        );
+        // Preparation precedes cache lookup: loaded DEM content, not just the
+        // site/quality label, decides whether a cached mesh is reusable.
+        try { void this.prepareForRequest(normalized).then(build, fail); }
+        catch (reason) { fail(reason); }
       } else {
-        postBuild();
+        build();
       }
     });
   }
@@ -116,6 +118,7 @@ export class WorkerTerrainMeshLoader implements TerrainMeshLoader {
     this.pending?.cancel('Terrain mesh loader disposed');
     this.worker?.terminate();
     this.worker = null;
+    this.workerIdentity = null;
     this.cache.clear();
   }
 }

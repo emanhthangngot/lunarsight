@@ -8,7 +8,7 @@ export function ProvenancePanel({ kind, terrain, result }: { kind: DataKind; ter
   return <section className="panel provenance-panel" aria-labelledby="provenance-title">
     <details open><summary id="provenance-title">Provenance & conventions · {kind.toUpperCase()} · {result?.id ?? 'No result'}</summary>
       <p>{isProcessed
-        ? 'Processed NASA PGDA LOLA topography and JPL Horizons ephemerides for pilot Artemis candidate sites. Not a flight-certified power budget, radio link budget, or landing-safety score.'
+        ? 'NASA-sourced, processed data: PGDA LOLA topography and JPL Horizons ephemerides for south-polar candidate sites. Modelled results, not independently validated; not a flight-certified power budget, radio link budget, or landing-safety score.'
         : 'Fictional demonstration only. Not JPL ephemerides or LOLA data. No scientific certification, power budget, radio link budget or landing-safety score.'}</p>
       <dl className="conventions">
         <div><dt>Frame</dt><dd>{result?.ephemeris.provenance.kind === 'processed' ? 'MOON_ME (JPL Horizons DE441 MEAN_ME)' : 'MOON_ME (mock label, not a SPICE realization)'}</dd></div>

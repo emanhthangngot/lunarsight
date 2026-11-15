@@ -6,6 +6,8 @@ export interface DemInitMessage {
   layers: DemLayerData[];
   coverage: CoverageBounds;
   provenance: Provenance;
+  /** Actual ordered DEM bytes/geometry identity, not a mutable version label. */
+  identity: string;
 }
 
 export interface MeshBuildRequest { type: 'build'; id: number; request: TerrainMeshRequest }

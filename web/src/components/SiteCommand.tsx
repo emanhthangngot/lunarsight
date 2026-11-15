@@ -20,7 +20,7 @@ export function SiteCommand({ open, onClose, sites, selectedSiteId, onChoose }: 
     return () => cancelAnimationFrame(frame);
   }, [open]);
   function choose(site: SiteSummary) { onChoose(site); onClose(); }
-  return <OverlayDialog open={open} onClose={onClose} title="Find a lunar site" description="Select a fictional site for your mission draft. Apply the scenario to update scientific results." className="command-dialog">
+  return <OverlayDialog open={open} onClose={onClose} title="Find a lunar site" description="Choosing a site analyses it right away with the current window and observer height." className="command-dialog">
     <div className="command-search"><Search size={20} aria-hidden="true" /><input ref={searchRef} role="combobox" aria-label="Search lunar sites" aria-expanded={open} aria-controls={listId} aria-autocomplete="list" aria-activedescendant={options[active] ? listId + '-' + active : undefined} placeholder="Search sites or east longitude…" value={query}
       onChange={(event) => { setQuery(event.target.value); setActive(0); }}
       onKeyDown={(event) => {
@@ -30,9 +30,9 @@ export function SiteCommand({ open, onClose, sites, selectedSiteId, onChoose }: 
       }} /></div>
     <div id={listId} role="listbox" aria-label="Matching lunar sites" className="command-options">
       {options.map((site, index) => <div key={site.id} id={listId + '-' + index} role="option" aria-selected={index === active} className="command-option" onPointerMove={() => setActive(index)} onClick={() => choose(site)}>
-        <MapPin size={18} aria-hidden="true" /><div><strong>{site.name}</strong><span>{site.latDeg.toFixed(3)}° · {site.lonDegE.toFixed(3)}° E{site.category === 'mock' ? ' · mock' : ''}{!site.nameVerified ? ' · name unverified' : ''}</span></div>{site.id === selectedSiteId && <Check size={18} aria-label="Current draft site" />}
+        <MapPin size={18} aria-hidden="true" /><div><strong>{site.name}</strong><span>{site.latDeg.toFixed(3)}° · {site.lonDegE.toFixed(3)}° E{site.category === 'mock' ? ' · mock' : ''}{!site.nameVerified ? ' · name unverified' : ''}</span></div>{site.id === selectedSiteId && <Check size={18} aria-label="Current site" />}
       </div>)}
-      {options.length === 0 && <p className="command-empty" role="status">No matching mock sites. Custom coordinates are available in Mission.</p>}
+      {options.length === 0 && <p className="command-empty" role="status">No matching sites. Custom coordinates are available in Mission.</p>}
     </div>
     <footer className="command-help"><span><ArrowUp size={14} /><ArrowDown size={14} /> Navigate</span><span><CornerDownLeft size={14} /> Select</span><span><kbd>Esc</kbd> Close</span></footer>
   </OverlayDialog>;

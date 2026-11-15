@@ -574,7 +574,7 @@ export function LunarViewer(props: LunarViewerProps) {
       {/* Every overlay lives inside the App-provided safe insets (contract-2). */}
       <div ref={safeRef} className="lunar-viewer__safe">
         {surface && <canvas ref={compassRef} className="lunar-viewer__compass" aria-hidden="true" />}
-        <div className="lunar-viewer__sr" aria-live="polite">{describeBody('Sun', sun)}. {describeBody('Earth', earth)}.{!sun ? ' Lighting: neutral light (no time cursor).' : ''}</div>
+        <div className="lunar-viewer__sr" aria-live="polite">{describeBody('Sun', sun)}. {describeBody('Earth', earth)}.{!sun ? ' Lighting: neutral light (no Sun direction for this site yet).' : ''}</div>
         <div className="lunar-viewer__corner">
           {mock && <div className="lunar-viewer__mock" role="status">MOCK DATA · fictional terrain</div>}
           <div className="lunar-viewer__toolbar" role="toolbar" aria-label="3D view options">
@@ -612,7 +612,7 @@ export function LunarViewer(props: LunarViewerProps) {
         </div>
         <div className="lunar-viewer__readout-row">
           {mesh?.partialCoverage && <span className="lunar-viewer__chip" role="status">Partial footprint · coverage edge</span>}
-          {!sun && ready && <span className="lunar-viewer__chip">Neutral light · no time cursor</span>}
+          {!sun && ready && <span className="lunar-viewer__chip">Neutral light · no Sun direction yet</span>}
           {reliefAid && ready && <span className="lunar-viewer__chip" title="Cool inspection light from the view's front-left; not sunlight. Toggle with Fill.">Fill light · display aid</span>}
           <div ref={readoutRef} className="lunar-viewer__readout" aria-hidden="true" title={surface ? 'Drag or arrow keys to look · wheel or ± to zoom' : 'Drag to orbit · wheel to zoom · click a site'} />
         </div>

@@ -2,6 +2,7 @@ import type { CoverageBounds, Provenance, TerrainSource } from '../contract';
 import { southPolarForward, validateCoordinates } from '../../geo/coordinates';
 import { WorkerTerrainMeshLoader } from '../../terrain/WorkerTerrainMeshLoader';
 import type { DemInitMessage } from '../../terrain/workerProtocol';
+import { terrainDependencyHash, validateGeneratedTerrainHeader } from './terrainDependency';
 
 export interface DemLayerMeta {
   id: string;
@@ -15,13 +16,16 @@ export interface DemLayerMeta {
   minHeightM: number;
   maxHeightM: number;
   source: string;
+  sha256?: string;
 }
 
 export interface DemManifest {
   version: string;
   coverage: CoverageBounds;
-  provenance: Provenance;
+  provenance: Provenance & { contentHash?: string | null; method?: string | null };
   layers: DemLayerMeta[];
+  terrainContentHash?: string | null;
+  terrainContentHashPolicy?: string | null;
 }
 
 export interface DemLayerData {
@@ -31,6 +35,15 @@ export interface DemLayerData {
   rows: number;
   cols: number;
   data: Float32Array;
+}
+
+interface LoadedDemLayerData extends DemLayerData { contentHash: string }
+
+async function sha256(buffer: ArrayBuffer): Promise<string> {
+  const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', buffer));
+  let hex = '';
+  for (const byte of digest) hex += byte.toString(16).padStart(2, '0');
+  return hex;
 }
 
 /** Bilinearly samples a GDAL-ordered row-major Float32 DEM grid in south-polar stereographic metres. */
@@ -81,6 +94,8 @@ export function createDemHeightAt(
 
 export interface LazyDemTerrainSource extends TerrainSource {
   ensureLayersFor(latDeg: number, lonDegE: number): Promise<void>;
+  /** Generated presets need a whole-pack proof; legacy compatibility returns null. */
+  verifyGeneratedDependency(): Promise<string | null>;
 }
 
 function layerMatchesPoint(meta: DemLayerMeta, xM: number, yM: number, padM = 2000): boolean {
@@ -91,15 +106,20 @@ function layerMatchesPoint(meta: DemLayerMeta, xM: number, yM: number, padM = 20
   return xM >= xMin - padM && xM <= xMax + padM && yM >= yMin - padM && yM <= yMax + padM;
 }
 
-async function fetchLayerBinary(meta: DemLayerMeta, url: string): Promise<DemLayerData> {
+async function fetchLayerBinary(meta: DemLayerMeta, url: string): Promise<LoadedDemLayerData> {
   const resp = await fetch(url);
   if (!resp.ok) {
+    if (resp.status === 409) throw new Error('Scientific terrain data changed; reload the workspace to obtain a matching manifest.');
     throw new Error(`Failed to load DEM layer ${meta.id} (${resp.status})`);
   }
   const buffer = await resp.arrayBuffer();
   const data = new Float32Array(buffer);
   if (data.length !== meta.rows * meta.cols) {
     throw new Error(`DEM layer ${meta.id} size mismatch: expected ${meta.rows * meta.cols}, got ${data.length}`);
+  }
+  const contentHash = await sha256(buffer);
+  if (meta.sha256 && meta.sha256.toLowerCase() !== contentHash) {
+    throw new Error(`DEM layer ${meta.id} content checksum does not match the source manifest`);
   }
   return {
     xMinM: meta.xMinM,
@@ -108,6 +128,7 @@ async function fetchLayerBinary(meta: DemLayerMeta, url: string): Promise<DemLay
     rows: meta.rows,
     cols: meta.cols,
     data,
+    contentHash,
   };
 }
 
@@ -119,9 +140,13 @@ export async function createLazyDemTerrainSource(
   manifest: DemManifest,
   resolveLayerUrl: (meta: DemLayerMeta) => string,
 ): Promise<LazyDemTerrainSource> {
-  const loadedById = new Map<string, DemLayerData>();
-  const inFlight = new Map<string, Promise<DemLayerData>>();
+  const loadedById = new Map<string, LoadedDemLayerData>();
+  const inFlight = new Map<string, Promise<LoadedDemLayerData>>();
   const activeLayers: DemLayerData[] = [];
+  const provenance = { ...manifest.provenance };
+  let revision = 0;
+  let snapshotPromise: Promise<DemInitMessage> | null = null;
+  let dependencyPromise: Promise<string | null> | null = null;
 
   const syncSortedLayers = () => {
     const ordered: DemLayerData[] = [];
@@ -129,80 +154,97 @@ export async function createLazyDemTerrainSource(
       const loaded = loadedById.get(meta.id);
       if (loaded) ordered.push(loaded);
     }
-    activeLayers.splice(0, activeLayers.length, ...ordered);
+    if (ordered.length !== activeLayers.length || ordered.some((layer, index) => layer !== activeLayers[index])) {
+      activeLayers.splice(0, activeLayers.length, ...ordered);
+      revision++;
+      snapshotPromise = null;
+    }
   };
 
-  const loadMetas = async (metas: DemLayerMeta[]): Promise<boolean> => {
-    const missing = metas.filter((m) => !loadedById.has(m.id));
-    if (missing.length === 0) return false;
-    await Promise.all(
-      missing.map(async (meta) => {
-        let pending = inFlight.get(meta.id);
-        if (!pending) {
-          pending = fetchLayerBinary(meta, resolveLayerUrl(meta)).then(
-            (layer) => {
-              loadedById.set(meta.id, layer);
-              inFlight.delete(meta.id);
-              return layer;
-            },
-            (err) => {
-              inFlight.delete(meta.id);
-              throw err;
-            },
-          );
-          inFlight.set(meta.id, pending);
-        }
-        await pending;
-      }),
-    );
+  const loadMetas = async (metas: DemLayerMeta[]): Promise<void> => {
+    await Promise.all(metas.filter((meta) => !loadedById.has(meta.id)).map(async (meta) => {
+      let pending = inFlight.get(meta.id);
+      if (!pending) {
+        pending = fetchLayerBinary(meta, resolveLayerUrl(meta)).then(
+          (layer) => { loadedById.set(meta.id, layer); inFlight.delete(meta.id); return layer; },
+          (reason) => { inFlight.delete(meta.id); throw reason; },
+        );
+        inFlight.set(meta.id, pending);
+      }
+      await pending;
+    }));
     syncSortedLayers();
-    return true;
   };
 
-  // Load regional background layers (!siteId) immediately; site-local tiles load on demand.
-  const regionalMetas = manifest.layers.filter((meta) => !meta.siteId);
-  await loadMetas(regionalMetas.length > 0 ? regionalMetas : manifest.layers);
+  const snapshotForCurrentLayers = async (): Promise<DemInitMessage> => {
+    const atRevision = revision;
+    if (!snapshotPromise) {
+      const layers = [...activeLayers];
+      const members = manifest.layers.filter((meta) => loadedById.has(meta.id)).map((meta) => {
+        const layer = loadedById.get(meta.id)!;
+        return [meta.id, layer.xMinM, layer.yMaxM, layer.spacingM, layer.rows, layer.cols, layer.contentHash];
+      });
+      const encoded = new TextEncoder().encode(JSON.stringify(['dem-mesh-v2', manifest.version, manifest.provenance.source, manifest.provenance.version, manifest.coverage, members]));
+      snapshotPromise = sha256(encoded.buffer).then<DemInitMessage>((identity) => ({
+        type: 'init',
+        layers,
+        identity,
+        coverage: { ...manifest.coverage },
+        provenance: {
+          ...manifest.provenance,
+          notes: `${manifest.provenance.notes ?? ''} Effective ordered DEM snapshot SHA-256 ${identity}; loaded layer bytes and geometry, not a scientific-validation claim.`,
+        },
+      }));
+    }
+    const snapshot = await snapshotPromise;
+    // Another site's fine-layer fetch may finish while hashing. Never publish a
+    // preparation result that already lost to the current complete layer state.
+    if (atRevision !== revision) return snapshotForCurrentLayers();
+    if (snapshot.provenance.notes === undefined) delete provenance.notes;
+    else provenance.notes = snapshot.provenance.notes;
+    return snapshot;
+  };
 
-  const ensureWithDiff = async (latDeg: number, lonDegE: number): Promise<DemInitMessage | null> => {
+  const ensureSnapshot = async (latDeg: number, lonDegE: number): Promise<DemInitMessage> => {
     const point = validateCoordinates(latDeg, lonDegE);
     const { xM, yM } = southPolarForward(point.latDeg, point.lonDegE);
-    const matching = manifest.layers.filter(
-      (meta) => !loadedById.has(meta.id) && layerMatchesPoint(meta, xM, yM),
-    );
-    if (matching.length === 0) return null;
-    const changed = await loadMetas(matching);
-    if (!changed) return null;
-    return {
-      type: 'init',
-      layers: [...activeLayers],
-      coverage: manifest.coverage,
-      provenance: manifest.provenance,
-    };
+    await loadMetas(manifest.layers.filter((meta) => layerMatchesPoint(meta, xM, yM)));
+    return snapshotForCurrentLayers();
   };
 
-  const heightAt = createDemHeightAt(activeLayers, manifest.coverage);
+  const verifyGeneratedDependency = (): Promise<string | null> => {
+    if (!dependencyPromise) {
+      dependencyPromise = (async () => {
+        if (!validateGeneratedTerrainHeader(manifest)) return null;
+        // This eager proof is generated-only: a declared whole-mosaic preset
+        // cannot be certified by hashes of only the selected near-field tiles.
+        await loadMetas(manifest.layers);
+        await snapshotForCurrentLayers();
+        const actualHashes = new Map([...loadedById].map(([id, layer]) => [id, layer.contentHash]));
+        const actual = await terrainDependencyHash(manifest, actualHashes);
+        if (actual !== manifest.terrainContentHash?.toLowerCase()) {
+          throw new Error('Generated terrain dependency contradicts the current ordered DEM bytes/geometry.');
+        }
+        return actual;
+      })().catch((reason) => { dependencyPromise = null; throw reason; });
+    }
+    return dependencyPromise;
+  };
 
+  const regionalMetas = manifest.layers.filter((meta) => !meta.siteId);
+  await loadMetas(regionalMetas.length > 0 ? regionalMetas : manifest.layers);
+  await snapshotForCurrentLayers();
+  const heightAt = createDemHeightAt(activeLayers, manifest.coverage);
   return {
     type: 'heightFunction',
-    provenance: { ...manifest.provenance },
+    provenance,
     coverage: { ...manifest.coverage },
     heightAt,
-    ensureLayersFor: async (latDeg, lonDegE) => {
-      await ensureWithDiff(latDeg, lonDegE);
-    },
-    createMeshLoader: () =>
-      new WorkerTerrainMeshLoader(
-        () =>
-          new Worker(new URL('../../terrain/localMesh.worker.ts', import.meta.url), {
-            type: 'module',
-          }),
-        {
-          type: 'init',
-          layers: [...activeLayers],
-          coverage: manifest.coverage,
-          provenance: manifest.provenance,
-        },
-        (req) => ensureWithDiff(req.latDeg, req.lonDegE),
-      ),
+    ensureLayersFor: async (latDeg, lonDegE) => { await ensureSnapshot(latDeg, lonDegE); },
+    verifyGeneratedDependency,
+    createMeshLoader: () => new WorkerTerrainMeshLoader(
+      () => new Worker(new URL('../../terrain/localMesh.worker.ts', import.meta.url), { type: 'module' }),
+      (request) => ensureSnapshot(request.latDeg, request.lonDegE),
+    ),
   };
 }

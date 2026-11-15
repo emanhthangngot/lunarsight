@@ -36,7 +36,8 @@ Timeline, observer height, Sun/Earth and camera changes never reload or rebuild 
 
 - Sun: depth-tested sprite at 0.533° (plus decorative glow), 500 km from the camera along the supplied direction. Earth: sphere at 1.90°, lit by the same Sun direction, so its phase is illustrative of the supplied directions only; its texture is procedural and **decorative** (not a map). Stars: seeded decorative points, not a catalogue.
 - Terrain hides the discs by depth. Hidden/unknown bodies (from props) also get an always-on-top dashed/dotted ring and a label "hidden below terrain horizon" / "visibility unknown" so occlusion by the rendered mesh is never the only cue.
-- Orbital mode draws direction lines from the site toward the Sun and Earth. Surface mode shows the heading compass (azimuth clockwise from north) with Sun/Earth ticks.
+- Camera modes are both local to the site's loaded footprint (no globe or global zoom). The App labels them **Site overview** (internal `cameraMode: 'orbital'`) and **Ground view** (`'surface'`). Site overview draws direction lines from the site toward the Sun and Earth; Ground view shows the heading compass (azimuth clockwise from north) with Sun/Earth ticks.
+- While the App is computing a different site, it passes that site's id with `sun`/`earth` = null. The viewer builds the new footprint under a labelled neutral light ("no Sun direction yet") instead of lighting it with the previous site's Sun.
 
 ## Known limitations
 

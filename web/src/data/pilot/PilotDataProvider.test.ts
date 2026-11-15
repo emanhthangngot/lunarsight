@@ -34,8 +34,8 @@ describe('PilotDataProvider real NASA asset contracts', () => {
     const site01 = sites.find((s) => s.id === 'site-01');
     const malapert = sites.find((s) => s.id === 'site-23');
     const dm2 = sites.find((s) => s.id === 'dm2');
-    expect(site04?.name).toContain('Connecting Ridge');
-    expect(site01?.name).toContain('de Gerlache Rim');
+    expect(site04?.name.toLowerCase()).toContain('shackleton rim');
+    expect(site01?.name.toLowerCase()).toContain('connecting ridge');
     expect(malapert?.name).toContain('Malapert Massif');
     expect(dm2?.name).toContain('Nobile Rim 2');
   });
@@ -100,14 +100,14 @@ describe('PilotDataProvider real NASA asset contracts', () => {
     const start = Date.parse('2027-01-01T00:00:00Z');
     const end = Date.parse('2027-03-15T00:00:00Z');
 
-    const s04 = await provider.getEphemeris(site04, start, start + 6 * 3600_000, 3600, 2.5);
+    const s04 = await provider.getEphemeris(site04, start, start + 6 * 3600_000, 3600, 1);
     expect(s04.provenance.kind).toBe('processed');
     expect(s04.sunAzDeg[0]).toBeCloseTo(59.1008, 1);
     expect(s04.sunElDeg[0]).toBeCloseTo(1.1243, 1);
     expect(s04.earthAzDeg[0]).toBeCloseTo(163.1606, 1);
     expect(s04.earthElDeg[0]).toBeCloseTo(-6.4541, 1);
 
-    const s23 = await provider.getEphemeris(malapert, end, end + 3600_000, 3600, 2.5);
+    const s23 = await provider.getEphemeris(malapert, end, end + 3600_000, 3600, 1);
     expect(s23.provenance.kind).toBe('processed');
     expect(s23.timesUtcMs).toHaveLength(2);
 
@@ -118,5 +118,60 @@ describe('PilotDataProvider real NASA asset contracts', () => {
     await expect(
       provider.getEphemeris({ id: 'custom:-89.5:0', latDeg: -89.5, lonDegE: 0 }, start, start + 3600_000, 3600),
     ).rejects.toThrow(/outside coverage/i);
+  });
+});
+
+describe('processed observer and missing-sample identity', () => {
+  afterEach(() => { vi.unstubAllGlobals(); });
+
+  it('rejects a catalog ID paired with another observer before serving either preset', async () => {
+    stubPilotPublicFetch();
+    const provider = new PilotDataProvider();
+    const site = (await provider.listSites()).find((entry) => entry.id === 'site-04')!;
+    const wrongObserver = { ...site, latDeg: 0, lonDegE: 0 };
+    const start = Date.parse('2027-01-01T00:00:00Z');
+    await expect(provider.getHorizonMask(wrongObserver, 1)).rejects.toThrow(/canonical observer/i);
+    await expect(provider.getEphemeris(wrongObserver, start, start + 3600_000, 3600, 1)).rejects.toThrow(/canonical observer/i);
+    // Longitude wrapping is the same observer, not a reason to reject a valid source.
+    const normalized = await provider.getEphemeris({ ...site, lonDegE: site.lonDegE - 360 }, start, start, 3600, 1);
+    expect(normalized.sunElDeg[0]).toBeCloseTo(1.1243, 1);
+  });
+
+  it('rejects unsupported static heights and discloses unrecorded historical altitude', async () => {
+    stubPilotPublicFetch();
+    const provider = new PilotDataProvider();
+    const site = (await provider.listSites()).find((entry) => entry.id === 'site-04')!;
+    const start = Date.parse('2027-01-01T00:00:00Z');
+    for (const height of [0, 0.25, 2.5, 10, 1000]) {
+      await expect(provider.getEphemeris(site, start, start, 3600, height)).rejects.toThrow(/recorded 1 m/i);
+    }
+    const recorded = await provider.getEphemeris(site, start, start, 3600, 1);
+    expect(recorded.observer).toMatchObject({ observerHeightM: 1, groundHeightM: null, ellipsoidAltitudeKm: null, datumStatus: 'conditional' });
+    expect(recorded.provenance.notes).toContain('Shackleton');
+  });
+
+  it('does not turn missing source angles into computed zero directions', async () => {
+    const provider = new PilotDataProvider();
+    const site = (await provider.listSites()).find((entry) => entry.id === 'site-04')!;
+    const start = Date.parse('2027-01-01T00:00:00Z');
+    vi.stubGlobal('fetch', async () => new Response(JSON.stringify({
+      siteId: site.id, frame: 'MOON_ME', startUtcMs: start, stepSeconds: 3600,
+      timesUtcMs: [start], sunAzDeg: [], sunElDeg: [1], earthAzDeg: [2], earthElDeg: [3],
+      provenance: { kind: 'processed', source: 'Synthetic incomplete fixture', version: 'test', generatedAt: '2027-01-01T00:00:00Z' },
+    })));
+    await expect(provider.getEphemeris(site, start, start, 3600, 1)).rejects.toThrow(/Missing\/nonfinite ephemeris samples/i);
+  });
+
+  it('does not present a retrospectively invented legacy query altitude', async () => {
+    const provider = new PilotDataProvider();
+    const site = (await provider.listSites()).find((entry) => entry.id === 'site-04')!;
+    const start = Date.parse('2027-01-01T00:00:00Z');
+    vi.stubGlobal('fetch', async () => new Response(JSON.stringify({
+      siteId: site.id, frame: 'MOON_ME', startUtcMs: start, stepSeconds: 3600,
+      timesUtcMs: [start], sunAzDeg: [0], sunElDeg: [1], earthAzDeg: [2], earthElDeg: [3],
+      observer: { latDeg: site.latDeg, lonDegE: site.lonDegE, observerHeightM: 1, groundHeightM: 9999, ellipsoidAltitudeKm: null, datumStatus: 'conditional', metadataOrigin: 'legacy-pipeline-height' },
+      provenance: { kind: 'processed', source: 'Synthetic invalid metadata fixture', version: 'test', generatedAt: '2027-01-01T00:00:00Z' },
+    })));
+    await expect(provider.getEphemeris(site, start, start, 3600, 1)).rejects.toThrow(/must remain null/i);
   });
 });

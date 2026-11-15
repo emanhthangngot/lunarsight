@@ -92,7 +92,7 @@ describe('ApiDataProvider backend integration contract', () => {
     );
   });
 
-  it('runs Stage 2 analysis jobs (202 polling -> result) and persists scenarios', async () => {
+  it('runs analysis jobs through an accepted receipt and terminal result', async () => {
     const prov = { kind: 'processed', source: 'PGDA', version: 'pilot-v2', generatedAt: '2026-11-14T00:00:00Z' } as const;
     const sampleInputs = {
       site: { id: 'site-04', name: 'Site 04', category: 'artemis-candidate' as const, latDeg: -89.785092, lonDegE: 204.018283, nameVerified: true, provenance: prov },
@@ -144,19 +144,6 @@ describe('ApiDataProvider backend integration contract', () => {
       if (url.endsWith('/api/analysis-results/res_abc123')) {
         return new Response(JSON.stringify(serverResult), { status: 200 });
       }
-      if (url.endsWith('/api/scenarios') && init?.method === 'POST') {
-        return new Response(JSON.stringify({
-          id: 'scn_1', title: 'Saved Test', notes: null, inputs: sampleInputs, resultId: 'res_abc123', metrics: serverResult.analysis.metrics, createdAt: '2026-11-14T00:00:00Z',
-        }), { status: 201 });
-      }
-      if (url.endsWith('/api/scenarios') && (!init?.method || init.method === 'GET')) {
-        return new Response(JSON.stringify([{
-          id: 'scn_1', title: 'Saved Test', notes: null, inputs: sampleInputs, resultId: 'res_abc123', metrics: serverResult.analysis.metrics, createdAt: '2026-11-14T00:00:00Z',
-        }]), { status: 200 });
-      }
-      if (url.endsWith('/api/scenarios/scn_1') && init?.method === 'DELETE') {
-        return new Response(null, { status: 204 });
-      }
       return new Response('Not Found', { status: 404 });
     });
 
@@ -166,38 +153,5 @@ describe('ApiDataProvider backend integration contract', () => {
     expect(result.serverResultId).toBe('res_abc123');
     expect(pollCount).toBe(2);
 
-    const saved = await provider.saveScenario('Saved Test', sampleInputs, result.serverResultId);
-    expect(saved.id).toBe('scn_1');
-    const list = await provider.listSavedScenarios();
-    expect(list).toHaveLength(1);
-    await expect(provider.deleteSavedScenario('scn_1')).resolves.toBeUndefined();
-  });
-
-  it('requests Stage 3 AI Advisor grounded in immutable resultId', async () => {
-    vi.stubGlobal('fetch', async (input: string | URL | Request, init?: RequestInit) => {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
-      if (url.endsWith('/api/advisor-responses') && init?.method === 'POST') {
-        return new Response(
-          JSON.stringify({
-            resultId: 'res_abc123',
-            mode: 'deterministic',
-            summary: 'Grounded summary for res_abc123.',
-            recommendations: ['Verify 0.25 m mast height.'],
-            limitations: ['Geometric visibility only.'],
-            citations: [{ label: 'Sunlit', value: '100.0%', source: 'JPL Horizons' }],
-            providerUnavailable: false,
-            providerError: null,
-          }),
-          { status: 200 },
-        );
-      }
-      return new Response('Not Found', { status: 404 });
-    });
-
-    const provider = new ApiDataProvider('http://127.0.0.1:8000');
-    const advice = await provider.askAdvisor('res_abc123', 'Summarize risks', 'en');
-    expect(advice.resultId).toBe('res_abc123');
-    expect(advice.mode).toBe('deterministic');
-    expect(advice.citations).toHaveLength(1);
   });
 });
