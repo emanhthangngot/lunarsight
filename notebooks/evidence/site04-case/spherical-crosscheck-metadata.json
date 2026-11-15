@@ -1,0 +1,10 @@
+{
+  "scope": "same 80m samples, same 1\u201325km projected distance mask and true-azimuth bins; not external reference or terrain validation",
+  "source_window_sha256": "ff5fcaf5bcbfb3d497da46587545ae3a96351f7ad7a6bcb8373eae30aa01343c",
+  "output_csv_sha256": "289962c38bef8f8eef24863c68509a2beae6fd2ba073928e319226d261101df3",
+  "median_abs_deg": 0.0012049228147991142,
+  "p95_abs_deg": 0.004549265080974552,
+  "max_abs_deg": 0.00856804344661466,
+  "bins": 360,
+  "observer_vertical_datum": "conditional, same sphere 1737400 m"
+}
