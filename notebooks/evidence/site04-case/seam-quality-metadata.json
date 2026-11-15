@@ -1,0 +1,331 @@
+{
+  "status": "bounded diagnostic; same footprint, not equal effective resolution; no uncertainty propagation",
+  "pixels": 111,
+  "sources": [
+    {
+      "layer": "5m_count",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_ldec.tif",
+      "headers": {
+        "Content-Length": "40980740",
+        "ETag": "W/\"2715104-17285c87b40\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:40:08 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "source_crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "source_transform": [
+        5.0,
+        0.0,
+        -9000.0,
+        0.0,
+        -5.0,
+        1000.0
+      ],
+      "window": [
+        1069,
+        1190,
+        401,
+        401
+      ],
+      "scale": 1.0,
+      "offset": 0.0,
+      "nodata": "nan",
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          15204352,
+          15728639
+        ],
+        [
+          15728640,
+          16252927
+        ],
+        [
+          16252928,
+          16777215
+        ],
+        [
+          16777216,
+          17301503
+        ],
+        [
+          17301504,
+          17825791
+        ],
+        [
+          17825792,
+          18350079
+        ],
+        [
+          18350080,
+          18874367
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ]
+      ],
+      "http_body_bytes": 5767168,
+      "window_sha256": "e6d8abbd3b0d2daf62c463cd00e9d460399272b66443312ed75fce4d985c611c"
+    },
+    {
+      "layer": "5m_zrms",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_toterr.tif",
+      "headers": {
+        "Content-Length": "40980808",
+        "ETag": "W/\"2715148-17285c89698\"",
+        "Last-Modified": "Fri, 05 Jun 2020 18:40:15 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "source_crs_wkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "source_transform": [
+        5.0,
+        0.0,
+        -9000.0,
+        0.0,
+        -5.0,
+        1000.0
+      ],
+      "window": [
+        1069,
+        1190,
+        401,
+        401
+      ],
+      "scale": 1.0,
+      "offset": 0.0,
+      "nodata": "nan",
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          15204352,
+          15728639
+        ],
+        [
+          15728640,
+          16252927
+        ],
+        [
+          16252928,
+          16777215
+        ],
+        [
+          16777216,
+          17301503
+        ],
+        [
+          17301504,
+          17825791
+        ],
+        [
+          17825792,
+          18350079
+        ],
+        [
+          18350080,
+          18874367
+        ],
+        [
+          18874368,
+          19398655
+        ],
+        [
+          19398656,
+          19922943
+        ],
+        [
+          19922944,
+          20447231
+        ]
+      ],
+      "http_body_bytes": 5767168,
+      "window_sha256": "e1e75e9e4c8291a28f4962500e57ec610a47e34be9abfae1dacf3d9395090e71"
+    },
+    {
+      "layer": "80m_count",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEC_80S_80MPP_ADJ.TIF",
+      "headers": {
+        "Content-Length": "115657642",
+        "ETag": "W/\"6e4cbaa-188981228f8\"",
+        "Last-Modified": "Wed, 07 Jun 2023 22:55:07 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "source_crs_wkt": "PROJCS[\"Moon (2015) - Sphere / Ocentric / South Polar\",GEOGCS[\"Moon (2015) - Sphere / Ocentric\",DATUM[\"Moon (2015) - Sphere\",SPHEROID[\"Moon (2015) - Sphere\",1737400,0,AUTHORITY[\"IAU\",\"30100\"]],AUTHORITY[\"IAU\",\"30100\"]],PRIMEM[\"Reference Meridian\",0,AUTHORITY[\"IAU\",\"30100\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"IAU\",\"30100\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH],AUTHORITY[\"IAU\",\"30135\"]]",
+      "source_transform": [
+        80.0,
+        0.0,
+        -304000.0,
+        0.0,
+        -80.0,
+        304000.0
+      ],
+      "window": [
+        3754,
+        3861,
+        26,
+        27
+      ],
+      "scale": 1.0,
+      "offset": 0.0,
+      "nodata": "nan",
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          88080384,
+          88604671
+        ]
+      ],
+      "http_body_bytes": 1048576,
+      "window_sha256": "54ef97e749c4ef729c709d4584322bddf19540153136181c91c59284257ead7c"
+    },
+    {
+      "layer": "80m_effres",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_80MPP_ADJ_EFFRES.TIF",
+      "headers": {
+        "Content-Length": "250228467",
+        "ETag": "W/\"eea2ef3-1887ec815b0\"",
+        "Last-Modified": "Sat, 03 Jun 2023 01:03:42 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "source_crs_wkt": "PROJCS[\"Moon (2015) - Sphere / Ocentric / South Polar\",GEOGCS[\"Moon (2015) - Sphere / Ocentric\",DATUM[\"Moon (2015) - Sphere\",SPHEROID[\"Moon (2015) - Sphere\",1737400,0,AUTHORITY[\"IAU\",\"30100\"]],AUTHORITY[\"IAU\",\"30100\"]],PRIMEM[\"Reference Meridian\",0,AUTHORITY[\"IAU\",\"30100\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"IAU\",\"30100\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH],AUTHORITY[\"IAU\",\"30135\"]]",
+      "source_transform": [
+        80.0,
+        0.0,
+        -304000.0,
+        0.0,
+        -80.0,
+        304000.0
+      ],
+      "window": [
+        3754,
+        3861,
+        26,
+        27
+      ],
+      "scale": 1.0,
+      "offset": 0.0,
+      "nodata": "nan",
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          156237824,
+          156762111
+        ],
+        [
+          156762112,
+          157286399
+        ]
+      ],
+      "http_body_bytes": 1572864,
+      "window_sha256": "91817e6ac061c4b3b5a9806f5a00ad7ecf938684c21122fe13862b13433cd8c9"
+    },
+    {
+      "layer": "80m_zerr",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_80MPP_ADJ_ERR.TIF",
+      "headers": {
+        "Content-Length": "254808965",
+        "ETag": "W/\"f301385-1887ebfc0e0\"",
+        "Last-Modified": "Sat, 03 Jun 2023 00:54:36 GMT",
+        "Content-Type": "image/tiff"
+      },
+      "source_crs_wkt": "PROJCS[\"Moon (2015) - Sphere / Ocentric / South Polar\",GEOGCS[\"Moon (2015) - Sphere / Ocentric\",DATUM[\"Moon (2015) - Sphere\",SPHEROID[\"Moon (2015) - Sphere\",1737400,0,AUTHORITY[\"IAU\",\"30100\"]],AUTHORITY[\"IAU\",\"30100\"]],PRIMEM[\"Reference Meridian\",0,AUTHORITY[\"IAU\",\"30100\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"IAU\",\"30100\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH],AUTHORITY[\"IAU\",\"30135\"]]",
+      "source_transform": [
+        80.0,
+        0.0,
+        -304000.0,
+        0.0,
+        -80.0,
+        304000.0
+      ],
+      "window": [
+        3754,
+        3861,
+        26,
+        27
+      ],
+      "scale": 1.0,
+      "offset": 0.0,
+      "nodata": "nan",
+      "ranges": [
+        [
+          0,
+          524287
+        ],
+        [
+          158859264,
+          159383551
+        ],
+        [
+          159383552,
+          159907839
+        ],
+        [
+          159907840,
+          160432127
+        ]
+      ],
+      "http_body_bytes": 2097152,
+      "window_sha256": "f91db9eda319e134791215726630ab33aa659ff102e4824ebc4629de4e0b0d90"
+    }
+  ],
+  "output_sha256": "5755fc3a99159723896cb66938f33c59802ce5b6e1bf68923c8cf863b804161b",
+  "zero_80m_count_cells": 0,
+  "null_by_field": {
+    "x80_m": 0,
+    "y80_m": 0,
+    "z5_minus_z80_area_mean_m": 0,
+    "area_5m_count_valid_m2": 0,
+    "area_5m_positive_fraction": 0,
+    "area_5m_zrms_valid_m2": 0,
+    "area_mean_5m_zrms_m": 0,
+    "80m_count": 0,
+    "80m_effres": 0,
+    "80m_zerr": 0
+  },
+  "all_5m_count_full_area": 111,
+  "all_5m_zrms_full_area": 111,
+  "area_5m_positive_fraction": {
+    "min": 0.015625,
+    "median": 0.078125,
+    "max": 0.1484375
+  },
+  "area_mean_5m_zrms_m": {
+    "min": 0.26252912866766565,
+    "median": 0.41383233800297603,
+    "max": 0.878236964577809
+  },
+  "80m_count": {
+    "min": 6.0,
+    "median": 21.0,
+    "max": 40.0
+  },
+  "80m_effres": {
+    "min": 11.379232406616211,
+    "median": 16.770538330078125,
+    "max": 40.486854553222656
+  },
+  "80m_zerr": {
+    "min": 0.04931832104921341,
+    "median": 0.08281207084655762,
+    "max": 0.36385634541511536
+  }
+}

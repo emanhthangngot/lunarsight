@@ -95,7 +95,7 @@ Use the existing task/PR/handoff rather than adding a reporting framework. Recor
 - Passed, failed, blocked, skipped, and not-run evidence separately; reasons for relevant omissions and failure-sensitivity limitations.
 - Remaining scientific/product uncertainty, changed protection, and any unresolved decision.
 
-Stop expanding checks once affected behavior and mandatory gates have adequate evidence, unless a new change, failure, or risk warrants more. In the present phase report **documentation verified; application/scientific tests not implemented**, never a fabricated green test run.
+Stop expanding checks once affected behavior and mandatory gates have adequate evidence, unless a new change, failure or risk warrants more. Report documentation-only checks separately from actually executed application/scientific checks. Implemented tests are not passing evidence until run; explicitly deferred or unrun gates must never be described as green.
 
 ## Basis
 

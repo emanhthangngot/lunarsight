@@ -2,9 +2,9 @@
 
 ## Khám phá địa điểm hạ cánh và lập kế hoạch nhiệm vụ Mặt Trăng
 
-**Trạng thái: tài liệu cùng bản prototype web 3D dùng dữ liệu giả (mock) đang được xây dựng trên nhánh `feat/3d-mock-viewer`, mã nguồn trong `web/`.** Ngày 13/11/2026 người dùng cho phép xây ứng dụng web 3D bằng dữ liệu mock có gắn nhãn rõ ràng trước, sau đó mới kết nối dữ liệu thật đã xử lý ([ADR 0002](docs/decisions/0002-mock-first-3d-web.md)). Nhóm chưa chốt bộ dữ liệu, dung lượng, độ phân giải hoặc phương án triển khai; chưa tải dữ liệu, chưa có script xử lý, CI hay triển khai, và prototype không hiển thị dữ liệu thật.
+**Trạng thái: mã nguồn đã tích hợp các sửa lỗi pilot/backend được review và giao diện Three.js tập trung so sánh Site01/Site04; kiểm chứng phần mềm trong phạm vi task42 đã PASS.** Dữ liệu pilot đã xử lý được giữ nguyên và kết nối qua static provider hoặc FastAPI cục bộ. [Trạng thái dự án](docs/project-state.md) và [handoff nghiệm thu](docs/handoffs/current.md#final-bounded-acceptance-round42) phân biệt kết quả đã quan sát, raw log bị mất và bằng chứng được tái sử dụng; đây không phải xác nhận độ chính xác khoa học.
 
-Ngày 14/11/2026 người dùng chấp nhận chuyển từ Cesium toàn cầu sang **địa hình cục bộ bằng Three.js**; việc chuyển đổi đang thực hiện và **chưa được kiểm chứng khi chạy**. Giữ nguyên giao diện hiện đại và mô hình mock 1.1.0; kết quả kiểm thử Cesium trước đây không chứng nhận phiên bản Three.js.
+Three.js địa hình cục bộ thay Cesium toàn cầu; giao diện hiện đại và mô hình mock 1.1.0 được giữ lại. Vercel vẫn phục vụ **snapshot mock cũ**, không phải mã nguồn pilot/backend vừa được nghiệm thu. Push/merge Git không tự triển khai lại. Phạm vi sản phẩm rộng hơn, datum/frame, hội tụ horizon và hosting vẫn cần quyết định riêng; không tự tải raster hoặc tái sinh dữ liệu khoa học.
 
 Tên **LunarSight** giữ sự nhất quán với proposal: Lunar là Mặt Trăng; Sight gợi việc quan sát và hiểu điều kiện tại một địa điểm.
 
@@ -27,7 +27,7 @@ Xem toàn bộ trong [mục lục tài liệu](docs/README.md).
 - Các phương án 0–90°S, 60–90°S và 80–90°S là lựa chọn để nhóm cân nhắc.
 - Khoảng **56,2 GB** chỉ là một kịch bản dữ liệu minh họa chưa được nhóm thông qua.
 - Các nguồn NASA/PDS được ghi là ứng viên; việc xác minh nguồn không đồng nghĩa nhóm đã chọn hoặc đã tải nguồn đó cho repo.
-- Kiến trúc hệ thống, API dịch vụ, cơ sở dữ liệu, hosting và AI provider còn là đề xuất. Stack prototype đã được chấp nhận: Vite + React + TypeScript + Three.js cục bộ + pnpm + Vitest (ADR 0002).
+- Stack Vite + React + TypeScript + Three.js cục bộ + pnpm + Vitest và backend FastAPI cục bộ đã có triển khai; kiến trúc rộng hơn, hosted backend, storage/provider và ngân sách vẫn là quyết định mở. Không có CI.
 - Những quan sát và số liệu demo trong proposal gốc không phải kết quả đã triển khai trong repo.
 
 ## Bắt đầu làm việc
@@ -39,4 +39,4 @@ cd lunarsight
 
 Mở thư mục bằng IDE hoặc agent đang dùng. Yêu cầu agent đọc `AGENTS.md`, `docs/project-state.md` và mục liên quan trong `docs/README.md`. Có [prompt khởi động](docs/agent-workflow.md#starter-prompt) để dùng trực tiếp.
 
-Lệnh chạy prototype (nếu có) nằm trong `web/` (pnpm); chỉ dùng những gì `web/package.json` cung cấp. Chưa có lệnh tải dataset, CI hay triển khai. Khi có yêu cầu tiếp theo (ví dụ kết nối dữ liệu thật), agent sẽ cập nhật trạng thái và thực hiện đúng phạm vi đó; không tự biến các lựa chọn chưa chốt thành quyết định của nhóm.
+Lệnh ứng dụng nằm trong [hướng dẫn web](web/README.md#run-locally) và [backend](backend/README.md#run-locally). Việc tiếp theo là người dùng review trải nghiệm hai địa điểm và chốt phạm vi sản phẩm/hosting/khoa học, không chạy lại các gate đã hoàn tất chỉ để dựng lại log bị mất. Boss giữ quyền Git/merge/triển khai; không biến các lựa chọn chưa chốt thành quyết định của nhóm.

@@ -1,0 +1,16 @@
+{
+  "annulus_m": [
+    800,
+    930
+  ],
+  "sampling": "area-weighted 5m cells within 80m footprint on projected grids; no kernel or effective-resolution matching",
+  "eligible_80m_cells": 111,
+  "complete_pairs": 111,
+  "median_difference_m": -0.2583789825439453,
+  "mean_difference_m": -0.20946348465240752,
+  "p95_abs_difference_m": 0.735114574432373,
+  "max_abs_difference_m": 1.7393231391906738,
+  "near_window_sha256": "a02fd72960ecc269a8e65be4cdce9f7d29de222094da292d7bebe8b7f4cbfed2",
+  "far_window_sha256": "ff5fcaf5bcbfb3d497da46587545ae3a96351f7ad7a6bcb8373eae30aa01343c",
+  "pairs_sha256": "e3f403969728be1a0095b0a9f99131b7987b6081dc1cb445fbc3dc8a4d09dc9e"
+}

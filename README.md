@@ -4,7 +4,7 @@
 
 LunarSight is a proposed application for exploring lunar landing locations and understanding how terrain, sunlight, Earth visibility, and mission assumptions affect a preliminary assessment.
 
-**Repository stage: documentation plus a mock-data 3D web prototype in progress (branch `feat/3d-mock-viewer`, app in `web/`).** On 13 November 2026 the user authorized building the 3D app with clearly labelled mock data first and connecting processed real data later ([ADR 0002](docs/decisions/0002-mock-first-3d-web.md)). The team is still choosing the dataset scope, quantities, resolution, hosting, and implementation priorities. Dataset acquisition, processing scripts, CI, and deployed infrastructure are not part of this step, and the prototype presents no real data.
+**Repository stage: reviewed pilot-data/backend repairs and focused two-site Three.js UX, with bounded final acceptance PASS.** The [mock-first decision](docs/decisions/0002-mock-first-3d-web.md) led to retained source-derived pilot assets, a static provider and a local FastAPI path. Broader product/data/hosting decisions remain open; software acceptance is not scientific validation. [Current state](docs/project-state.md) and [the handoff](docs/handoffs/current.md#final-bounded-acceptance-round42) distinguish observed results, lost raw logs and reused evidence. The public Vercel demo remains the older static mock snapshot, not this source.
 
 [Tiếng Việt](README.vi.md) · [Documentation index](docs/README.md) · [Current project state](docs/project-state.md) · [Open decisions](docs/open-decisions.md)
 
@@ -28,12 +28,12 @@ The [original proposal transcription](docs/reference/proposal-v2.md) is a histor
 | Item | Current status |
 | --- | --- |
 | Project name and repository | LunarSight; `emanhthangngot/lunarsight`. |
-| Current work scope | Documentation, agent context, system design, and an in-progress mock-data 3D viewer prototype (ADR 0002). |
-| Product features | Proposal-derived requirements awaiting prioritization. |
-| Geography, products, data volume, and resolution | Candidate options; no team selection recorded. |
-| Backend, storage, hosting, and AI provider | Open decisions. Vite, React, TypeScript, **local Three.js**, pnpm and Vitest are accepted for the mock prototype only; the 14 November renderer cutover is in progress and unverified. |
-| Architecture and API contracts | Broader system/service designs remain proposals; the mock client provider/mesh contract exists in `web/`. |
-| Real-data connection, acquisition, or deployment | Future work after a subsequent explicit instruction. |
+| Current work scope | Reviewed PR13 repairs and focused Site01/Site04 A/B UX accepted within the exercised software scope; GitHub merge freshness remains owner-controlled. |
+| Product features | The focused comparison is implemented; broader proposal-derived requirements remain subject to prioritization. |
+| Geography, products, data volume, and resolution | [Revisable Site01/Site04 working agreement](docs/decisions/0003-pilot-working-agreement.md) accepted; final acquisition/products/resolution remain open. |
+| Backend, storage, hosting, and AI provider | Conditional local FastAPI source exists. Hosted backend, broader storage/provider choices and paid services remain open; no CI is configured. |
+| Architecture and API contracts | Executable client/provider/mesh and local backend interfaces exist; broader system designs remain proposals. |
+| Data connection and deployment | Retained processed assets are connected and locally accepted; fresh acquisition/regeneration or hosting needs explicit authority. Git push/merge does not redeploy Vercel. |
 
 The roughly 56.2 GB figure previously researched is retained only as **one illustrative, unapproved acquisition scenario**. It is not a project requirement, an agreed download budget, or a statement of data acquired for this repository.
 
@@ -46,14 +46,15 @@ git clone https://github.com/emanhthangngot/lunarsight.git
 cd lunarsight
 ```
 
-Prototype commands are defined in `web/` (pnpm); use only what `web/package.json` provides. No data download, CI, or deployment command is defined. The [agent workflow](docs/agent-workflow.md) explains how to keep durable project state, prepare a bounded task, hand work over, and report evidence without inventing completion.
+Use existing commands from the [web guide](web/README.md#run-locally) and [backend guide](backend/README.md#run-locally). Existing pipeline source is not permission for fresh raster acquisition or regeneration. There is no CI; deployment remains an explicit owner action. The [agent workflow](docs/agent-workflow.md) explains bounded tasks, handoffs and evidence.
 
 ## Repository organization
 
 | Location | Purpose |
 | --- | --- |
 | `docs/` | Product, requirements, system design, source proposals, and verification plans. |
-| `web/` | Mock-data 3D viewer prototype (in progress; not verified here). |
+| `web/` | Local Three.js workspace and static/API providers; [bounded acceptance](docs/handoffs/current.md#final-bounded-acceptance-round42), not scientific certification. |
+| `backend/` | [Conditional local FastAPI source](backend/README.md); no hosted backend implied. |
 | `docs/decisions/` | Decisions with explicit status, rationale, and authority. |
 | `docs/templates/` | Task briefs and handoff templates. |
 | `docs/handoffs/` | Concise current handoff, not a dump of chat transcripts. |
@@ -64,7 +65,7 @@ Prototype commands are defined in `web/` (pnpm); use only what `web/package.json
 
 ## Review and next step
 
-Review the [open decision register](docs/open-decisions.md), starting with the target demo, initial geographic area, and minimum evidence needed for its features. Record actual decisions through an [ADR](docs/decisions/README.md); a source link or agent recommendation alone is not approval.
+Review the accepted two-site workflow and agree the next explicit product, hosting and science decisions through the [open decision register](docs/open-decisions.md). Completed acceptance is not a task to replay merely to replace lost logs. Record decisions through an [ADR](docs/decisions/README.md); a source link or agent recommendation alone is not approval.
 
 The [roadmap](docs/roadmap.md) describes later implementation stages. Their existence does not mark them as authorized, started, or complete.
 

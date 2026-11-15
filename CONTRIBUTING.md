@@ -1,6 +1,6 @@
 # Contributing to LunarSight
 
-Current phase: documentation plus a mock-data 3D web prototype in `web/` ([ADR 0002](docs/decisions/0002-mock-first-3d-web.md)). Read [project state](docs/project-state.md) before starting; [AGENTS.md](AGENTS.md) also applies when using an agent.
+Current source integrates reviewed pilot/backend repairs and focused two-site Three.js UX with bounded acceptance PASS. Read [project state](docs/project-state.md) and [the qualified acceptance handoff](docs/handoffs/current.md#final-bounded-acceptance-round42) before starting; [AGENTS.md](AGENTS.md) applies to agents. The older public mock deployment is not this accepted source.
 
 ## A useful change
 
@@ -10,7 +10,7 @@ Describe unapproved data, technology, costs, and priorities as proposals. An acc
 
 ## Working together
 
-Use a focused branch such as `docs/scenario-contract` or `research/terrain-options` for collaborative work. Keep unrelated changes out of the same pull request. The requested owner-directed repository setup can be committed directly; ongoing team review conventions can be refined together.
+Use a focused branch such as `docs/scenario-contract` or `research/terrain-options` under the owner's instructions; keep unrelated work out of the pull request. Boss owns Git/PR freshness, merges, pushes and account/deployment actions in the current workflow; contributors edit assigned files and report evidence.
 
 Assign separate file ownership when agents work in parallel, then integrate and review cross-document consistency. Preserve other contributors' work. Explain material corrections rather than silently changing the original proposal or reported evidence.
 
@@ -20,11 +20,11 @@ Assign separate file ownership when agents work in parallel, then integrate and 
 - Current repository capabilities are separated from prototype observations and future intentions.
 - Dataset sizes and source selections remain proposals until decided.
 - Diagrams, units, terms, and statuses agree across related documents.
-- No data downloads or processing scripts, generated datasets, deployment configuration, CI, credentials, or private transcripts are introduced; mock values stay labelled mock.
+- Acceptance grants no fresh raster download, regenerated numeric products, hosted backend, CI/deployment changes or credential material. Preserve existing assets/source histories; mock stays labelled and processed science conditional.
 - The change includes evidence of the checks actually performed and an updated handoff when needed.
 
-Application checks live in `web/` (pnpm) and are defined by its `package.json`; documentation changes need link and status checks. See the [verification plan](docs/verification-plan.md).
+Application commands are owned by the [web guide](web/README.md#run-locally) and [backend guide](backend/README.md#run-locally). Documentation-only changes need narrow link/status checks, not application reruns. Reuse accepted results only for unchanged inputs and retain lost-log/reused-evidence qualifications; do not replay completed gates solely to reconstruct missing stdout. See [testing policy](docs/testing-policy.md) and [verification plan](docs/verification-plan.md).
 
-## Test changes in a later implementation phase
+## Test changes
 
 Follow the [shared testing policy](docs/testing-policy.md). A contribution explains the protected behavior, existing evidence and remaining gap before adding tests; zero additions is valid when sufficient protection already exists. Audit requests report findings only. Test maintenance must preserve accepted contracts and explain any removed protection. Measure optimization on comparable runs and keep unrun/blocked/skipped evidence distinct from passes.

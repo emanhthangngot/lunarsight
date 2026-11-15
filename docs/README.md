@@ -1,6 +1,6 @@
 # Documentation index
 
-Read [project state](project-state.md) first. Documents labeled **proposed** describe options or intended behavior; they do not establish team approval or implementation. The repository holds documentation plus a mock-data 3D viewer prototype in progress under `web/` ([ADR 0002](decisions/0002-mock-first-3d-web.md)).
+Read [project state](project-state.md) first. Documents labelled **proposed** do not establish approval or implementation. The source now integrates reviewed pilot/backend repairs and focused local Three.js comparison UX with [bounded final acceptance](handoffs/current.md#final-bounded-acceptance-round42); its lost-log/reused-evidence qualifications and the older public mock deployment remain distinct from scientific validation.
 
 ## Product and requirements
 
@@ -31,9 +31,13 @@ Read [project state](project-state.md) first. Documents labeled **proposed** des
 | [Candidate-site visual review notebook](../notebooks/candidate-site-visual-review.ipynb) | Rendered overview of reference centers, available ROI outlines, five-layer file sizes, and the original four-site p95 scale comparison. |
 | [Terrain pre-decision notebook](../notebooks/terrain-predecision-review.ipynb) | Bounded real DEM previews, synthetic hillshade, slope proxy, mask and source evidence. |
 | [Site04 near/far diagnostic](site04-near-far-review.md) | Conditional 5 m / 80 m bin-wise fusion and overlap evidence, with unresolved datum and convergence limits. |
+| [Site04 seam and 50 km review](site04-seam-convergence-review.md) | Area-weighted overlap, conditional convergence and spherical cross-check evidence. |
+| [Site04 seam quality](site04-seam-quality-review.md) | Effective-resolution, observation-count and uncertainty layers in the overlap. |
+| [Site04 100 km review](site04-100km-review.md) | Bounded 100 km far-field sensitivity and 50 km nesting checks. |
+| [DE pipeline roadmap](de-pipeline-roadmap.md) | Milestones to a reproducible pilot input pipeline and separate science-validation work. |
 | [Team decision worksheet](predecision-review.md) | Comparison table, unresolved evidence, meeting agenda, decision fields and DE handoff responsibilities. |
 | [Data quality proposal](data-quality.md) | Scientific interpretation, provenance, missing data, and acceptance evidence. |
-| [Data boundary](../data/README.md) | Explains why this repository currently contains no acquired data. |
+| [Data boundary](../data/README.md) | Acquisition/preview boundary; retained pilot assets do not authorize fresh downloads. |
 
 ## Team and agent workflow
 
