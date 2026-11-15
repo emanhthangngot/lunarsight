@@ -20,6 +20,10 @@ See [pilot ROI/datum review](../pilot-roi-datum-review.md). Site01 ROI is fully 
 
 See [Site04 ROI coverage](../site04-roi-coverage.md). The five PGDA 78 layers have 526/526 finite pixels under the ROI pixel-center mask; 468 LDEC pixels are zero. Projection parameters match but semantic CRS equality is false. Vertical datum and observer choice remain open. A point is proposed only for technical review, not landing selection.
 
+## Site04 observer and datum audit
+
+See [observer/datum audit](../site04-observer-datum-audit.md). The inside-ROI point is only a provisional technical observer; LOLA LDEM_64 documentation supports a 1737.4 km reference sphere but is not direct vertical-datum metadata for PGDA 78. At that audit stage, Horizons and horizon reproduction had not been run for this point because datum confirmation was missing. The later conditional diagnostics below do not settle that datum.
+
 ## Site04 conditional observer diagnostic
 
 [Diagnostic report](../site04-observer-diagnostic.md) records a provisional ROI-pixel observer and explicit 1737.4 km sphere assumption. Horizons returned 745 hourly rows per target including both endpoints (744 in the pilot closed-open interval). An 80 m 1–25 km far-field-only horizon was reproduced for nested radii; all cells valid and maxima nondecreasing, but 82/360 maxima fall in the outer 10%. It omits the near 1 km, uses grid north, and is not mission visibility. Direct PGDA 78 vertical datum and ROI frame identity are not independently settled; config remains unchanged. Next: independently validate datum/method, integrate 5 m near-field and test horizon convergence before any derived visibility.
