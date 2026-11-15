@@ -11,6 +11,8 @@ import numpy as np
 
 from ..geo import south_polar_forward, validate_coordinates
 from ..models import CoverageBounds, DemLayerMeta, DemManifest, ElevationResponse, Provenance
+from .assets import ScienceAssets
+from .resources import CapacityError
 
 
 @dataclass(frozen=True)
@@ -101,8 +103,8 @@ def sample_layer_bilinear_array(
 class TerrainService:
     """Serves PGDA DEM mosaic metadata, lazy-loaded layer binaries, elevation, and cropped patches."""
 
-    def __init__(self, pilot_public_dir: Path) -> None:
-        self._public_dir = pilot_public_dir
+    def __init__(self, pilot_public_dir: Path, assets: ScienceAssets | None = None) -> None:
+        self.assets = assets or ScienceAssets(pilot_public_dir)
         self._lock = threading.Lock()
         self._manifest: DemManifest | None = None
         self._metas_by_id: dict[str, DemLayerMeta] = {}
@@ -113,9 +115,16 @@ class TerrainService:
             return self._manifest
         with self._lock:
             if self._manifest is None:
-                manifest_path = self._public_dir / "terrain_manifest.json"
-                raw_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                raw_manifest = json.loads(self.assets.bytes["terrain_manifest.json"])
                 manifest = DemManifest.model_validate(raw_manifest)
+                qualified_layers = []
+                for meta in manifest.layers:
+                    filename = Path(meta.url).name
+                    actual = self.assets.content_hashes[filename]
+                    if meta.sha256 is not None and meta.sha256.lower() != actual:
+                        raise ValueError(f"DEM layer {meta.id} checksum contradicts startup bytes")
+                    qualified_layers.append(meta.model_copy(update={"sha256": actual}))
+                manifest = manifest.model_copy(update={"layers": qualified_layers})
                 self._metas_by_id = {meta.id: meta for meta in manifest.layers}
                 self._manifest = manifest
             return self._manifest
@@ -133,8 +142,7 @@ class TerrainService:
             if cached is not None:
                 return cached
             filename = Path(meta.url).name
-            bin_path = self._public_dir / filename
-            raw_bytes = bin_path.read_bytes()
+            raw_bytes = self.assets.bytes[filename]
             arr = np.frombuffer(raw_bytes, dtype=np.float32)
             expected = meta.rows * meta.cols
             if arr.size != expected:
@@ -175,7 +183,7 @@ class TerrainService:
         manifest = self._ensure_manifest()
         prefix = layer_url_prefix.rstrip("/")
         rewritten_layers = [
-            layer.model_copy(update={"url": f"{prefix}/{layer.id}.bin"})
+            layer.model_copy(update={"url": f"{prefix}/{layer.id}.bin?dataset={self.assets.fingerprint}"})
             for layer in manifest.layers
         ]
         return manifest.model_copy(update={"layers": rewritten_layers})
@@ -268,6 +276,8 @@ class TerrainService:
         r1 = min(meta.rows, int(math.ceil((meta.yMaxM - (y_f - radius_m)) / meta.spacingM)) + 1)
         if c1 - c0 < 2 or r1 - r0 < 2:
             return None
+        if (c1 - c0) * (r1 - r0) > 1_048_576:
+            raise CapacityError("DEM patch exceeds 1,048,576 cells")
 
         sub = np.ascontiguousarray(selected.grid[r0:r1, c0:c1], dtype=np.float32)
         finite_vals = sub[np.isfinite(sub)]

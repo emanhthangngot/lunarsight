@@ -13,10 +13,16 @@ from ..config import HORIZON_MAX_RANGE_M, MOON_RADIUS_M
 from ..geo import DEG_TO_RAD, RAD_TO_DEG, normalize_longitude, validate_coordinates
 from ..models import HorizonMask, Provenance
 from .terrain import TerrainService
+from .assets import HORIZON_METHOD, ScienceAssets
+from .resources import JsonCache, checkpoint
 
 
 def _format_height_key(height_m: float) -> str:
     return str(int(height_m)) if float(height_m).is_integer() else str(height_m)
+
+
+def _finite_number(value: object) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
 class HorizonService:
@@ -28,47 +34,80 @@ class HorizonService:
         cache_dir: Path,
         terrain: TerrainService,
         pilot_public_dir: Path | None = None,
+        assets: ScienceAssets | None = None,
     ) -> None:
-        self._asset_dirs = [d for d in (pilot_public_dir, pilot_src_dir) if d is not None]
-        self._cache_dir = cache_dir / "horizons"
+        self._assets = assets or ScienceAssets(pilot_public_dir or pilot_src_dir, pilot_src_dir)
         self._terrain = terrain
-        self._precomputed_paths: dict[str, Path] | None = None
-        self._precomputed_cache: dict[str, dict] = {}
-        self._mem_cache: dict[str, HorizonMask] = {}
+        self._cache = JsonCache(cache_dir / "horizons", HorizonMask)
+        self._presets = {}
+        self._generated_presets: set[str] = set()
+        for name, content in self._assets.bytes.items():
+            if name.startswith("horizon_") and name.endswith(".json"):
+                loaded = json.loads(content)
+                if not isinstance(loaded, dict) or not isinstance(loaded.get("siteId"), str):
+                    raise ValueError("Startup horizon requires a siteId")
+                site_id = loaded["siteId"]
+                generated = self._assets.validate_preset_dependency(
+                    loaded, self._assets.observers.get(site_id))
+                self._validate_preset(loaded, generated)
+                if generated:
+                    self._generated_presets.add(site_id)
+                if site_id in self._presets:
+                    raise ValueError("Duplicate startup horizon siteId")
+                self._presets[site_id] = loaded
 
-    def _discover_precomputed(self) -> dict[str, Path]:
-        if self._precomputed_paths is None:
-            discovered: dict[str, Path] = {}
-            for directory in self._asset_dirs:
-                if not directory.exists():
-                    continue
-                for path in sorted(directory.glob("horizon_*.json")):
-                    try:
-                        payload = json.loads(path.read_text(encoding="utf-8"))
-                        sid = payload.get("siteId")
-                        if isinstance(sid, str) and sid and sid not in discovered:
-                            discovered[sid] = path
-                    except (OSError, json.JSONDecodeError):
-                        continue
-            self._precomputed_paths = discovered
-        return self._precomputed_paths
+    def _validate_preset(self, raw: dict, generated: bool) -> None:
+        azimuths = raw.get("azimuthsDeg")
+        heights = raw.get("heights")
+        if (not isinstance(azimuths, list) or len(azimuths) < 2
+                or any(not _finite_number(a) or not 0 <= a <= 360
+                       for a in azimuths)
+                or any(b <= a for a, b in zip(azimuths, azimuths[1:]))):
+            raise ValueError("Invalid startup horizon azimuth samples")
+        if (not isinstance(heights, dict) or not heights
+                or not _finite_number(raw.get("maxRangeM")) or raw["maxRangeM"] <= 0):
+            raise ValueError("Invalid startup horizon heights/range")
+        recorded_heights = []
+        for key, elevations in heights.items():
+            try:
+                height = float(key)
+            except (ValueError, TypeError) as exc:
+                raise ValueError("Invalid startup horizon height key") from exc
+            if (not math.isfinite(height) or not 0 <= height <= 1000
+                    or (generated and key != _format_height_key(height))):
+                raise ValueError("Invalid startup horizon height key")
+            if (not isinstance(elevations, list) or len(elevations) != len(azimuths)
+                    or any(not _finite_number(e) or not -90 <= e <= 90
+                           for e in elevations)):
+                raise ValueError("Invalid startup horizon elevation samples")
+            recorded_heights.append(height)
+        Provenance.model_validate(raw.get("provenance"))
+        if not generated:
+            return
+        if raw.get("horizonMethod") != HORIZON_METHOD:
+            raise ValueError("Unsupported generated horizon method")
+        site_id = raw["siteId"]
+        observer = raw.get("observer")
+        if (site_id not in self._assets.sites or not isinstance(observer, dict)
+                or observer.get("metadataOrigin") != "pipeline-record"
+                or observer.get("datumStatus") != "conditional"):
+            raise ValueError("Generated horizon requires canonical pipeline-record observer")
+        if not _finite_number(observer.get("latDeg")) or not _finite_number(observer.get("lonDegE")):
+            raise ValueError("Generated horizon requires finite observer coordinates")
+        self._assets.validate_site(site_id, observer["latDeg"], observer["lonDegE"])
+        observer_heights = observer.get("observerHeightsM")
+        if (not isinstance(observer_heights, list)
+                or any(not _finite_number(h) for h in observer_heights)
+                or len(set(observer_heights)) != len(observer_heights)
+                or set(observer_heights) != set(recorded_heights)):
+            raise ValueError("Generated horizon observer height set disagrees with masks")
+        ground_m, _ = self._terrain.height_at(observer["latDeg"], observer["lonDegE"])
+        if (ground_m is None or not _finite_number(observer.get("groundHeightM"))
+                or observer["groundHeightM"] != ground_m):
+            raise ValueError("Generated horizon observer ground disagrees with current terrain")
 
     def _get_precomputed(self, site_id: str) -> dict | None:
-        cached = self._precomputed_cache.get(site_id)
-        if cached is not None:
-            return cached
-        for directory in self._asset_dirs:
-            direct = directory / f"horizon_{site_id}.json"
-            if direct.exists():
-                loaded = json.loads(direct.read_text(encoding="utf-8"))
-                self._precomputed_cache[site_id] = loaded
-                return loaded
-        path = self._discover_precomputed().get(site_id)
-        if path is not None and path.exists():
-            loaded = json.loads(path.read_text(encoding="utf-8"))
-            self._precomputed_cache[site_id] = loaded
-            return loaded
-        return None
+        return self._presets.get(site_id)
 
     def get_horizon_mask(
         self,
@@ -78,8 +117,10 @@ class HorizonService:
         site_id: str | None = None,
     ) -> HorizonMask | None:
         lat_v, lon_v = validate_coordinates(lat_deg, lon_deg_e)
-        if not math.isfinite(observer_height_m) or observer_height_m < 0.0:
-            raise ValueError("observerHeightM must be finite and nonnegative")
+        checkpoint()
+        self._assets.validate_site(site_id, lat_v, lon_v)
+        if not math.isfinite(observer_height_m) or not 0.0 <= observer_height_m <= 1000.0:
+            raise ValueError("observerHeightM must be between 0 and 1000 m")
 
         if site_id:
             pre = self._get_precomputed(site_id)
@@ -93,37 +134,28 @@ class HorizonService:
                         azimuthsDeg=[float(a) for a in pre["azimuthsDeg"]],
                         elevationsDeg=[float(e) for e in preset],
                         maxRangeM=float(pre["maxRangeM"]),
-                        provenance=Provenance.model_validate(pre["provenance"]),
+                        provenance=self._assets.provenance(
+                            Provenance.model_validate(pre["provenance"]), site_id,
+                            generated=site_id in self._generated_presets),
                     )
 
         resolved_site_id = site_id or f"custom:{lat_v}:{lon_v}"
         cache_key_raw = json.dumps(
             [
-                round(lat_v, 6),
-                round(lon_v, 6),
-                round(observer_height_m, 4),
-                self._terrain.provenance.version,
+                lat_v,
+                lon_v,
+                observer_height_m,
+                self._assets.fingerprint,
             ]
         )
         cache_hash = hashlib.sha256(cache_key_raw.encode("utf-8")).hexdigest()[:24]
 
-        cached = self._mem_cache.get(cache_hash)
+        cached = self._cache.get(cache_hash)
         if cached is not None:
             return cached.model_copy(update={"siteId": resolved_site_id})
-
-        disk_path = self._cache_dir / f"{cache_hash}.json"
-        if disk_path.exists():
-            doc = HorizonMask.model_validate_json(disk_path.read_text(encoding="utf-8"))
-            self._mem_cache[cache_hash] = doc
-            return doc.model_copy(update={"siteId": resolved_site_id})
-
         computed = self._ray_march(resolved_site_id, lat_v, lon_v, observer_height_m)
-        if computed is None:
-            return None
-
-        self._cache_dir.mkdir(parents=True, exist_ok=True)
-        disk_path.write_text(computed.model_dump_json(), encoding="utf-8")
-        self._mem_cache[cache_hash] = computed
+        if computed is not None:
+            self._cache.put(cache_hash, computed)
         return computed
 
     def _ray_march(

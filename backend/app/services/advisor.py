@@ -5,10 +5,12 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import json
 import requests
+import threading
 
 from ..config import Settings
 from ..models import AdvisorCitation, AdvisorRequest, AdvisorResponse, AnalysisResultModel
 from .storage import SQLiteStorage
+from .resources import Admission, BoundedHttp, CapacityError
 
 
 def _fmt_pct(value: float | None) -> str:
@@ -58,18 +60,18 @@ def _build_citations(result: AnalysisResultModel) -> list[AdvisorCitation]:
 def _build_deterministic_advice(result: AnalysisResultModel, language: str) -> tuple[str, list[str], list[str]]:
     m = result.analysis.metrics
     site = result.inputs.site
-    unknown = result.mask is None or m.sunlitPercent is None
+    unknown = result.mask is None or any(value is None for value in m.model_dump().values())
 
     if language == "vi":
         if unknown:
             summary = (
                 f"Kết quả {result.id} tại {site.name} ({site.latDeg:.4f}°, {site.lonDegE:.4f}° E) "
                 f"trong cửa sổ {m.windowHours:.1f} giờ hiện có trạng thái tầm nhìn KHÔNG XÁC ĐỊNH (Unknown) "
-                f"do thiếu horizon mask bao phủ đầy đủ."
+                f"vì một phần bằng chứng địa hình/tầm nhìn không có sẵn."
             )
             recommendations = [
-                "Không dùng giá trị 0 thay thế cho dữ liệu thiếu; kiểm tra lại tọa độ hoặc vùng phủ PGDA DEM (-90° đến -84°).",
-                "Thử chọn một vị trí nằm sâu hơn về phía cực Nam để đảm bảo tia quét 150 km nằm trọn trong vùng phủ.",
+                "Không dùng giá trị 0 thay thế cho dữ liệu thiếu; kiểm tra vùng phủ và mẫu nguồn.",
+                "Kiểm tra phạm vi hữu hạn của horizon mask; không suy diễn an toàn hạ cánh.",
             ]
         else:
             sun_pct = m.sunlitPercent or 0.0
@@ -97,11 +99,11 @@ def _build_deterministic_advice(result: AnalysisResultModel, language: str) -> t
                 )
             if not site.nameVerified:
                 recommendations.append(
-                    "Đây là tọa độ tự nhập chưa qua đối chiếu danh mục chuẩn; cần kiểm tra thêm độ dốc cục bộ và đá tảng trước khi chốt điểm đáp."
+                    "Observer/catalog identity is source-derived and provisional; assess local slope and surface hazards independently."
                 )
         limitations = [
             "Chỉ phản ánh tầm nhìn tâm Mặt Trời/Trái Đất trên địa hình PGDA (không bao gồm khúc xạ, công suất điện pin mặt trời hay suy hao RF).",
-            f"Bước lấy mẫu là {result.inputs.stepSeconds} giây; thời điểm mọc/lặn thực tế có thể lệch trong phạm vi ±{result.inputs.stepSeconds / 3600:.2f} giờ.",
+            f"Bước đầu ra {result.inputs.stepSeconds} giây không xác lập độ chính xác chuyển tiếp; cần xét bước nguồn và nội suy.",
             "Không phải chứng nhận an toàn hạ cánh hay dữ liệu bay chính thức.",
         ]
         return summary, recommendations, limitations
@@ -110,11 +112,11 @@ def _build_deterministic_advice(result: AnalysisResultModel, language: str) -> t
     if unknown:
         summary = (
             f"Result {result.id} for {site.name} ({site.latDeg:.4f}°, {site.lonDegE:.4f}° E) "
-            f"over {m.windowHours:.1f} h has UNKNOWN visibility because a complete terrain horizon mask is unavailable."
+            f"over {m.windowHours:.1f} h has UNKNOWN visibility because some terrain/visibility evidence is unavailable."
         )
         recommendations = [
-            "Do not treat unknown intervals as zero; verify coordinates lie within PGDA DEM coverage (-90° to -84°).",
-            "Select a point further south so the 150 km horizon ray-march stays inside coverage.",
+            "Do not treat unknown intervals as zero; inspect terrain coverage and source samples.",
+            "Inspect the finite horizon extent; do not infer landing safety.",
         ]
     else:
         sun_pct = m.sunlitPercent or 0.0
@@ -142,22 +144,26 @@ def _build_deterministic_advice(result: AnalysisResultModel, language: str) -> t
             )
         if not site.nameVerified:
             recommendations.append(
-                "Coordinates are custom/unverified; assess local slope and surface hazards independently."
+                "Observer/catalog identity is source-derived and provisional; assess local slope and surface hazards independently."
             )
     limitations = [
         "Geometric centre-above-terrain visibility only; does not model solar power output, RF link margin, or atmospheric/penumbral effects.",
-        f"Sample-bounded at {result.inputs.stepSeconds} s (±{result.inputs.stepSeconds / 3600:.2f} h transition uncertainty).",
+        f"Output step {result.inputs.stepSeconds} s does not establish transition accuracy; source cadence/interpolation also limit it.",
         "Preliminary screening only; not flight-certified.",
     ]
     return summary, recommendations, limitations
 
 
 class AdvisorService:
-    """Produces deterministic or LLM-assisted explanations strictly grounded in stored results."""
+    """Keep deterministic facts authoritative and optional private prose explicitly unverified."""
 
     def __init__(self, settings: Settings, storage: SQLiteStorage) -> None:
         self._settings = settings
         self._storage = storage
+        self._admission = Admission(1)
+        self._budget_lock = threading.Lock()
+        self._provider_calls = 0
+        self._http = BoundedHttp(1)
 
     def advise(self, req: AdvisorRequest) -> AdvisorResponse | None:
         result = self._storage.get_result_by_id(req.resultId)
@@ -179,29 +185,30 @@ class AdvisorService:
                 providerError=None,
             )
 
-        try:
-            llm_summary, llm_recs = self._call_llm(result, citations, req.question, req.language)
-            return AdvisorResponse(
-                resultId=result.id,
-                mode="llm",
-                summary=llm_summary,
-                recommendations=llm_recs or det_recs,
-                limitations=det_limits,
-                citations=citations,
-                providerUnavailable=False,
-                providerError=None,
-            )
-        except Exception as exc:
-            return AdvisorResponse(
-                resultId=result.id,
-                mode="deterministic_fallback",
-                summary=det_summary,
-                recommendations=det_recs,
-                limitations=det_limits,
-                citations=citations,
-                providerUnavailable=True,
-                providerError=f"External LLM advisor unavailable ({exc}); deterministic summary preserved.",
-            )
+        with self._admission.enter():
+            with self._budget_lock:
+                if self._provider_calls >= 32:
+                    raise CapacityError("Private advisor lifetime budget exhausted (32 calls per process)")
+                self._provider_calls += 1
+            try:
+                llm_summary, llm_recs = self._call_llm(result, citations, req.question, req.language)
+                return AdvisorResponse(
+                    resultId=result.id, mode="llm",
+                    summary=det_summary, recommendations=det_recs,
+                    limitations=[*det_limits, "External provider prose is unverified, not evidence; citations support only deterministic facts."],
+                    citations=citations,
+                    unverifiedProviderSummary=llm_summary,
+                    unverifiedProviderRecommendations=llm_recs,
+                )
+            except CapacityError:
+                raise
+            except (requests.RequestException, ValueError, KeyError, IndexError, TypeError, TimeoutError, RuntimeError):
+                return AdvisorResponse(
+                    resultId=result.id, mode="deterministic_fallback",
+                    summary=det_summary, recommendations=det_recs, limitations=det_limits,
+                    citations=citations, providerUnavailable=True,
+                    providerError="External provider unavailable or invalid; deterministic summary preserved.",
+                )
 
     def _call_llm(
         self,
@@ -231,34 +238,52 @@ class AdvisorService:
             "provenance supplied. Never invent numbers, never fill null/unknown values with 0, and "
             "never claim visibility equals electrical power, radio link margin, or flight certification. "
             f"Respond in {'Vietnamese' if language == 'vi' else 'English'} as JSON with keys "
-            '{"summary": string, "recommendations": string[]}.'
+            '{"summary": string, "recommendations": string[], "facts": exact supplied metrics object}. '
+            "Facts must retain every null and number unchanged. Free prose is unverified."
         )
-        resp = requests.post(
+        payload = self._http.request(
+            requests.post,
             f"{self._settings.llm_base_url}/chat/completions",
             headers={
                 "Authorization": f"Bearer {self._settings.llm_api_key}",
                 "Content-Type": "application/json",
+                "Accept-Encoding": "identity",
             },
             json={
                 "model": self._settings.llm_model,
                 "temperature": 0.2,
                 "response_format": {"type": "json_object"},
+                "max_tokens": 800,
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {
                         "role": "user",
-                        "content": f"Question: {question}\n\nVerified result JSON:\n{json.dumps(context)}",
+                        "content": f"Question: {question}\n\nStored conditional result JSON:\n{json.dumps(context)}",
                     },
                 ],
             },
-            timeout=self._settings.llm_timeout_s,
+            timeout_s=self._settings.llm_timeout_s,
+            max_bytes=65_536,
         )
-        resp.raise_for_status()
-        payload = resp.json()
+        if not isinstance(payload, dict):
+            raise ValueError("Provider response must be an object")
         content = payload["choices"][0]["message"]["content"]
+        if not isinstance(content, str) or len(content) > 6000:
+            raise ValueError("Invalid provider content")
         parsed = json.loads(content)
-        summary = str(parsed.get("summary", "")).strip()
-        if not summary:
-            raise ValueError("LLM response missing summary")
-        recs = [str(item).strip() for item in parsed.get("recommendations", []) if str(item).strip()]
-        return summary, recs
+        if not isinstance(parsed, dict) or set(parsed) != {"summary", "recommendations", "facts"}:
+            raise ValueError("Invalid structured provider fields")
+        expected = result.analysis.metrics.model_dump(mode="json")
+        facts = parsed["facts"]
+        if (not isinstance(facts, dict) or set(facts) != set(expected)
+                or any((facts[k] is not None if v is None else
+                        type(facts[k]) not in (int, float) or facts[k] != v)
+                       for k, v in expected.items())):
+            raise ValueError("Provider facts contradict stored metrics")
+        summary, recs = parsed["summary"], parsed["recommendations"]
+        if not isinstance(summary, str) or not summary.strip() or len(summary) > 4000:
+            raise ValueError("Invalid provider summary")
+        if (not isinstance(recs, list) or len(recs) > 5
+                or any(not isinstance(item, str) or not item.strip() or len(item) > 500 for item in recs)):
+            raise ValueError("Invalid provider recommendations")
+        return summary.strip(), [item.strip() for item in recs]

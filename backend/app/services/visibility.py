@@ -155,6 +155,9 @@ def analyze_visibility(series: EphemerisSeries, mask: HorizonMask | None) -> Vis
 def validate_scenario_inputs(inputs: ScenarioInputsModel) -> None:
     """Matches web/src/state/scenario.ts validateScenario."""
     validate_coordinates(inputs.site.latDeg, inputs.site.lonDegE)
+    end_ms = inputs.startUtcMs + round(inputs.durationDays * 86_400_000) if math.isfinite(inputs.durationDays) else inputs.startUtcMs
+    if not -62_135_596_800_000 <= inputs.startUtcMs <= end_ms <= 253_402_300_799_999:
+        raise ValueError("Scenario UTC timestamps must fit calendar years 1 through 9999")
     if not math.isfinite(inputs.durationDays) or inputs.durationDays <= 0.0 or inputs.durationDays > 90.0:
         raise ValueError("Duration must be greater than 0 and at most 90 days")
     if inputs.stepSeconds < 60:
@@ -169,18 +172,18 @@ def validate_scenario_inputs(inputs: ScenarioInputsModel) -> None:
         raise ValueError("At most 25,000 samples per scenario; increase the step or shorten the duration")
 
 
-def compute_calc_hash(inputs: ScenarioInputsModel, dem_version: str) -> str:
+def compute_calc_hash(inputs: ScenarioInputsModel, science_fingerprint: str) -> str:
     """Deterministic identity for immutable cached results."""
     lat_v, lon_v = validate_coordinates(inputs.site.latDeg, inputs.site.lonDegE)
     payload = [
         inputs.site.id if not inputs.site.id.startswith("custom:") else "custom",
-        round(lat_v, 6),
-        round(lon_v, 6),
+        lat_v,
+        lon_v,
         inputs.startUtcMs,
-        round(inputs.durationDays, 6),
+        inputs.durationDays,
         inputs.stepSeconds,
-        round(inputs.observerHeightM, 4),
-        dem_version,
+        inputs.observerHeightM,
+        science_fingerprint,
         METHOD_VERSION,
     ]
     return hashlib.sha256(json.dumps(payload, separators=(",", ":")).encode("utf-8")).hexdigest()[:32]

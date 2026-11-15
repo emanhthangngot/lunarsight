@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Literal
-from pydantic import BaseModel, Field
+from typing import Literal, Self
+from pydantic import BaseModel, Field, model_validator
 
 DataKind = Literal["mock", "processed"]
 SiteCategory = Literal["mock", "custom", "apollo", "clps", "artemis-candidate", "international"]
@@ -48,6 +48,7 @@ class DemLayerMeta(BaseModel):
     minHeightM: float
     maxHeightM: float
     source: str
+    sha256: str | None = Field(default=None, pattern=r"^[0-9a-fA-F]{64}$")
 
 
 class DemManifest(BaseModel):
@@ -55,6 +56,8 @@ class DemManifest(BaseModel):
     coverage: CoverageBounds
     provenance: Provenance
     layers: list[DemLayerMeta]
+    terrainContentHashPolicy: str | None = None
+    terrainContentHash: str | None = None
 
 
 class HorizonMask(BaseModel):
@@ -64,6 +67,35 @@ class HorizonMask(BaseModel):
     elevationsDeg: list[float]
     maxRangeM: float
     provenance: Provenance
+
+
+class ObserverMetadata(BaseModel):
+    latDeg: float = Field(allow_inf_nan=False)
+    lonDegE: float = Field(allow_inf_nan=False)
+    observerHeightM: float = Field(ge=0, le=1000, allow_inf_nan=False)
+    groundHeightM: float | None = Field(default=None, allow_inf_nan=False)
+    ellipsoidAltitudeKm: float | None = Field(default=None, allow_inf_nan=False)
+    datumStatus: Literal["conditional"] = "conditional"
+    metadataOrigin: Literal["legacy-pipeline-height", "pipeline-record", "runtime-dem-query"]
+
+    @model_validator(mode="after")
+    def check_identity(self) -> Self:
+        from .geo import validate_coordinates
+        validate_coordinates(self.latDeg, self.lonDegE)
+        if self.metadataOrigin == "legacy-pipeline-height":
+            if self.observerHeightM != 1 or self.groundHeightM is not None or self.ellipsoidAltitudeKm is not None:
+                raise ValueError("Legacy assets only retain 1 m height; ground/altitude must remain null")
+        elif self.groundHeightM is None or self.ellipsoidAltitudeKm is None:
+            raise ValueError("Recorded/runtime observer requires actual ground and altitude")
+        else:
+            requested_altitude = (self.groundHeightM + self.observerHeightM) / 1000
+            # The offline pipeline retains its actual five-decimal query value;
+            # live queries transmit the full-precision value. This is transport
+            # identity, not a widened scientific/datum tolerance.
+            used_altitude = round(requested_altitude, 5) if self.metadataOrigin == "pipeline-record" else requested_altitude
+            if abs(self.ellipsoidAltitudeKm - used_altitude) > 1e-12:
+                raise ValueError("Observer altitude does not match the recorded query precision")
+        return self
 
 
 class EphemerisSeries(BaseModel):
@@ -77,6 +109,7 @@ class EphemerisSeries(BaseModel):
     earthAzDeg: list[float]
     earthElDeg: list[float]
     provenance: Provenance
+    observer: ObserverMetadata | None = None
 
 
 class ElevationResponse(BaseModel):
@@ -151,7 +184,7 @@ class AnalysisResultModel(BaseModel):
 
 class AnalysisRequest(BaseModel):
     inputs: ScenarioInputsModel
-    idempotencyKey: str | None = None
+    idempotencyKey: str | None = Field(default=None, min_length=1, max_length=128)
 
 
 class AnalysisJobModel(BaseModel):
@@ -170,6 +203,7 @@ class AnalysisSubmitResponse(BaseModel):
     status: Literal["cached", "accepted"]
     result: AnalysisResultModel | None = None
     job: AnalysisJobModel | None = None
+    cancelToken: str | None = None
 
 
 class SaveScenarioRequest(BaseModel):
@@ -223,6 +257,8 @@ class AdvisorResponse(BaseModel):
     citations: list[AdvisorCitation] = Field(default_factory=list)
     providerUnavailable: bool = False
     providerError: str | None = None
+    unverifiedProviderSummary: str | None = None
+    unverifiedProviderRecommendations: list[str] = Field(default_factory=list)
 
 
 class HealthResponse(BaseModel):

@@ -25,9 +25,11 @@ def client(tmp_path: Path):
         cors_origins=("http://127.0.0.1:5173",),
         horizons_url=base.horizons_url,
         horizons_timeout_s=10.0,
+        admin_token="offline-test-administrator-token-32chars",
     )
     app = create_app(settings)
     with TestClient(app) as tc:
+        tc.headers["Authorization"] = "Bearer offline-test-administrator-token-32chars"
         yield tc
 
 
@@ -89,7 +91,7 @@ def test_analysis_job_execution_cache_hit_and_scenarios(client: TestClient) -> N
         "startUtcMs": 1_798_761_600_000,  # 2027-01-01T00:00:00Z
         "durationDays": 2,
         "stepSeconds": 3600,
-        "observerHeightM": 2.5,
+        "observerHeightM": 1,
     }
 
     # First submission queues background job (202 Accepted)

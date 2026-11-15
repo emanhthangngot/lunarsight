@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from bisect import bisect_right
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -10,8 +11,10 @@ from pathlib import Path
 import requests
 
 from ..geo import interpolate_angle_deg, validate_coordinates
-from ..models import EphemerisSeries, Provenance
+from ..models import EphemerisSeries, ObserverMetadata, Provenance
 from .terrain import TerrainService
+from .assets import ScienceAssets
+from .resources import Admission, BoundedHttp, JsonCache, checkpoint
 
 
 class OutsideCoverageError(ValueError):
@@ -30,9 +33,9 @@ def _resample_series(
     step_seconds: int,
     provenance_notes: str | None = None,
 ) -> EphemerisSeries:
-    pilot_start_ms = raw.startUtcMs
-    pilot_step_ms = raw.stepSeconds * 1000
-    pilot_count = len(raw.timesUtcMs)
+    _validate_series(raw)
+    if start_utc_ms < raw.timesUtcMs[0] or end_utc_ms > raw.timesUtcMs[-1]:
+        raise UpstreamEphemerisError("Ephemeris timestamps do not bracket the requested window")
     step_ms = step_seconds * 1000
 
     times_ms: list[int] = []
@@ -44,10 +47,10 @@ def _resample_series(
     t = start_utc_ms
     while t <= end_utc_ms:
         times_ms.append(t)
-        float_idx = (t - pilot_start_ms) / pilot_step_ms
-        i0 = max(0, min(pilot_count - 1, int(math.floor(float_idx))))
-        i1 = min(pilot_count - 1, i0 + 1)
-        alpha = max(0.0, min(1.0, float_idx - i0))
+        i0 = max(0, bisect_right(raw.timesUtcMs, t) - 1)
+        i1 = min(len(raw.timesUtcMs) - 1, i0 + 1)
+        span = raw.timesUtcMs[i1] - raw.timesUtcMs[i0]
+        alpha = 0.0 if span == 0 else (t - raw.timesUtcMs[i0]) / span
 
         s_az0 = raw.sunAzDeg[i0]
         s_az1 = raw.sunAzDeg[i1]
@@ -80,7 +83,25 @@ def _resample_series(
         earthAzDeg=earth_az,
         earthElDeg=earth_el,
         provenance=prov,
+        observer=raw.observer,
     )
+
+def _validate_series(raw: EphemerisSeries) -> None:
+    times = raw.timesUtcMs
+    arrays = (raw.sunAzDeg, raw.sunElDeg, raw.earthAzDeg, raw.earthElDeg)
+    if not times or raw.stepSeconds <= 0 or raw.startUtcMs != times[0]:
+        raise UpstreamEphemerisError("Invalid ephemeris timestamp origin/support")
+    if any(len(arr) != len(times) or any(not math.isfinite(v) for v in arr) for arr in arrays):
+        raise UpstreamEphemerisError("Invalid ephemeris sample arrays")
+    if any(b <= a for a, b in zip(times, times[1:])):
+        raise UpstreamEphemerisError("Ephemeris timestamps must be strictly increasing")
+    if any(b - a != raw.stepSeconds * 1000 for a, b in zip(times, times[1:])):
+        raise UpstreamEphemerisError("Ephemeris timestamps disagree with source cadence")
+    if any(not 0 <= v <= 360 for arr in (raw.sunAzDeg, raw.earthAzDeg) for v in arr):
+        raise UpstreamEphemerisError("Ephemeris azimuth outside [0, 360]")
+    if any(not -90 <= v <= 90 for arr in (raw.sunElDeg, raw.earthElDeg) for v in arr):
+        raise UpstreamEphemerisError("Ephemeris elevation outside [-90, 90]")
+
 
 
 def _choose_horizons_step_minutes(start_utc_ms: int, end_utc_ms: int, step_seconds: int) -> int:
@@ -116,49 +137,70 @@ class EphemerisService:
         horizons_url: str,
         horizons_timeout_s: float = 45.0,
         pilot_public_dir: Path | None = None,
+        assets: ScienceAssets | None = None,
     ) -> None:
-        self._asset_dirs = [d for d in (pilot_public_dir, pilot_src_dir) if d is not None]
-        self._cache_dir = cache_dir / "ephemeris"
+        self._assets = assets or ScienceAssets(pilot_public_dir or pilot_src_dir, pilot_src_dir)
         self._terrain = terrain
         self._horizons_url = horizons_url
-        self._horizons_timeout_s = horizons_timeout_s
-        self._precomputed_paths: dict[str, Path] | None = None
+        self._horizons_timeout_s = min(30.0, horizons_timeout_s)
+        self.fingerprint = hashlib.sha256(
+            (self._assets.fingerprint + horizons_url).encode()
+        ).hexdigest()
+        self._upstream = Admission(2)
+        self._http = BoundedHttp(2)
+        self._cache = JsonCache(cache_dir / "ephemeris", EphemerisSeries)
         self._precomputed_cache: dict[str, EphemerisSeries] = {}
-        self._mem_cache: dict[str, EphemerisSeries] = {}
-
-    def _discover_precomputed(self) -> dict[str, Path]:
-        if self._precomputed_paths is None:
-            discovered: dict[str, Path] = {}
-            for directory in self._asset_dirs:
-                if not directory.exists():
-                    continue
-                for path in sorted(directory.glob("ephemeris_*.json")):
-                    try:
-                        payload = json.loads(path.read_text(encoding="utf-8"))
-                        sid = payload.get("siteId")
-                        if isinstance(sid, str) and sid and sid not in discovered:
-                            discovered[sid] = path
-                    except (OSError, json.JSONDecodeError):
-                        continue
-            self._precomputed_paths = discovered
-        return self._precomputed_paths
+        for name, content in self._assets.bytes.items():
+            if name.startswith("ephemeris_") and name.endswith(".json"):
+                record = json.loads(content)
+                series = EphemerisSeries.model_validate(record)
+                try:
+                    _validate_series(series)
+                except UpstreamEphemerisError as exc:
+                    raise ValueError(f"Invalid startup ephemeris {name}: {exc}") from exc
+                observer = series.observer or self._assets.observers.get(series.siteId)
+                registry_observer = self._assets.observers.get(series.siteId)
+                if series.observer is not None and registry_observer is not None and series.observer != registry_observer:
+                    raise ValueError("Ephemeris observer conflicts with startup metadata registry")
+                if observer is not None:
+                    self._assets.validate_site(series.siteId, observer.latDeg, observer.lonDegE)
+                generated = self._assets.validate_preset_dependency(record, observer)
+                if generated:
+                    if (series.siteId not in self._assets.sites or series.observer is None
+                            or registry_observer is None or observer is None
+                            or observer.metadataOrigin != "pipeline-record"
+                            or observer.observerHeightM != 1):
+                        raise ValueError("Generated ephemeris requires canonical recorded 1 m observer and registry")
+                    ground_m, _ = self._terrain.height_at(observer.latDeg, observer.lonDegE)
+                    if ground_m is None or observer.groundHeightM != ground_m:
+                        raise ValueError("Generated ephemeris observer ground disagrees with current terrain")
+                    altitude_km = float(f"{(ground_m + observer.observerHeightM) / 1000:.5f}")
+                    if observer.ellipsoidAltitudeKm != altitude_km:
+                        raise ValueError("Generated ephemeris altitude disagrees with five-decimal pipeline query")
+                elif observer is None or observer.metadataOrigin != "legacy-pipeline-height":
+                    raise ValueError("Legacy ephemeris requires unknown historical ground/altitude metadata")
+                provenance = self._assets.provenance(series.provenance, series.siteId, generated=generated)
+                if observer is not None:
+                    altitude_note = (
+                        "Original queried ground/ellipsoid altitude were not retained and remain unknown."
+                        if observer.metadataOrigin == "legacy-pipeline-height" else
+                        "Observer ground and transmitted altitude are retained in the generation record."
+                    )
+                    provenance.notes = (
+                        f"{provenance.notes or ''} Recorded {observer.observerHeightM:g} m AGL; "
+                        f"source cadence {series.stepSeconds} s (interpolation does not add source fidelity). "
+                        f"{altitude_note}"
+                    )
+                series = series.model_copy(update={
+                    "observer": observer,
+                    "provenance": provenance,
+                })
+                if series.siteId in self._precomputed_cache:
+                    raise ValueError("Duplicate startup ephemeris siteId")
+                self._precomputed_cache[series.siteId] = series
 
     def _get_precomputed(self, site_id: str) -> EphemerisSeries | None:
-        cached = self._precomputed_cache.get(site_id)
-        if cached is not None:
-            return cached
-        for directory in self._asset_dirs:
-            direct = directory / f"ephemeris_{site_id}.json"
-            if direct.exists():
-                loaded = EphemerisSeries.model_validate_json(direct.read_text(encoding="utf-8"))
-                self._precomputed_cache[site_id] = loaded
-                return loaded
-        path = self._discover_precomputed().get(site_id)
-        if path is not None and path.exists():
-            loaded = EphemerisSeries.model_validate_json(path.read_text(encoding="utf-8"))
-            self._precomputed_cache[site_id] = loaded
-            return loaded
-        return None
+        return self._precomputed_cache.get(site_id)
 
     def has_precomputed_coverage(
         self, site_id: str | None, start_utc_ms: int, end_utc_ms: int
@@ -181,10 +223,14 @@ class EphemerisService:
         site_id: str | None = None,
     ) -> EphemerisSeries:
         lat_v, lon_v = validate_coordinates(lat_deg, lon_deg_e)
-        if not math.isfinite(observer_height_m) or observer_height_m < 0.0:
-            raise ValueError("observerHeightM must be finite and nonnegative")
+        checkpoint()
+        self._assets.validate_site(site_id, lat_v, lon_v)
+        if not math.isfinite(observer_height_m) or not 0.0 <= observer_height_m <= 1000.0:
+            raise ValueError("observerHeightM must be between 0 and 1000 m")
         if end_utc_ms < start_utc_ms or step_seconds < 60:
             raise ValueError("Require endUtcMs >= startUtcMs and stepSeconds >= 60")
+        if not -62_135_596_800_000 <= start_utc_ms <= end_utc_ms <= 253_402_300_799_999:
+            raise ValueError("UTC timestamps must fit calendar years 1 through 9999")
 
         sample_count = int(math.floor((end_utc_ms - start_utc_ms) / (step_seconds * 1000))) + 1
         if sample_count > 25_000:
@@ -195,7 +241,9 @@ class EphemerisService:
         # Fast-path: precomputed Q1 2027 Horizons series for any catalog site
         if site_id:
             ephem = self._get_precomputed(site_id)
-            if ephem is not None and ephem.timesUtcMs:
+            if (ephem is not None and ephem.timesUtcMs and ephem.observer is not None
+                    and ephem.observer.observerHeightM == observer_height_m
+                    and self._assets.coordinates_match(lat_v, lon_v, ephem.observer.latDeg, ephem.observer.lonDegE)):
                 if start_utc_ms >= ephem.timesUtcMs[0] and end_utc_ms <= ephem.timesUtcMs[-1]:
                     return _resample_series(ephem, site_id, start_utc_ms, end_utc_ms, step_seconds)
 
@@ -209,16 +257,19 @@ class EphemerisService:
         alt_km = (ground_m + observer_height_m) / 1000.0
         step_min = _choose_horizons_step_minutes(start_utc_ms, end_utc_ms, step_seconds)
         aligned_start_ms = int(math.floor(start_utc_ms / 60_000) * 60_000)
-        # Ensure at least one Horizons step covers end_utc_ms
-        aligned_end_ms = int(math.ceil(end_utc_ms / (step_min * 60_000)) * (step_min * 60_000))
-        if aligned_end_ms <= aligned_start_ms:
-            aligned_end_ms = aligned_start_ms + step_min * 60_000
+        source_step_ms = step_min * 60_000
+        aligned_end_ms = aligned_start_ms + max(
+            1, math.ceil((end_utc_ms - aligned_start_ms) / source_step_ms)
+        ) * source_step_ms
 
         cache_key_raw = json.dumps(
             [
-                round(lat_v, 5),
-                round(lon_v, 5),
-                round(alt_km, 4),
+                lat_v,
+                lon_v,
+                alt_km,
+                observer_height_m,
+                self._assets.fingerprint,
+                self._horizons_url,
                 aligned_start_ms,
                 aligned_end_ms,
                 step_min,
@@ -226,14 +277,9 @@ class EphemerisService:
         )
         cache_hash = hashlib.sha256(cache_key_raw.encode("utf-8")).hexdigest()[:24]
 
-        raw_series = self._mem_cache.get(cache_hash)
+        raw_series = self._cache.get(cache_hash)
         if raw_series is None:
-            disk_path = self._cache_dir / f"{cache_hash}.json"
-            if disk_path.exists():
-                raw_series = EphemerisSeries.model_validate_json(
-                    disk_path.read_text(encoding="utf-8")
-                )
-            else:
+            with self._upstream.enter():
                 raw_series = self._fetch_horizons_pair(
                     site_id=resolved_site_id,
                     lat_deg=lat_v,
@@ -244,9 +290,15 @@ class EphemerisService:
                     step_minutes=step_min,
                     dem_layer_id=layer_id,
                 )
-                self._cache_dir.mkdir(parents=True, exist_ok=True)
-                disk_path.write_text(raw_series.model_dump_json(), encoding="utf-8")
-            self._mem_cache[cache_hash] = raw_series
+            raw_series.observer = ObserverMetadata(
+                latDeg=lat_v, lonDegE=lon_v, observerHeightM=observer_height_m,
+                groundHeightM=ground_m, ellipsoidAltitudeKm=alt_km,
+                metadataOrigin="runtime-dem-query",
+            )
+            _validate_series(raw_series)
+            if raw_series.timesUtcMs[0] > aligned_start_ms or raw_series.timesUtcMs[-1] < aligned_end_ms:
+                raise UpstreamEphemerisError("JPL Horizons returned incomplete timestamp support")
+            self._cache.put(cache_hash, raw_series)
 
         return _resample_series(raw_series, resolved_site_id, start_utc_ms, end_utc_ms, step_seconds)
 
@@ -269,12 +321,15 @@ class EphemerisService:
         )
         step_str = f"{step_minutes} m"
 
+        checkpoint()
         t_sun, s_az, s_el = self._query_horizons_target(
             "10", lon_deg_e, lat_deg, alt_km, start_str, stop_str, step_str
         )
+        checkpoint()
         t_earth, e_az, e_el = self._query_horizons_target(
             "399", lon_deg_e, lat_deg, alt_km, start_str, stop_str, step_str
         )
+        checkpoint()
         if t_sun != t_earth or not t_sun:
             raise UpstreamEphemerisError("JPL Horizons Sun/Earth timestamps mismatched or empty")
 
@@ -319,7 +374,7 @@ class EphemerisService:
             "EPHEM_TYPE": "OBSERVER",
             "CENTER": "coord@301",
             "COORD_TYPE": "GEODETIC",
-            "SITE_COORD": f"{lon_deg_e:.6f},{lat_deg:.6f},{alt_km:.5f}",
+            "SITE_COORD": f"{lon_deg_e},{lat_deg},{alt_km}",
             "START_TIME": start_str,
             "STOP_TIME": stop_str,
             "STEP_SIZE": step_str,
@@ -327,13 +382,15 @@ class EphemerisService:
             "CSV_FORMAT": "YES",
         }
         try:
-            resp = requests.get(self._horizons_url, params=params, timeout=self._horizons_timeout_s)
-            resp.raise_for_status()
-            payload = resp.json()
-        except requests.RequestException as exc:
-            raise UpstreamEphemerisError(f"JPL Horizons request failed: {exc}") from exc
-        except ValueError as exc:
-            raise UpstreamEphemerisError(f"Invalid JSON from JPL Horizons: {exc}") from exc
+            payload = self._http.request(
+                requests.get, self._horizons_url,
+                params=params, headers={"Accept-Encoding": "identity"},
+                timeout_s=self._horizons_timeout_s, max_bytes=8 * 1024 * 1024,
+            )
+        except (requests.RequestException, ValueError, TimeoutError) as exc:
+            raise UpstreamEphemerisError("JPL Horizons request failed or exceeded response limits") from exc
+        if not isinstance(payload, dict):
+            raise UpstreamEphemerisError("JPL Horizons response must be an object")
 
         raw = payload.get("result")
         if not isinstance(raw, str):
@@ -352,8 +409,11 @@ class EphemerisService:
                 continue
             parts = [p.strip() for p in stripped.split(",")]
             if len(parts) < 5:
-                continue
-            times_ms.append(_parse_horizons_timestamp_ms(parts[0]))
-            az_deg.append(round(float(parts[3]), 4))
-            el_deg.append(round(float(parts[4]), 4))
+                raise UpstreamEphemerisError("Malformed JPL Horizons sample")
+            try:
+                times_ms.append(_parse_horizons_timestamp_ms(parts[0]))
+                az_deg.append(round(float(parts[3]), 4))
+                el_deg.append(round(float(parts[4]), 4))
+            except ValueError as exc:
+                raise UpstreamEphemerisError("Invalid JPL Horizons numeric sample") from exc
         return times_ms, az_deg, el_deg

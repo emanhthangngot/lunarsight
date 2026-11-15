@@ -31,6 +31,16 @@ class Settings:
     llm_base_url: str = DEFAULT_LLM_BASE_URL
     llm_model: str = DEFAULT_LLM_MODEL
     llm_timeout_s: float = 20.0
+    admin_token: str | None = None
+
+    def __post_init__(self) -> None:
+        import math
+        if not 0 < self.horizons_timeout_s <= 30 or not math.isfinite(self.horizons_timeout_s):
+            raise ValueError("Horizons timeout must be in (0, 30] seconds")
+        if not 0 < self.llm_timeout_s <= 20 or not math.isfinite(self.llm_timeout_s):
+            raise ValueError("LLM timeout must be in (0, 20] seconds")
+        if self.admin_token is not None and len(self.admin_token) < 32:
+            raise ValueError("Administrative token must contain at least 32 characters")
 
 
 def load_settings() -> Settings:
@@ -49,7 +59,7 @@ def load_settings() -> Settings:
     )
     cors_origins = tuple(origin.strip() for origin in raw_origins.split(",") if origin.strip())
     horizons_url = os.environ.get("LUNARSIGHT_HORIZONS_URL", DEFAULT_HORIZONS_URL)
-    horizons_timeout_s = float(os.environ.get("LUNARSIGHT_HORIZONS_TIMEOUT_S", "45"))
+    horizons_timeout_s = float(os.environ.get("LUNARSIGHT_HORIZONS_TIMEOUT_S", "30"))
     llm_api_key = os.environ.get("LUNARSIGHT_LLM_API_KEY", "").strip() or None
     llm_base_url = os.environ.get("LUNARSIGHT_LLM_BASE_URL", DEFAULT_LLM_BASE_URL).strip().rstrip("/")
     llm_model = os.environ.get("LUNARSIGHT_LLM_MODEL", DEFAULT_LLM_MODEL).strip()
@@ -66,4 +76,5 @@ def load_settings() -> Settings:
         llm_base_url=llm_base_url,
         llm_model=llm_model,
         llm_timeout_s=llm_timeout_s,
+        admin_token=os.environ.get("LUNARSIGHT_ADMIN_TOKEN", "").strip() or None,
     )

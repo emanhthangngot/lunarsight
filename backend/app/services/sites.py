@@ -1,25 +1,21 @@
-"""Catalog service for verified lunar landing sites."""
+"""Source-attributed lunar technical observer catalog."""
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 from ..models import SiteSummary
+from .assets import ScienceAssets
 
 
 class SiteCatalogService:
-    """Loads and serves verified candidate landing sites from JSON."""
+    """Serve the immutable startup catalog, not a live filesystem view."""
 
-    def __init__(self, pilot_src_dir: Path) -> None:
-        self._sites_path = pilot_src_dir / "sites.json"
-        self._sites: list[SiteSummary] | None = None
+    def __init__(self, pilot_src_dir: Path, assets: ScienceAssets | None = None) -> None:
+        self.assets = assets or ScienceAssets(pilot_src_dir)
 
     def _load(self) -> list[SiteSummary]:
-        if self._sites is None:
-            raw = json.loads(self._sites_path.read_text(encoding="utf-8"))
-            self._sites = [SiteSummary.model_validate(item) for item in raw]
-        return self._sites
+        return list(self.assets.sites.values())
 
     def list_sites(self) -> list[SiteSummary]:
         return [site.model_copy(deep=True) for site in self._load()]

@@ -59,7 +59,7 @@ def test_terrain_manifest_binary_elevation_and_patch(client: TestClient) -> None
     arr = np.frombuffer(bin_resp.content, dtype=np.float32)
     assert arr.size == first_layer["rows"] * first_layer["cols"]
 
-    # Verified Site 04 elevation (~1737.18 m)
+    # Retained processed Site04 elevation regression (~1737.18 m), not datum validation.
     elev_ok = client.get("/api/terrain/elevation", params={"latDeg": -89.785092, "lonDegE": 204.018283})
     assert elev_ok.status_code == 200
     assert elev_ok.json()["outsideCoverage"] is False
@@ -128,6 +128,7 @@ def test_ephemeris_precomputed_and_dynamic_horizons_cached(client: TestClient) -
             "startUtcMs": start_ms,
             "endUtcMs": end_ms,
             "stepSeconds": 3600,
+            "observerHeightM": 1,
         },
     )
     assert pre.status_code == 200
@@ -150,8 +151,11 @@ def test_ephemeris_precomputed_and_dynamic_horizons_cached(client: TestClient) -
         def raise_for_status(self) -> None:
             return None
 
-        def json(self) -> dict:
-            return fake_horizons
+        def iter_content(self, chunk_size: int):
+            yield json.dumps(fake_horizons).encode()
+
+        def close(self) -> None:
+            pass
 
     dyn_start = 1_830_297_600_000  # 2028-01-01T00:00:00Z
     dyn_end = dyn_start + 2 * 3_600_000

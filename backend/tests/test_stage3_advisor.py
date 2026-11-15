@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import time
 from unittest.mock import patch
@@ -23,6 +24,7 @@ def _make_settings(tmp_path: Path, llm_api_key: str | None = None) -> Settings:
         horizons_url=base.horizons_url,
         horizons_timeout_s=10.0,
         llm_api_key=llm_api_key,
+        admin_token="offline-test-administrator-token-32chars",
     )
 
 
@@ -37,7 +39,7 @@ def _create_sample_result(client: TestClient) -> str:
                 "startUtcMs": 1_798_761_600_000,
                 "durationDays": 2,
                 "stepSeconds": 3600,
-                "observerHeightM": 2.5,
+                "observerHeightM": 1,
             }
         },
     )
@@ -54,6 +56,7 @@ def _create_sample_result(client: TestClient) -> str:
 
 def test_advisor_deterministic_and_missing_result(tmp_path: Path) -> None:
     with TestClient(create_app(_make_settings(tmp_path, llm_api_key=None))) as client:
+        client.headers["Authorization"] = "Bearer offline-test-administrator-token-32chars"
         missing = client.post("/api/advisor-responses", json={"resultId": "res_missing"})
         assert missing.status_code == 404
 
@@ -74,25 +77,23 @@ def test_advisor_deterministic_and_missing_result(tmp_path: Path) -> None:
 
 def test_advisor_llm_success_and_recoverable_fallback(tmp_path: Path) -> None:
     with TestClient(create_app(_make_settings(tmp_path, llm_api_key="test-key"))) as client:
+        client.headers["Authorization"] = "Bearer offline-test-administrator-token-32chars"
         result_id = _create_sample_result(client)
+        metrics = client.get(f"/api/analysis-results/{result_id}").json()["analysis"]["metrics"]
 
         class FakeOk:
             def raise_for_status(self) -> None:
                 return None
 
-            def json(self) -> dict:
-                return {
-                    "choices": [
-                        {
-                            "message": {
-                                "content": (
-                                    '{"summary":"Site 04 shows continuous illumination over 48.0 h.",'
-                                    '"recommendations":["Verify 0.25 m mast sensitivity."]}'
-                                )
-                            }
-                        }
-                    ]
-                }
+            def iter_content(self, chunk_size: int):
+                yield json.dumps({"choices": [{"message": {"content": json.dumps({
+                    "summary": "Site 04 shows continuous illumination over 48.0 h.",
+                    "recommendations": ["Verify 0.25 m mast sensitivity."],
+                    "facts": metrics,
+                })}}]}).encode()
+
+            def close(self) -> None:
+                pass
 
         with patch("app.services.advisor.requests.post", return_value=FakeOk()) as mock_post:
             ok_resp = client.post(
@@ -105,6 +106,8 @@ def test_advisor_llm_success_and_recoverable_fallback(tmp_path: Path) -> None:
             assert ok_body["mode"] == "llm"
             assert ok_body["providerUnavailable"] is False
             assert "48.0 h" in ok_body["summary"]
+            assert ok_body["unverifiedProviderSummary"] == "Site 04 shows continuous illumination over 48.0 h."
+            assert ok_body["recommendations"] != ok_body["unverifiedProviderRecommendations"]
 
         # Recoverable fallback when external LLM fails
         with patch("app.services.advisor.requests.post", side_effect=RuntimeError("Upstream timeout")):
@@ -116,5 +119,5 @@ def test_advisor_llm_success_and_recoverable_fallback(tmp_path: Path) -> None:
             fb_body = fb_resp.json()
             assert fb_body["mode"] == "deterministic_fallback"
             assert fb_body["providerUnavailable"] is True
-            assert "Upstream timeout" in fb_body["providerError"]
+            assert "deterministic summary preserved" in fb_body["providerError"]
             assert "100.0%" in fb_body["summary"]
