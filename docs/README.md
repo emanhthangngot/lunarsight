@@ -31,6 +31,9 @@ Read [project state](project-state.md) first. Documents labeled **proposed** des
 | [Terrain pre-decision notebook](../notebooks/terrain-predecision-review.ipynb) | Bounded real DEM previews, synthetic hillshade, slope proxy, mask and source evidence. |
 | [Site04 near/far diagnostic](site04-near-far-review.md) | Conditional 5 m / 80 m bin-wise fusion and overlap evidence, with unresolved datum and convergence limits. |
 | [Site04 seam and 50 km review](site04-seam-convergence-review.md) | Area-weighted overlap, conditional convergence and spherical cross-check evidence. |
+| [Site04 seam quality](site04-seam-quality-review.md) | Effective-resolution, observation-count and uncertainty layers in the overlap. |
+| [Site04 100 km review](site04-100km-review.md) | Bounded 100 km far-field sensitivity and 50 km nesting checks. |
+| [DE pipeline roadmap](de-pipeline-roadmap.md) | Milestones to a reproducible pilot input pipeline and separate science-validation work. |
 | [Team decision worksheet](predecision-review.md) | Comparison table, unresolved evidence, meeting agenda, decision fields and DE handoff responsibilities. |
 | [Data quality proposal](data-quality.md) | Scientific interpretation, provenance, missing data, and acceptance evidence. |
 | [Data boundary](../data/README.md) | Explains why this repository currently contains no acquired data. |

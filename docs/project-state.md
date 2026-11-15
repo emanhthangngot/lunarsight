@@ -21,6 +21,10 @@ Updated: **14 November 2026**. This is the concise starting point for the team a
 
 - [Site04 seam and convergence review](site04-seam-convergence-review.md) compares area-weighted 5 m/80 m overlap and a conditional 50 km profile; 50 km is not established as converged, and datum/reference remain open.
 
+- The local [seam-quality review](site04-seam-quality-review.md) samples LDEC, Z error and PGDA 90 effective resolution over the 111 overlap footprints; the [DE pipeline roadmap](de-pipeline-roadmap.md) distinguishes an input pipeline from science validation.
+
+- Local-only [100 km review](site04-100km-review.md) has one valid bounded read; 70/360 far-field peaks occur in its outer 10%, so convergence remains unproven. No PR was pushed for this local work.
+
 ## Current scope
 
 Documentation plus explicitly authorized analysis notebooks for pre-decision review. The current request authorizes bounded local DEM previews, visual comparison and a decision worksheet; native preview arrays are cached under ignored `data/preview/`. Rendered notebook outputs and source/window metadata are retained for review. No production ingestion pipeline, full raster acquisition, application implementation or deployment is authorized by this step.
