@@ -726,7 +726,7 @@ export function LunarViewer(props: LunarViewerProps) {
   const mock = terrain?.provenance.kind === 'mock';
   const extentKm = mesh ? (mesh.maxRangeM / 1000).toFixed(0) : null;
   return (
-    <div ref={containerRef} className="lunar-viewer" data-camera-mode={cameraMode}>
+    <div ref={containerRef} className="lunar-viewer" data-camera-mode={cameraMode} data-landing={landingPhase}>
       {failure && <div className="lunar-viewer__failure" role="alert">3D view unavailable: {failure}. The data panels still work.</div>}
       {/* Every overlay lives inside the App-provided safe insets (contract-2). */}
       <div ref={safeRef} className="lunar-viewer__safe">
@@ -788,12 +788,11 @@ export function LunarViewer(props: LunarViewerProps) {
           </section>
         )}
         <div className="lunar-viewer__readout-row">
-          {landingPhase !== 'parked' && <span className="lunar-viewer__chip" role="status">Illustrative landing · display aid</span>}
-          {landingPhase !== 'parked' && <span className="lunar-viewer__chip">Sun enlarged ×{SHOWCASE_SUN_SCALE} · display aid</span>}
+          {landingPhase !== 'parked' && <span className="lunar-viewer__chip" role="status">Illustrative landing · Sun enlarged ×{SHOWCASE_SUN_SCALE} · display aid</span>}
           <span ref={scaleChipRef} className="lunar-viewer__chip" hidden />
           {mesh?.partialCoverage && <span className="lunar-viewer__chip" role="status">Partial footprint · coverage edge</span>}
           {!sun && ready && <span className="lunar-viewer__chip">Neutral light · no Sun direction yet</span>}
-          {reliefAid && ready && <span className="lunar-viewer__chip" title="Cool inspection light from the view's front-left; not sunlight. Toggle with Fill.">Fill light · display aid</span>}
+          {reliefAid && ready && <span className="lunar-viewer__chip lunar-viewer__chip--fill" title="Cool inspection light from the view's front-left; not sunlight. Toggle with Fill.">Fill light · display aid</span>}
           <div ref={readoutRef} className="lunar-viewer__readout" aria-hidden="true" title={surface ? 'Drag or arrow keys to look · wheel or ± to zoom' : 'Drag to orbit · wheel to zoom · click a site'} />
         </div>
       </div>
