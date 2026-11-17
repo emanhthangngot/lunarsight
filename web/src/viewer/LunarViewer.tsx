@@ -124,9 +124,9 @@ type MeshStatus =
   | { kind: 'ready'; mesh: LocalTerrainMesh; siteId: string }
   | { kind: 'error'; message: string };
 
-/** One word for the folded status line; the full wording stays in the expanded card. */
-function visibilityWord(visible: boolean | null): string {
-  return visible === true ? 'visible' : visible === false ? 'hidden' : 'unknown';
+/** Short wording for the folded status line; it still names the terrain horizon. */
+function horizonWord(visible: boolean | null): string {
+  return visible === true ? 'above horizon' : visible === false ? 'below horizon' : 'unknown';
 }
 
 export function LunarViewer(props: LunarViewerProps) {
@@ -831,17 +831,17 @@ export function LunarViewer(props: LunarViewerProps) {
               : <button type="button" onClick={() => { if (settled()) playLanding(); }} aria-label="Replay landing" title="Replay landing">↻</button>}<button type="button" onClick={closeLanding} aria-label="Close landing view" title="Close">×</button></span></header>
             {cardCollapsed && (
               <p className="lunar-viewer__landing-brief">
-                <span data-body="sun" data-state={sun ? visibleToState(sun.visible) : 'unknown'}>Sun {sun ? `${formatSigned(sun.elDeg)} ${visibilityWord(sun.visible)}` : 'unavailable'}</span>
-                <span data-body="earth" data-state={earth ? visibleToState(earth.visible) : 'unknown'}>Earth {earth ? `${formatSigned(earth.elDeg)} ${visibilityWord(earth.visible)}` : 'unavailable'}</span>
+                <span data-body="sun" data-state={sun ? visibleToState(sun.visible) : 'unknown'} title={sun ? `Sun ${visibilityText(sun.visible)}` : undefined}>Sun {sun ? `${formatSigned(sun.elDeg)} ${horizonWord(sun.visible)}` : 'unavailable'}</span>
+                <span data-body="earth" data-state={earth ? visibleToState(earth.visible) : 'unknown'} title={earth ? `Earth ${visibilityText(earth.visible)} — not radio-link performance` : undefined}>Earth {earth ? `${formatSigned(earth.elDeg)} ${horizonWord(earth.visible)}` : 'unavailable'}</span>
               </p>
             )}
+            {landingSummary?.notice && <p className="lunar-viewer__landing-stale" role="status">{landingSummary.notice}</p>}
             <div id="lunar-viewer-landing-body" hidden={cardCollapsed}>
             <ul className="lunar-viewer__landing-now">
               <li data-body="sun" data-state={sun ? visibleToState(sun.visible) : 'unknown'}><strong>Sun</strong>{sun ? `${formatSigned(sun.elDeg)} · ${visibilityText(sun.visible)}` : 'direction unavailable'}</li>
               <li data-body="earth" data-state={earth ? visibleToState(earth.visible) : 'unknown'}><strong>Earth</strong>{earth ? `${formatSigned(earth.elDeg)} · ${visibilityText(earth.visible)}` : 'direction unavailable'}</li>
             </ul>
             {landingNote && <p className="lunar-viewer__landing-note">{landingNote}</p>}
-            {landingSummary?.notice && <p className="lunar-viewer__landing-stale" role="status">{landingSummary.notice}</p>}
             {landingSummary && <dl>{landingSummary.rows.map((row) => <div key={row.label}><dt>{row.label}</dt><dd>{row.value}</dd></div>)}</dl>}
             <p className="lunar-viewer__landing-foot">Terrain-horizon visibility only — not power or radio-link performance.</p>
             <details className="lunar-viewer__landing-about"><summary>About these values</summary>
