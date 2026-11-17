@@ -9,6 +9,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import type { LocalTerrainMesh, TerrainMeshLoader, TerrainMeshQuality } from '../data/contract';
@@ -123,6 +124,11 @@ type MeshStatus =
   | { kind: 'ready'; mesh: LocalTerrainMesh; siteId: string }
   | { kind: 'error'; message: string };
 
+/** One word for the folded status line; the full wording stays in the expanded card. */
+function visibilityWord(visible: boolean | null): string {
+  return visible === true ? 'visible' : visible === false ? 'hidden' : 'unknown';
+}
+
 export function LunarViewer(props: LunarViewerProps) {
   const { terrain, sites, selectedSiteId, observerHeightM, cameraMode, sun, earth, onSelectSite, onPlayLanding, landingNote, landingSummary, landingRequest = 0 } = props;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -149,6 +155,8 @@ export function LunarViewer(props: LunarViewerProps) {
   const [landingPhase, setLandingPhase] = useState<LandingPhase>('parked');
   /** Incremented per Play so the showcase starts after the App's cursor move has rendered. */
   const [landingRun, setLandingRun] = useState(0);
+  /** Status card folded to one line so the scene can be watched; kept across runs. */
+  const [cardCollapsed, setCardCollapsed] = useState(false);
   const selectedSite = useMemo(() => sites.find((s) => s.id === selectedSiteId) ?? null, [sites, selectedSiteId]);
   const mesh = status.kind === 'ready' && status.siteId === selectedSiteId ? status.mesh : null;
   const readoutState = useRef({ mesh, selectedSite });
@@ -817,10 +825,17 @@ export function LunarViewer(props: LunarViewerProps) {
           {status.kind === 'idle' && ready && !selectedSite && <div className="lunar-viewer__loading" role="status">Select a site to build its local terrain.</div>}
         </div>
         {landingPhase !== 'parked' && (
-          <section className="lunar-viewer__landing-card" aria-label="Landing status">
-            <header><strong>{landingPhase === 'descent' ? 'Landing' : 'Touchdown'}{landingSummary ? ` · ${landingSummary.title}` : ''}</strong><span>{landingPhase === 'descent'
+          <section className="lunar-viewer__landing-card" aria-label="Landing status" data-collapsed={cardCollapsed}>
+            <header><strong>{landingPhase === 'descent' ? 'Landing' : 'Touchdown'}{landingSummary ? ` · ${landingSummary.title}` : ''}</strong><span><button type="button" onClick={() => setCardCollapsed((value) => !value)} aria-expanded={!cardCollapsed} aria-controls="lunar-viewer-landing-body" aria-label={cardCollapsed ? 'Expand landing status' : 'Collapse landing status'} title={cardCollapsed ? 'Expand' : 'Collapse'}>{cardCollapsed ? <ChevronDown size={16} aria-hidden="true" /> : <ChevronUp size={16} aria-hidden="true" />}</button>{landingPhase === 'descent'
               ? <button type="button" onClick={onLandingButton} aria-label="Skip to touchdown" title="Skip to touchdown">⏭</button>
               : <button type="button" onClick={() => { if (settled()) playLanding(); }} aria-label="Replay landing" title="Replay landing">↻</button>}<button type="button" onClick={closeLanding} aria-label="Close landing view" title="Close">×</button></span></header>
+            {cardCollapsed && (
+              <p className="lunar-viewer__landing-brief">
+                <span data-body="sun" data-state={sun ? visibleToState(sun.visible) : 'unknown'}>Sun {sun ? `${formatSigned(sun.elDeg)} ${visibilityWord(sun.visible)}` : 'unavailable'}</span>
+                <span data-body="earth" data-state={earth ? visibleToState(earth.visible) : 'unknown'}>Earth {earth ? `${formatSigned(earth.elDeg)} ${visibilityWord(earth.visible)}` : 'unavailable'}</span>
+              </p>
+            )}
+            <div id="lunar-viewer-landing-body" hidden={cardCollapsed}>
             <ul className="lunar-viewer__landing-now">
               <li data-body="sun" data-state={sun ? visibleToState(sun.visible) : 'unknown'}><strong>Sun</strong>{sun ? `${formatSigned(sun.elDeg)} · ${visibilityText(sun.visible)}` : 'direction unavailable'}</li>
               <li data-body="earth" data-state={earth ? visibleToState(earth.visible) : 'unknown'}><strong>Earth</strong>{earth ? `${formatSigned(earth.elDeg)} · ${visibilityText(earth.visible)}` : 'direction unavailable'}</li>
@@ -833,6 +848,7 @@ export function LunarViewer(props: LunarViewerProps) {
               {landingSummary && <p>{landingSummary.meta}</p>}
               <p>Sun and Earth states are centre visibility from the terrain horizon mask at the selected time. The descent, flame and dust are illustrative; this is not a mission-success assessment.</p>
             </details>
+            </div>
           </section>
         )}
         <div className="lunar-viewer__readout-row">
