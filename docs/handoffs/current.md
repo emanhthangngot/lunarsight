@@ -6,6 +6,8 @@ Anonymous production browser checks observed completed Site04 metrics, actual te
 
 Rollback candidate: previous mock deployment `dpl_DKV8zVX7bhtk6XHL7AZv1K7BbhkA`; rollback itself is untested. The older deployment and merge-pending statements below are historical, superseded by this record. Git auto-deploy remains disabled. Final round42 local acceptance and its lost-log/reused-evidence qualifications remain applicable.
 
+**Production update — 17 November 2026 (later):** PR #19 (landing status card folds to one line; the recompute notice stays visible when folded) merged as `bc2c506041b8b920038d43a9a20f048d494194f4` and deployed as `dpl_3BNM7q4GWGg3AzrVkhLEeZ3Dhdbj` (READY, production alias), same clean-archive route and configuration hash. An anonymous headless-Chrome run on the alias at 1440 and 390 px folded and expanded the card (283→82 px and 260→84 px) with 0 console or page errors. Rollback candidate: `dpl_3CrSgS2xn66HMXettGPLfWPB4Qv3`.
+
 **Production update — 17 November 2026:** PR #17 merged as `b081e4ba036468e1b118ae3393f37145714e5e84` and deployed to https://lunarsight.vercel.app as `dpl_3CrSgS2xn66HMXettGPLfWPB4Qv3` (READY, production alias). Same clean-archive route of committed `web/` (`.env.example` excluded, static pilot assets, no backend); configuration SHA-256 unchanged (`f374277c…a916`). A fresh anonymous headless-Chrome run on the alias loaded terrain, played the landing (cursor moved to 2027-01-10 09:00 UTC, both links clear, status card metrics shown) and recorded 0 console or page errors. Rollback candidate: `dpl_BEdESpGFuzepH8WX39u2UAFXnNdy` (untested rollback).
 
 **Lander, landing view and UI polish — 17 November 2026 (user instruction, issue #14, PR #17):**
