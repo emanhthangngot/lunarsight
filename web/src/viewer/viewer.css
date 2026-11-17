@@ -136,3 +136,90 @@
 .sky-horizon__caption > span { overflow: hidden; text-overflow: ellipsis; }
 .sky-horizon__caption > span:last-child { flex: 1; min-width: 0; }
 .sky-horizon__caption strong { font-weight: 600; }
+
+/* Landing showcase (display aid): start/stop control, beam tags and the touchdown card. */
+.lunar-viewer__landing-button {
+  min-height: 32px; padding: 5px 14px; border: 1px solid color-mix(in srgb, var(--lv-accent) 55%, transparent); border-radius: 999px;
+  background: var(--lv-glass); color: var(--lv-accent); font: 600 13px var(--lv-font); cursor: pointer; pointer-events: auto; box-shadow: var(--lv-shadow);
+  backdrop-filter: blur(var(--lv-blur)) saturate(1.2); -webkit-backdrop-filter: blur(var(--lv-blur)) saturate(1.2);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.lunar-viewer__landing-button:hover { background: color-mix(in srgb, var(--lv-accent) 22%, rgba(10, 14, 20, 0.8)); }
+.lunar-viewer__landing-button:focus-visible, .lunar-viewer__landing-card button:focus-visible { outline: 2px solid var(--lv-accent); outline-offset: 2px; }
+.lunar-viewer__chip[hidden] { display: none; }
+
+.lunar-viewer__link-tag { pointer-events: none; padding: 2px 8px; border-radius: 999px; background: rgba(5, 8, 12, 0.72); border: 1px solid currentColor; font: 600 13px var(--lv-font); white-space: nowrap; }
+.lunar-viewer__link-tag[data-body='sun'] { color: var(--lv-sun); }
+.lunar-viewer__link-tag[data-body='earth'] { color: var(--lv-earth); }
+.lunar-viewer__link-tag[data-state='hidden'] { border-style: dashed; }
+.lunar-viewer__link-tag[data-state='unknown'] { border-style: dotted; }
+
+/* Status card: top-left corner of the safe area, over the sky, so the craft and both links stay
+   in view. It drops below the toolbar row when the safe area is too narrow to sit beside it. */
+.lunar-viewer__safe { container-type: inline-size; }
+.lunar-viewer__landing-card {
+  position: absolute; top: 12px; left: 12px; width: min(400px, calc(100% - 24px)); max-height: calc(100% - 110px); overflow: auto; padding: 10px 12px; border-radius: var(--lv-radius);
+  background: rgba(10, 14, 20, 0.82); border: 1px solid var(--lv-border); box-shadow: var(--lv-shadow); pointer-events: auto; font-size: 13px; line-height: 1.4;
+  backdrop-filter: blur(var(--lv-blur)) saturate(1.2); -webkit-backdrop-filter: blur(var(--lv-blur)) saturate(1.2);
+}
+.lunar-viewer[data-camera-mode='surface'] .lunar-viewer__landing-card { top: 74px; max-height: calc(100% - 164px); }
+/* Narrow safe area: the card carries Skip / Replay / Close itself, so the corner landing button
+   is hidden instead of being covered; the card starts below the corner toolbar (and the compass). */
+@container (max-width: 720px) {
+  .lunar-viewer:not([data-landing='parked']) .lunar-viewer__landing-button { display: none; }
+  .lunar-viewer[data-camera-mode] .lunar-viewer__landing-card { top: 104px; max-height: calc(100% - 194px); }
+  .lunar-viewer[data-camera-mode='surface'] .lunar-viewer__landing-card { top: 150px; max-height: calc(100% - 240px); }
+}
+/* Larger toolbar buttons (touch or ≤900 px) push the Ground-view corner stack further down. */
+@media (pointer: coarse), (max-width: 900px) {
+  @container (max-width: 720px) {
+    .lunar-viewer[data-camera-mode='surface'] .lunar-viewer__landing-card { top: 166px; max-height: calc(100% - 256px); }
+  }
+}
+.lunar-viewer__landing-card header span { display: flex; flex: none; }
+.lunar-viewer__landing-card header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.lunar-viewer__landing-card header strong { font-size: 15px; }
+.lunar-viewer__landing-card header button { min-width: 28px; min-height: 28px; border: 0; border-radius: 999px; background: transparent; color: var(--lv-muted); font-size: 18px; line-height: 1; cursor: pointer; }
+.lunar-viewer__landing-card header button:hover { color: var(--lv-text); background: rgba(255, 255, 255, 0.07); }
+.lunar-viewer__landing-card p { margin: 6px 0 0; }
+.lunar-viewer__landing-foot, .lunar-viewer__landing-about { color: var(--lv-muted); font-size: 12px; }
+.lunar-viewer__landing-about summary { cursor: pointer; margin-top: 4px; }
+.lunar-viewer__landing-note { color: var(--lv-accent); font-size: 12px; }
+.lunar-viewer__landing-stale { color: var(--lv-mock); font-size: 12px; }
+.lunar-viewer__landing-now { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
+.lunar-viewer__landing-now li { padding-left: 16px; position: relative; }
+.lunar-viewer__landing-now li strong { display: inline-block; min-width: 46px; }
+.lunar-viewer__landing-now li::before { content: ''; position: absolute; left: 0; top: 0.42em; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+.lunar-viewer__landing-now li[data-body='sun'] { color: var(--lv-sun); }
+.lunar-viewer__landing-now li[data-body='earth'] { color: var(--lv-earth); }
+.lunar-viewer__landing-now li[data-state='hidden']::before, .lunar-viewer__landing-now li[data-state='unknown']::before { background: transparent; border: 1.5px dashed currentColor; }
+.lunar-viewer__landing-card dl { margin: 8px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 3px 18px; }
+.lunar-viewer__landing-card dl > div { display: flex; justify-content: space-between; gap: 12px; }
+.lunar-viewer__landing-card dt { color: var(--lv-muted); }
+.lunar-viewer__landing-card dd { margin: 0; font-weight: 600; white-space: nowrap; }
+@media (pointer: coarse), (max-width: 900px) {
+  .lunar-viewer__landing-button { min-height: 44px; }
+  .lunar-viewer__landing-card header button { min-width: 44px; min-height: 44px; }
+}
+
+/* HUD surfaces sit over projected site labels: keep them opaque enough that a label passing
+   underneath does not read as stray text beside the control. */
+.lunar-viewer__toolbar, .lunar-viewer__chip, .lunar-viewer__readout, .lunar-viewer__landing-button { background: rgba(10, 14, 20, 0.86); }
+
+@media (max-width: 900px) {
+  /* The readout wraps instead of hiding its last values behind an ellipsis. */
+  .lunar-viewer__readout { white-space: normal; border-radius: 12px; }
+}
+@media (max-width: 600px) {
+  .sky-horizon__caption { flex-wrap: wrap; gap: 0 14px; white-space: normal; }
+  /* Small safe area: the touchdown card scrolls; nothing in it is dropped. */
+  .lunar-viewer__landing-card { padding: 8px 10px; font-size: 12px; }
+  /* Phones: the toolbar and compass give way during the view; only a data badge stays above. */
+  .lunar-viewer[data-camera-mode] .lunar-viewer__landing-card { top: 40px; max-height: calc(100% - 130px); }
+  .lunar-viewer:not([data-landing='parked']) .lunar-viewer__compass { display: none; }
+  /* With the compass gone the corner (data badge) moves back to the top, above the card. */
+  .lunar-viewer:not([data-landing='parked']) .lunar-viewer__corner { margin-top: 0; }
+  .lunar-viewer__landing-card header strong { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* While the landing view is open the layer toolbar and readout make room for it. */
+  .lunar-viewer:not([data-landing='parked']) :is(.lunar-viewer__toolbar, .lunar-viewer__readout, .lunar-viewer__legend) { display: none; }
+}

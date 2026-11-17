@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { Activity, ArrowLeftRight, ChevronDown, Clock3, Info, MapPin, Moon, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, ScanLine, X } from 'lucide-react';
+import { Activity, ArrowLeftRight, ChevronDown, Clock3, Info, MapPin, Moon, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, ScanLine, Sparkles, X } from 'lucide-react';
 import type { LunarDataProvider, SiteSummary } from './data/contract';
-import { LunarViewer, type BodyDirection } from './viewer/LunarViewer';
+import { LunarViewer, type BodyDirection, type LandingSummary } from './viewer/LunarViewer';
 import { SkyHorizonView } from './viewer/SkyHorizonView';
 import { useWorkspace } from './state/useWorkspace';
 import { useComparison } from './state/useComparison';
@@ -14,7 +14,9 @@ import { TimelinePanel } from './panels/TimelinePanel';
 import { ProvenancePanel } from './panels/ProvenancePanel';
 import { OverlayDialog } from './components/OverlayDialog';
 import { SiteCommand } from './components/SiteCommand';
-import { utc } from './panels/format';
+import { FeatureGuide, type FeatureId } from './components/FeatureGuide';
+import { number, sourceLabel, utc, windowLabel } from './panels/format';
+import { planLandingMoment } from './analysis/landingMoment';
 
 export function App({ provider }: { provider: LunarDataProvider }) {
   const { state, dispatch, sites, terrain, bootError, submit, cancel, selectSite } = useWorkspace(provider);
@@ -47,6 +49,36 @@ export function App({ provider }: { provider: LunarDataProvider }) {
     azDeg: shown.ephemeris.earthAzDeg[cursorIndex]!, elDeg: shown.ephemeris.earthElDeg[cursorIndex]!,
     visible: shown.analysis.earthVisible[cursorIndex] ?? null,
   } : null;
+  const [landingNote, setLandingNoteState] = useState<{ text: string; index: number; resultId: string } | null>(null);
+  /** Landing showcase: move the time cursor to the first sample with both bodies visible, if any. */
+  const playLanding = useCallback(() => {
+    if (!shown) { setLandingNoteState(null); return; }
+    const moment = planLandingMoment(shown.analysis.both, cursorIndex, shown.mask !== null);
+    const text: Record<typeof moment.kind, string> = {
+      move: `Timeline moved to ${utc(shown.ephemeris.timesUtcMs[moment.index]).replace('Z', '')} UTC: the first sample in this window with the Sun and Earth both above the terrain horizon.`,
+      already: 'The Sun and Earth are both above the terrain horizon at the selected time.',
+      none: 'No sample in this window has the Sun and Earth both above the terrain horizon. The selected time was kept.',
+      'none-known': 'No known sample in this window has the Sun and Earth both above the terrain horizon; some samples are unknown. The selected time was kept.',
+      'mask-unavailable': 'Horizon mask unavailable: visibility is unknown, so the selected time was kept.',
+    };
+    // Playback would walk the cursor away from the moment the landing view explains.
+    dispatch({ type: 'playing', playing: false });
+    if (moment.kind === 'move') dispatch({ type: 'cursor', index: moment.index });
+    // The note describes one cursor position of one result; it is dropped once either changes.
+    setLandingNoteState({ text: text[moment.kind], index: moment.index, resultId: shown.id });
+  }, [shown, cursorIndex, dispatch]);
+  const staleSummary = pending && !pendingOther;
+  const landingSummary = useMemo<LandingSummary | null>(() => shown ? {
+    title: shown.inputs.site.name,
+    meta: `${windowLabel(shown.inputs)} · ${sourceLabel(shown.ephemeris.provenance.kind)}`,
+    ...(staleSummary ? { notice: `Recomputing — values from ${shown.id} until it finishes.` } : {}),
+    rows: [
+      { label: 'Sunlit', value: number(shown.analysis.metrics.sunlitHours, ' h') },
+      { label: 'Longest darkness', value: number(shown.analysis.metrics.longestDarknessHours, ' h') },
+      { label: 'Earth visible', value: number(shown.analysis.metrics.earthVisibleHours, ' h') },
+      { label: 'Both visible', value: number(shown.analysis.metrics.bothHours, ' h') },
+    ],
+  } : null, [shown, staleSummary]);
   const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 1199px)').matches);
   const [showInputs, setShowInputs] = useState(() => !window.matchMedia('(max-width: 1199px)').matches);
   const [showResults, setShowResults] = useState(() => !window.matchMedia('(max-width: 1199px)').matches);
@@ -54,6 +86,8 @@ export function App({ provider }: { provider: LunarDataProvider }) {
   const [commandOpen, setCommandOpen] = useState(false);
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [provenanceOpen, setProvenanceOpen] = useState(false);
+  const [featuresOpen, setFeaturesOpen] = useState(false);
+  const [landingRequest, setLandingRequest] = useState(0);
   const [insets, setInsets] = useState({ instrumentTop: 88, top: 120, bottom: 320 });
   const commandRef = useRef<HTMLElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
@@ -102,6 +136,24 @@ export function App({ provider }: { provider: LunarDataProvider }) {
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
   }, [openCommands]);
+  /** Feature guide: close it and open the chosen feature straight away. */
+  function openFeature(feature: FeatureId) {
+    setFeaturesOpen(false);
+    if (feature === 'sites') openCommands();
+    else if (feature === 'compare') openComparison();
+    else if (feature === 'provenance') setProvenanceOpen(true);
+    else if (feature === 'horizon') setShowHorizon(true);
+    else if (feature === 'summary') { setShowResults(true); if (compact) setShowInputs(false); }
+    else if (feature === 'ground') dispatch({ type: 'camera', mode: 'surface' });
+    else if (feature === 'timeline') {
+      // Same rules as the timeline's own Play: nothing while computing, restart from the window end.
+      if (!shown || pending) return;
+      if (cursorIndex === shown.ephemeris.timesUtcMs.length - 1) dispatch({ type: 'cursor', index: 0 });
+      dispatch({ type: 'playing', playing: true });
+    }
+    // Only for a settled result: a request must not fire later against a different result.
+    else if (feature === 'landing') { if (shown && !pending) setLandingRequest((request) => request + 1); }
+  }
   function toggleMission() { setShowInputs((value) => !value); if (compact) setShowResults(false); }
   function toggleInspector() { setShowResults((value) => !value); if (compact) setShowInputs(false); }
   const dataBadge = (() => {
@@ -125,7 +177,7 @@ export function App({ provider }: { provider: LunarDataProvider }) {
 
   return <main className="app-shell" data-compact={compact} style={appStyle}>
     <div className="viewer-stage">
-      <LunarViewer terrain={terrain} sites={viewerSites} selectedSiteId={displaySite?.id ?? null} observerHeightM={displayInputs?.observerHeightM ?? 0} cameraMode={state.cameraMode} sun={sun} earth={earth} onSelectSite={(id) => { const site = viewerSites.find((candidate) => candidate.id === id); if (site) selectSite(site); }} />
+      <LunarViewer terrain={terrain} sites={viewerSites} selectedSiteId={displaySite?.id ?? null} observerHeightM={displayInputs?.observerHeightM ?? 0} cameraMode={state.cameraMode} sun={sun} earth={earth} onSelectSite={(id) => { const site = viewerSites.find((candidate) => candidate.id === id); if (site) selectSite(site); }} onPlayLanding={() => { playLanding(); if (compact) { setShowInputs(false); setShowResults(false); } }} landingRequest={landingRequest} landingNote={landingNote && shown && landingNote.resultId === shown.id && landingNote.index === cursorIndex ? landingNote.text : null} landingSummary={landingSummary} />
     </div>
     <header ref={commandRef} className="command-bar glass-surface">
       <a className="brand" href="#workspace" aria-label="LunarSight workspace"><Moon size={25} strokeWidth={1.3} aria-hidden="true" /><h1>LunarSight</h1></a>
@@ -138,7 +190,8 @@ export function App({ provider }: { provider: LunarDataProvider }) {
         <button className="icon-button" type="button" aria-label="Compare two sites" aria-haspopup="dialog" title="Compare two sites" onClick={openComparison}><ArrowLeftRight size={18} aria-hidden="true" /></button>
         <button className="icon-button" type="button" aria-label="Open provenance" aria-haspopup="dialog" title="Provenance & conventions" onClick={() => setProvenanceOpen(true)}><Info size={18} aria-hidden="true" /></button>
       </div>
-      <strong className="mock-badge" data-kind={dataBadge.kind}>{dataBadge.label}</strong>
+      {dataBadge.kind !== 'processed' && <strong className="mock-badge" data-kind={dataBadge.kind}>{dataBadge.label}</strong>}
+      <button className="features-button" type="button" aria-label="Features" title="What LunarSight does" aria-haspopup="dialog" onClick={() => setFeaturesOpen(true)}><Sparkles size={16} aria-hidden="true" /><span>Features</span></button>
     </header>
     <div id="workspace" className="result-status" data-status={pending ? 'pending' : state.error ? 'error' : 'ready'}>
       <span className="status-dot" aria-hidden="true" />
@@ -170,6 +223,7 @@ export function App({ provider }: { provider: LunarDataProvider }) {
     <OverlayDialog open={comparisonOpen} onClose={() => setComparisonOpen(false)} title="Compare two sites" description="Same UTC window, step and observer height for both sites; only the site differs." className="comparison-dialog">
       <ComparisonPanel sites={viewerSites} shortlist={shortlist} siteA={comparison.siteA} siteB={comparison.siteB} onSiteA={setSiteAId} onSiteB={setSiteBId} settings={comparison.settings} running={comparison.running} outcome={comparison.outcome} />
     </OverlayDialog>
+    <OverlayDialog open={featuresOpen} onClose={() => setFeaturesOpen(false)} title="What LunarSight does" description="Tap any item to open it." className="features-dialog"><FeatureGuide onOpen={openFeature} /></OverlayDialog>
     <OverlayDialog open={provenanceOpen} onClose={() => setProvenanceOpen(false)} title="Data provenance" description="Data sources, scientific conventions and finite-range limitations." className="provenance-dialog"><ProvenancePanel kind={provider.kind} terrain={terrain} result={shown} /></OverlayDialog>
   </main>;
 }

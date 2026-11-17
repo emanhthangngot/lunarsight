@@ -19,6 +19,27 @@ export interface LunarViewerProps {
   sun: BodyDirection | null;
   earth: BodyDirection | null;
   onSelectSite?(siteId: string): void;
+  /**
+   * The user started the illustrative landing showcase. The App may move the time cursor
+   * (the new `sun` / `earth` arrive as props) and explain it in `landingNote`.
+   */
+  onPlayLanding?(): void;
+  /** Increment to start the landing view from outside the viewer; it waits until the view can run and is dropped on a site change. */
+  landingRequest?: number;
+  /** What the App did to the time cursor for the showcase, in plain words. */
+  landingNote?: string | null;
+  /** Already-computed site metrics shown after touchdown; null = no applied result. */
+  landingSummary?: LandingSummary | null;
+}
+
+/** Preformatted by the App so the viewer never formats or derives scientific values. */
+export interface LandingSummary {
+  /** Site name. */
+  title: string;
+  meta: string;
+  /** Shown prominently, e.g. that the values belong to a result being recomputed. */
+  notice?: string;
+  rows: { label: string; value: string }[];
 }
 
 export interface SkyHorizonViewProps {

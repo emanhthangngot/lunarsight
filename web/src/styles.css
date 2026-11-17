@@ -25,7 +25,8 @@ input { font-family: var(--ls-font-mono); font-size: var(--ls-type-sm); }
 input[aria-invalid="true"] { border-color: var(--ls-danger); }
 label { display: grid; gap: 8px; font-size: var(--ls-type-sm); color: var(--ls-text-muted); line-height: 1.4; }
 label input, label select { color: var(--ls-text); }
-summary { cursor: pointer; min-height: 44px; padding: 12px 0; font-size: var(--ls-type-sm); line-height: 1.5; font-weight: 500; }
+/* Inline padding offset by a negative margin keeps text aligned while the hover fill gets breathing room. */
+summary { cursor: pointer; min-height: 44px; padding: 12px 8px; margin-inline: -8px; border-radius: 6px; font-size: var(--ls-type-sm); line-height: 1.5; font-weight: 500; }
 svg { flex-shrink: 0; }
 .app-shell { position: relative; width: 100%; height: 100dvh; min-height: 560px; overflow: hidden; isolation: isolate; font-size: var(--ls-type-body); }
 .viewer-stage { position: absolute; inset: 0; z-index: 0; height: 100%; }
@@ -108,7 +109,10 @@ button.icon-button:hover:not(:disabled) { background: var(--ls-surface-raised); 
 .summary-details { margin-top: 8px; border-top: 1px solid var(--ls-border); }
 .detail-heading { margin: 12px 0 4px; font-size: var(--ls-type-sm); }
 .detail-grid { display: grid; margin: 0 0 12px; }
-.detail-grid > div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 0; border-top: 1px solid var(--ls-border); }
+/* A value too wide for the label's row drops below it, right-aligned, instead of splitting label and timestamp. */
+.detail-grid > div { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 12px; padding: 8px 0; border-top: 1px solid var(--ls-border); }
+.detail-grid dt { white-space: nowrap; }
+.detail-grid dd { margin-left: auto; white-space: nowrap; }
 .detail-grid dd small { text-align: right; }
 .pending-card { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: start; padding: 12px; border-radius: 8px; background: var(--ls-control); }
 .pending-card p { color: var(--ls-text-muted); font-size: var(--ls-type-xs); margin-top: 4px; }
@@ -158,7 +162,7 @@ input[type="range"] { width: 100%; min-height: 44px; margin: 0; accent-color: va
 .band-unknown { background: repeating-linear-gradient(135deg, var(--ls-text-muted) 0 2px, var(--ls-control) 2px 5px); }
 .timeline-extent { display: flex; justify-content: space-between; gap: 16px; margin: 6px 0 0 60px; font: var(--ls-type-xs) var(--ls-font-mono); color: var(--ls-text-muted); }
 .timeline-method { margin-top: 2px; }
-.timeline-method summary { font-size: var(--ls-type-xs); color: var(--ls-text-muted); min-height: 44px; padding: 12px 0 0; text-align: right; }
+.timeline-method summary { font-size: var(--ls-type-xs); color: var(--ls-text-muted); min-height: 44px; padding: 12px 8px 0; text-align: right; }
 .track-legend { display: flex; flex-wrap: wrap; gap: 12px; color: var(--ls-text-muted); font-size: var(--ls-type-xs); padding-block: 12px; }
 .track-legend span::before { content: ''; display: inline-block; width: 10px; height: 4px; margin-right: 5px; vertical-align: 2px; }
 .legend-visible::before { background: var(--ls-accent); }
@@ -186,6 +190,8 @@ caption { text-align: left; color: var(--ls-text-muted); line-height: 1.5; paddi
 th, td { padding: 12px 16px; vertical-align: top; border-bottom: 1px solid var(--ls-border); }
 th { color: var(--ls-text); font-weight: 500; text-align: left; }
 thead th { color: var(--ls-text-muted); font-size: var(--ls-type-sm); }
+/* Value column headings align with their right-aligned numbers. */
+thead th + th { text-align: right; }
 tbody th small { font-weight: 400; margin-top: 2px; }
 td { text-align: right; font-family: var(--ls-font-mono); }
 td strong { display: block; font-weight: 500; font-size: var(--ls-type-md); }
@@ -203,12 +209,15 @@ td.cell-unknown, td.cell-pending { color: var(--ls-text-muted); font-family: var
 .quiet-button { margin-top: 8px; background: transparent; border-color: transparent; color: var(--ls-text-muted); }
 .provenance-dialog { width: min(760px, calc(100vw - 48px)); }
 .provenance-panel details > p { margin-top: 20px; }
-.provenance-panel summary { font-size: var(--ls-type-body); padding-top: 0; }
+.provenance-panel summary { font-size: var(--ls-type-body); padding-block: 8px; }
 .conventions { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0; }
 .conventions dd { text-align: left; margin-top: 6px; font-family: var(--ls-font-sans); font-size: var(--ls-type-sm); line-height: 1.5; }
 .provenance-record { padding-top: 20px; margin-top: 20px; border-top: 1px solid var(--ls-border); }
-.provenance-record p { color: var(--ls-text-muted); font-size: var(--ls-type-sm); margin-top: 8px; }
-.command-dialog { width: min(620px, calc(100vw - 32px)); margin-top: min(16dvh, 140px); }
+/* Long unbroken identifiers (SHA-256 digests, epochs) must wrap inside narrow dialogs. */
+.provenance-record p { color: var(--ls-text-muted); font-size: var(--ls-type-sm); margin-top: 8px; overflow-wrap: anywhere; }
+/* Top-offset sheet: cap its height to the space below the offset so it never runs off-screen. */
+.overlay-dialog.command-dialog { width: min(620px, calc(100vw - 32px)); margin-top: min(16dvh, 140px); max-height: calc(100dvh - min(16dvh, 140px) - 16px); }
+.command-dialog .command-search { position: sticky; top: 0; z-index: 1; }
 .command-dialog .dialog-surface { padding: 16px; }
 .command-dialog .dialog-heading { margin-bottom: 16px; padding-left: 8px; }
 .command-dialog .dialog-heading p { max-width: 48ch; }
@@ -237,7 +246,8 @@ td.cell-unknown, td.cell-pending { color: var(--ls-text-muted); font-family: var
   .mode-toggle button { padding-inline: 9px; }
   .command-utilities { gap: 0; }
   .command-utilities .icon-button { min-width: 44px; width: 44px; }
-  .instrument-drawer { z-index: 24; }
+  /* Drawers span the centre here, so start them below the result-status pill instead of covering it. */
+  .instrument-drawer { z-index: 24; top: calc(var(--instrument-top) + 40px); }
 }
 @media (max-width: 900px) {
   .command-bar { flex-wrap: wrap; row-gap: 4px; }
@@ -269,20 +279,32 @@ td.cell-unknown, td.cell-pending { color: var(--ls-text-muted); font-family: var
   .utc-pill { font-size: var(--ls-type-xs); padding-left: 4px; min-width: 0; }
   .utc-pill > svg { display: none; }
   .utc-pill time { font-size: var(--ls-type-xs); }
-  .mode-toggle button { padding-inline: 7px; font-size: var(--ls-type-xs); }
-  .command-utilities .icon-button { min-width: 44px; width: 44px; }
+  /* View toggle and utilities share one row: 3 command rows instead of 4. */
+  .mode-toggle button { padding-inline: 5px; font-size: var(--ls-type-xs); }
+  .command-utilities .icon-button { min-width: 40px; width: 40px; }
   .command-utilities .icon-button > svg { width: 16px; }
+  /* One drawer at a time on phones: use the full width and height instead of a strip between bar and dock. */
+  .mission-drawer, .inspector-drawer { left: var(--ls-gutter); right: var(--ls-gutter); width: auto; bottom: var(--ls-gutter); }
   .result-status { width: max-content; max-width: calc(100% - 16px); font-size: var(--ls-type-xs); gap: 6px; }
   .timeline-panel { padding: 8px 12px; }
   .timeline-heading { flex-wrap: wrap; }
   .timeline-identity { display: flex; justify-content: space-between; width: 100%; }
-  .timeline-controls { justify-content: center; width: 100%; }
+  /* Six controls do not fit one phone row; event jumps wrap to their own labelled row instead of clipping. */
+  .timeline-controls { justify-content: center; width: 100%; flex-wrap: wrap; row-gap: 4px; }
+  .timeline-controls .event-jump { flex: 1 1 auto; width: auto; }
+  .timeline-controls .event-jump > span { display: inline; }
+  th, td { padding: 10px 6px; }
+  td { white-space: nowrap; }
+  td strong { font-size: var(--ls-type-body); }
+  td.cell-delta { font-size: var(--ls-type-body); }
   .timeline-extent { font-size: var(--ls-type-xs); margin-left: 0; }
   .dock-toolbar { padding-inline: 4px; gap: 4px; }
   .dock-toolbar button { font-size: var(--ls-type-xs); padding-inline: 6px; }
   .pair-selects { grid-template-columns: 1fr; }
   .panoramic-horizon { padding-inline: 8px; max-height: 160px; }
-  .overlay-dialog { width: calc(100vw - 16px); max-height: calc(100dvh - 32px); }
+  /* Override the UA dialog max-width (100% - 2em - 6px) so sheets really use the phone width. */
+  .overlay-dialog { width: calc(100vw - 16px); max-width: calc(100vw - 16px); max-height: calc(100dvh - 32px); }
+  .overlay-dialog.command-dialog { width: calc(100vw - 16px); }
   .dialog-surface { padding: 16px; }
   .dialog-heading { gap: 12px; }
   .conventions { grid-template-columns: 1fr; }
@@ -292,3 +314,49 @@ td.cell-unknown, td.cell-pending { color: var(--ls-text-muted); font-family: var
    quiet/inspector buttons) so an unavailable control never looks available. */
 .app-shell :is(button, input, select):disabled { color: var(--ls-text-disabled); background: var(--ls-disabled-surface); border-color: var(--ls-border); box-shadow: none; cursor: not-allowed; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto; } }
+
+/* Feature guide: header entry point and a short, tappable list. */
+.features-button { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; min-height: 36px; padding: 6px 12px; border-radius: 8px; color: var(--ls-bg); background: var(--ls-accent); border-color: transparent; font-size: var(--ls-type-sm); font-weight: 600; }
+.features-button:hover { background: var(--ls-text); }
+.features-dialog { width: min(520px, calc(100vw - 32px)); }
+.feature-guide { list-style: none; margin: 0; padding: 0 12px 12px; display: grid; gap: 4px; }
+.feature-guide button { display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: 100%; min-height: 52px; padding: 8px 12px; text-align: left; background: transparent; border-color: transparent; border-radius: 8px; }
+.feature-guide button:hover { background: var(--ls-control); }
+.feature-guide svg { flex: none; color: var(--ls-accent); }
+.feature-guide span { display: grid; gap: 1px; min-width: 0; }
+.feature-guide small { color: var(--ls-text-muted); font-size: var(--ls-type-xs); }
+@media (max-width: 1199px) { .features-button { order: 3; margin-left: auto; } }
+/* Phones: icon only, so the UTC time keeps its room in the first command row. */
+@media (max-width: 600px) { .features-button { width: 44px; min-height: 44px; justify-content: center; padding: 0; } .features-button span { display: none; } }
+
+/* Compact timeline dock for mouse and trackpad: the 3D view gets the height. Touch keeps the
+   44 px targets above. */
+@media (pointer: fine) and (min-width: 601px) {
+  .dock-toolbar { min-height: 30px; }
+  .dock-toolbar > button { min-height: 28px; padding-block: 2px; font-size: var(--ls-type-xs); }
+  .timeline-panel { padding: 2px 16px 6px; }
+  .timeline-controls > button, .timeline-controls select { min-height: 32px; }
+  .timeline-controls .icon-button { width: 34px; min-width: 34px; }
+  .timeline-controls .play-button { padding-inline: 12px; }
+  .timeline-notes { min-height: 0; line-height: 1.3; }
+  .scrubber-label { height: 22px; }
+  .scrubber-label input[type="range"] { min-height: 22px; }
+  .tracks { gap: 3px; }
+  .timeline-extent { margin-top: 3px; }
+  .timeline-method summary { min-height: 20px; width: fit-content; margin-inline: auto; padding: 0 8px; line-height: 20px; }
+}
+/* Wide enough for both window timestamps and the legend toggle on one line. */
+@media (pointer: fine) and (min-width: 800px) {
+  .timeline-method { margin-top: -18px; }
+  .timeline-method[open] { margin-top: 0; }
+}
+@media (pointer: coarse) {
+  .command-utilities .icon-button { min-width: 44px; width: 44px; }
+  .features-button { min-height: 44px; }
+}
+
+/* Phones, landing view open: the timeline keeps its controls and scrubber and gives the rest of
+   its height to the 3D view and the status card. Everything returns when the view closes. */
+@media (max-width: 600px) {
+  .app-shell:has(.lunar-viewer:not([data-landing='parked'])) .timeline-dock :is(.dock-toolbar, .panoramic-horizon, .tracks, .timeline-extent, .timeline-method, .cursor-bodies) { display: none; }
+}

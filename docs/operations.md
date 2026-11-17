@@ -1,6 +1,6 @@
 # Development and operations
 
-**Current scope:** user-authorized static **Vercel** hosting for the mock app, with current public health recorded in [project state](project-state.md) and [the handoff](handoffs/current.md). The broader backend, storage, telemetry and budget sections below remain proposals. No dataset, backend, CI, DNS change or paid service is authorized by this hosting exception.
+**Current scope:** the user authorized redeploying the merged frontend with its existing static pilot assets. Current deployment evidence and the previous mock rollback candidate are in [the handoff](handoffs/current.md). The clean-source upload route below still applies; no backend hosting, fresh acquisition, CI, DNS change or paid service is authorized. References below to mock-only release checks describe the earlier baseline; current static pilot checks use its supported1m height and source-derived labels.
 
 Basis: the integrated workflow and reliability goals in the [LunarSight V2 proposal](reference/proposal-v2.md). Related documents: [architecture](architecture.md), [API design](api-design.md), [data proposals](data-sources.md), and [roadmap](roadmap.md).
 
