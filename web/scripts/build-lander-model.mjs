@@ -490,9 +490,10 @@ async function main() {
   const exporter = new GLTFExporter();
   const result = await exporter.parseAsync(root, { binary: true, trs: true });
   const bytes = new Uint8Array(result);
+  // Verify before writing so a failed check never replaces the committed model.
+  verify(bytes, root);
   await mkdir(dirname(OUTPUT_PATH), { recursive: true });
   await writeFile(OUTPUT_PATH, bytes);
-  verify(bytes, root);
 }
 
 main().catch((error) => {

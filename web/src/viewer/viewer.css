@@ -181,7 +181,6 @@
 @media (pointer: coarse), (max-width: 900px) {
   .lunar-viewer__landing-button { min-height: 44px; }
   .lunar-viewer__landing-columns { grid-template-columns: minmax(0, 1fr); }
-  .lunar-viewer__landing-meta { display: none; }
   .lunar-viewer__landing-card header button { min-width: 44px; min-height: 44px; }
 }
 
@@ -194,13 +193,10 @@
   .lunar-viewer__readout { white-space: normal; border-radius: 12px; }
 }
 @media (max-width: 600px) {
-  .lunar-viewer__toolbar button { min-width: 40px; padding-inline: 7px; }
   .sky-horizon__caption { flex-wrap: wrap; gap: 0 14px; white-space: normal; }
-  /* Small safe area: the touchdown card keeps the live Sun/Earth state and the note; the
-     window metrics stay in the Summary drawer. */
-  .lunar-viewer__landing-card dl, .lunar-viewer__landing-foot { display: none; }
+  /* Small safe area: the touchdown card scrolls; nothing in it is dropped. */
   .lunar-viewer__landing-card { padding: 8px 10px; margin-bottom: 4px; font-size: 12px; }
   .lunar-viewer__landing-card header strong { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  /* While the landing view is open the layer toolbar, fill chip and readout make room for it. */
-  .lunar-viewer:not([data-landing='parked']) :is(.lunar-viewer__toolbar, .lunar-viewer__chip--fill, .lunar-viewer__readout, .lunar-viewer__legend) { display: none; }
+  /* While the landing view is open the layer toolbar and readout make room for it. */
+  .lunar-viewer:not([data-landing='parked']) :is(.lunar-viewer__toolbar, .lunar-viewer__readout, .lunar-viewer__legend) { display: none; }
 }

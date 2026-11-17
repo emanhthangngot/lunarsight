@@ -15,7 +15,7 @@ import { ProvenancePanel } from './panels/ProvenancePanel';
 import { OverlayDialog } from './components/OverlayDialog';
 import { SiteCommand } from './components/SiteCommand';
 import { number, sourceLabel, utc, windowLabel } from './panels/format';
-import { firstBothVisibleIndex } from './analysis/landingMoment';
+import { planLandingMoment } from './analysis/landingMoment';
 
 export function App({ provider }: { provider: LunarDataProvider }) {
   const { state, dispatch, sites, terrain, bootError, submit, cancel, selectSite } = useWorkspace(provider);
@@ -52,31 +52,31 @@ export function App({ provider }: { provider: LunarDataProvider }) {
   /** Landing showcase: move the time cursor to the first sample with both bodies visible, if any. */
   const playLanding = useCallback(() => {
     if (!shown) { setLandingNoteState(null); return; }
-    const index = firstBothVisibleIndex(shown.analysis.both);
+    const moment = planLandingMoment(shown.analysis.both, cursorIndex, shown.mask !== null);
+    const text: Record<typeof moment.kind, string> = {
+      move: `Timeline moved to ${utc(shown.ephemeris.timesUtcMs[moment.index]).replace('Z', '')} UTC: the first sample in this window with the Sun and Earth both above the terrain horizon.`,
+      already: 'The Sun and Earth are both above the terrain horizon at the selected time.',
+      none: 'No sample in this window has the Sun and Earth both above the terrain horizon. The selected time was kept.',
+      'none-known': 'No known sample in this window has the Sun and Earth both above the terrain horizon; some samples are unknown. The selected time was kept.',
+      'mask-unavailable': 'Horizon mask unavailable: visibility is unknown, so the selected time was kept.',
+    };
+    // Playback would walk the cursor away from the moment the landing view explains.
+    dispatch({ type: 'playing', playing: false });
+    if (moment.kind === 'move') dispatch({ type: 'cursor', index: moment.index });
     // The note describes one cursor position of one result; it is dropped once either changes.
-    const setLandingNote = (text: string) => setLandingNoteState({ text, index: index !== null ? index : cursorIndex, resultId: shown.id });
-    if (index === null) {
-      setLandingNote(shown.mask === null
-        ? 'Horizon mask unavailable: visibility is unknown, so the selected time was kept.'
-        : 'No sample in this window has the Sun and Earth both above the terrain horizon. The selected time was kept.');
-    } else if (index === cursorIndex) {
-      setLandingNote('The Sun and Earth are both above the terrain horizon at the selected time.');
-    } else {
-      dispatch({ type: 'playing', playing: false });
-      dispatch({ type: 'cursor', index });
-      setLandingNote(`Timeline moved to ${utc(shown.ephemeris.timesUtcMs[index]).replace('Z', '')} UTC: the first sample in this window with the Sun and Earth both above the terrain horizon.`);
-    }
+    setLandingNoteState({ text: text[moment.kind], index: moment.index, resultId: shown.id });
   }, [shown, cursorIndex, dispatch]);
+  const staleSummary = pending && !pendingOther;
   const landingSummary = useMemo<LandingSummary | null>(() => shown ? {
     title: `Touchdown · ${shown.inputs.site.name}`,
-    meta: `${windowLabel(shown.inputs)} · ${sourceLabel(shown.ephemeris.provenance.kind)}`,
+    meta: `${staleSummary ? `Recomputing — values are ${shown.id} until it finishes · ` : ''}${windowLabel(shown.inputs)} · ${sourceLabel(shown.ephemeris.provenance.kind)}`,
     rows: [
       { label: 'Sunlit time', value: number(shown.analysis.metrics.sunlitHours, ' h') },
       { label: 'Longest darkness', value: number(shown.analysis.metrics.longestDarknessHours, ' h') },
       { label: 'Earth-visible time', value: number(shown.analysis.metrics.earthVisibleHours, ' h') },
       { label: 'Sun and Earth both visible', value: number(shown.analysis.metrics.bothHours, ' h') },
     ],
-  } : null, [shown]);
+  } : null, [shown, staleSummary]);
   const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 1199px)').matches);
   const [showInputs, setShowInputs] = useState(() => !window.matchMedia('(max-width: 1199px)').matches);
   const [showResults, setShowResults] = useState(() => !window.matchMedia('(max-width: 1199px)').matches);

@@ -153,6 +153,7 @@ export function LunarViewer(props: LunarViewerProps) {
   const mesh = status.kind === 'ready' && status.siteId === selectedSiteId ? status.mesh : null;
   const readoutState = useRef({ mesh, selectedSite });
   readoutState.current = { mesh, selectedSite };
+  const hasSun = sun !== null;
   const surfaceModeRef = useRef(surfaceMode);
   surfaceModeRef.current = surfaceMode;
 
@@ -277,7 +278,7 @@ export function LunarViewer(props: LunarViewerProps) {
         lightTarget.y + Math.sin(INSPECT_ELEVATION_RAD) * LIGHT_DISTANCE_M,
         lightTarget.z - inspectCos * Math.cos(inspectAz) * LIGHT_DISTANCE_M,
       );
-      const half = showcase ? SHOWCASE_SHADOW_HALF_M : mode === 'surface' ? SURFACE_SHADOW_HALF_M : Math.min(ORBIT_SHADOW_HALF_MAX_M, Math.max(1_500, camera.position.distanceTo(controls.target) * 0.8));
+      const half = showcase && mode === 'orbital' ? SHOWCASE_SHADOW_HALF_M : mode === 'surface' ? SURFACE_SHADOW_HALF_M : Math.min(ORBIT_SHADOW_HALF_MAX_M, Math.max(1_500, camera.position.distanceTo(controls.target) * 0.8));
       if (Math.abs(half - lastShadowHalf) > 1) {
         lastShadowHalf = half;
         const shadowCamera = sunLight.shadow.camera;
@@ -296,8 +297,9 @@ export function LunarViewer(props: LunarViewerProps) {
       }
       if (animating) requestRender();
     };
+    let torndown = false;
     const requestRender = () => {
-      if (frame === 0) frame = requestAnimationFrame(render);
+      if (frame === 0 && !torndown) frame = requestAnimationFrame(render);
     };
     controls.addEventListener('change', requestRender);
 
@@ -425,7 +427,9 @@ export function LunarViewer(props: LunarViewerProps) {
       const hit = raycaster.intersectObject(ground.group, true)[0];
       return hit ? { y: hit.point.y, normal: hit.face ? hit.face.normal.clone() : null } : null;
     };
+    let savedLook: Look | null = null;
     const beginLanding = () => {
+      if (latest.current.cameraMode === 'surface') savedLook = { ...lookRef.current };
       if (latest.current.cameraMode === 'orbital') {
         savedOrbit = { position: camera.position.clone(), target: controls.target.clone(), fov: camera.fov };
         orbitHandedOver = false;
@@ -451,6 +455,11 @@ export function LunarViewer(props: LunarViewerProps) {
         controls.enabled = latest.current.cameraMode === 'orbital';
         savedOrbit = null;
       }
+      if (savedLook) {
+        // Ground view: the descent turned the eye toward the craft; give the heading back.
+        if (latest.current.cameraMode === 'surface') { lookRef.current = savedLook; applyLook(); }
+        savedLook = null;
+      }
       requestRender();
     };
 
@@ -459,6 +468,7 @@ export function LunarViewer(props: LunarViewerProps) {
     setReady(true);
 
     return () => {
+      torndown = true;
       if (frame) cancelAnimationFrame(frame);
       frame = 0;
       resizeObserver.disconnect();
@@ -654,7 +664,8 @@ export function LunarViewer(props: LunarViewerProps) {
     runtime.requestRender();
     // A new terrain build or site ends any running showcase.
     return () => { runtime.endLanding(); runtime.lander.setVisible(false); };
-  }, [mesh, landerReady, ready]);
+    // `hasSun`: a site's terrain can finish before its result; place again once the Sun is known.
+  }, [mesh, landerReady, hasSun, ready]);
 
   // Switching camera mode ends the showcase before the camera is re-framed below.
   useEffect(() => () => { runtimeRef.current?.endLanding(); }, [cameraMode]);
@@ -723,6 +734,13 @@ export function LunarViewer(props: LunarViewerProps) {
     latest.current.onPlayLanding?.();
     setLandingRun((run) => run + 1);
   };
+  // One button for the whole showcase so keyboard focus survives the phase changes.
+  const onLandingButton = () => {
+    const runtime = runtimeRef.current;
+    if (landingPhase === 'parked') playLanding();
+    else if (landingPhase === 'descent') { runtime?.lander.skip(); runtime?.requestRender(); }
+    else runtime?.endLanding();
+  };
   const mock = terrain?.provenance.kind === 'mock';
   const extentKm = mesh ? (mesh.maxRangeM / 1000).toFixed(0) : null;
   return (
@@ -731,7 +749,7 @@ export function LunarViewer(props: LunarViewerProps) {
       {/* Every overlay lives inside the App-provided safe insets (contract-2). */}
       <div ref={safeRef} className="lunar-viewer__safe">
         {surface && <canvas ref={compassRef} className="lunar-viewer__compass" aria-hidden="true" />}
-        <div className="lunar-viewer__sr" aria-live="polite">{describeBody('Sun', sun)}. {describeBody('Earth', earth)}.{!sun ? ' Lighting: neutral light (no Sun direction for this site yet).' : ''}{landingPhase === 'descent' ? ' Illustrative landing in progress.' : landingPhase === 'link' ? ' Lander has touched down; landing result shown.' : ''}</div>
+        <div className="lunar-viewer__sr" aria-live="polite">{describeBody('Sun', sun)}. {describeBody('Earth', earth)}.{!sun ? ' Lighting: neutral light (no Sun direction for this site yet).' : ''}{landingPhase === 'descent' ? ' Illustrative landing in progress.' : landingPhase === 'link' ? ' Lander has touched down; landing result shown.' : ''}{landingPhase !== 'parked' && landingNote ? ` ${landingNote}` : ''}</div>
         <div className="lunar-viewer__corner">
           {mock && <div className="lunar-viewer__mock" role="status">MOCK DATA · fictional terrain</div>}
           <div className="lunar-viewer__toolbar" role="toolbar" aria-label="3D view options">
@@ -744,9 +762,11 @@ export function LunarViewer(props: LunarViewerProps) {
             <button type="button" aria-pressed={quality === 'high'} onClick={() => setQuality((q) => (q === 'high' ? 'balanced' : 'high'))} title={quality === 'high' ? 'High detail (denser mesh, sharper shadows; slower)' : 'Balanced (default)'} aria-label="High detail rendering">HD</button>
             <button type="button" aria-expanded={legendOpen} aria-controls="lunar-viewer-legend" onClick={() => setLegendOpen((v) => !v)} title="Legend" aria-label="Legend">i</button>
           </div>
-          {canLand && landingPhase === 'parked' && <button type="button" className="lunar-viewer__landing-button" onClick={playLanding} title="Illustrative descent to this site, then the Sun ray and Earth link at the selected time">▶ Play landing</button>}
-          {landingPhase === 'descent' && <button type="button" className="lunar-viewer__landing-button" onClick={() => { runtimeRef.current?.lander.skip(); runtimeRef.current?.requestRender(); }}>⏭ Skip to touchdown</button>}
-          {landingPhase === 'link' && <button type="button" className="lunar-viewer__landing-button" data-active="true" onClick={() => runtimeRef.current?.endLanding()}>■ End landing view</button>}
+          {(canLand || landingPhase !== 'parked') && (
+            <button type="button" className="lunar-viewer__landing-button" onClick={onLandingButton} aria-label={landingPhase === 'parked' ? 'Play illustrative landing' : landingPhase === 'descent' ? 'Skip to touchdown' : 'End landing view'} title={landingPhase === 'parked' ? 'Illustrative descent to this site, then the Sun ray and Earth link at the selected time' : undefined}>
+              {landingPhase === 'parked' ? '▶ Play landing' : landingPhase === 'descent' ? '⏭ Skip to touchdown' : '■ End landing view'}
+            </button>
+          )}
           {legendOpen && (
             <div id="lunar-viewer-legend" className="lunar-viewer__legend">
               {surfaceMode === 'elevation' && mesh ? (
@@ -788,7 +808,7 @@ export function LunarViewer(props: LunarViewerProps) {
           </section>
         )}
         <div className="lunar-viewer__readout-row">
-          {landingPhase !== 'parked' && <span className="lunar-viewer__chip" role="status">Illustrative landing · Sun enlarged ×{SHOWCASE_SUN_SCALE} · display aid</span>}
+          {landingPhase !== 'parked' && <span className="lunar-viewer__chip" role="status">Illustrative landing · Sun enlarged ×{SHOWCASE_SUN_SCALE}{surface ? '' : ' · terrain shadows near lander only'} · display aid</span>}
           <span ref={scaleChipRef} className="lunar-viewer__chip" hidden />
           {mesh?.partialCoverage && <span className="lunar-viewer__chip" role="status">Partial footprint · coverage edge</span>}
           {!sun && ready && <span className="lunar-viewer__chip">Neutral light · no Sun direction yet</span>}

@@ -306,7 +306,8 @@ export function createLanderScene(options: {
     model.traverse((object) => {
       if ((object as Mesh).isMesh) {
         const mesh = object as Mesh;
-        mesh.castShadow = true;
+        // Honour the scale already applied: an enlarged icon must not cast a Sun shadow.
+        mesh.castShadow = castingShadow;
         mesh.receiveShadow = true;
         modelMeshes.push(mesh);
       }

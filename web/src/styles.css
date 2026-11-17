@@ -304,6 +304,7 @@ td.cell-unknown, td.cell-pending { color: var(--ls-text-muted); font-family: var
   .panoramic-horizon { padding-inline: 8px; max-height: 160px; }
   /* Override the UA dialog max-width (100% - 2em - 6px) so sheets really use the phone width. */
   .overlay-dialog { width: calc(100vw - 16px); max-width: calc(100vw - 16px); max-height: calc(100dvh - 32px); }
+  .overlay-dialog.command-dialog { width: calc(100vw - 16px); }
   .dialog-surface { padding: 16px; }
   .dialog-heading { gap: 12px; }
   .conventions { grid-template-columns: 1fr; }
