@@ -4,6 +4,7 @@ import {
   HemisphereLight,
   PCFShadowMap,
   PerspectiveCamera,
+  Raycaster,
   Scene,
   Vector3,
   WebGLRenderer,
@@ -12,6 +13,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import type { LocalTerrainMesh, TerrainMeshLoader, TerrainMeshQuality } from '../data/contract';
 import { drawCompass, type CompassMarker } from './compass';
+import { createLanderScene, type GroundSample, type LanderScene, type LandingPhase } from './landerScene';
 import { bodyDirectionLocal, toLocal } from './localFrame';
 import { createSkyScene, type SkyScene } from './skyScene';
 import { describeBody, formatSigned, visibilityText, visibleToState } from './skyGeometry';
@@ -19,7 +21,7 @@ import { createTerrainMaterials, createTerrainObject, RAMP_STOPS, setTerrainMode
 import type { BodyDirection, LunarViewerProps } from './types';
 import './viewer.css';
 
-export type { BodyDirection, CameraMode, LunarViewerProps } from './types';
+export type { BodyDirection, CameraMode, LandingSummary, LunarViewerProps } from './types';
 
 /** Vertical field of view (deg). */
 const DEFAULT_FOV_DEG = 50;
@@ -33,6 +35,7 @@ const MAX_FOV_DEG = 80;
 const ORBIT_RANGE_M = 75_000;
 const ORBIT_ELEVATION_DEG = 60;
 const ORBIT_MIN_DISTANCE_M = 150;
+const ORBIT_MAX_DISTANCE_M = 200_000;
 /**
  * Near planes only clip; they never move the eye. With a logarithmic depth buffer a 2 cm near
  * plane keeps 0 m / 0.25 m observers usable without a hidden height floor.
@@ -60,6 +63,22 @@ const INSPECT_AZIMUTH_OFFSET_RAD = -Math.PI / 4;
 /** Small uniform ambient (part of the display aid) so faces turned from both lights are not black. */
 const AMBIENT_INTENSITY = 0.08;
 
+/**
+ * Lander (display aid). It stands a short walk from the observer so Ground view looks at it
+ * rather than from inside it, and in Site overview it is enlarged with camera distance so it
+ * stays visible; the HUD says so whenever it is not at true size.
+ */
+const LANDER_OFFSET_M = 30;
+const LANDER_AZIMUTH_FROM_SUN_DEG = 25;
+const LANDER_SCALE_PER_M = 0.011;
+/** Showcase: tight shadow box so the lander casts a readable shadow; closer orbit limits. */
+const SHOWCASE_SHADOW_HALF_M = 300;
+const SHOWCASE_MIN_DISTANCE_M = 8;
+const SHOWCASE_MAX_DISTANCE_M = 600;
+/** Showcase only: the Sun disc is drawn this many times its true angular size (labelled). */
+const SHOWCASE_SUN_SCALE = 4;
+const LANDER_MODEL_URL = `${import.meta.env.BASE_URL}models/lander.glb`;
+
 /** Bounded defaults: Balanced is the default; High raises density and shadow resolution. */
 const PIXEL_RATIO_CAP: Record<TerrainMeshQuality, number> = { balanced: 1.5, high: 2 };
 const SHADOW_MAP_SIZE: Record<TerrainMeshQuality, number> = { balanced: 2048, high: 4096 };
@@ -85,11 +104,17 @@ interface Runtime {
   inspect: DirectionalLight;
   ambient: HemisphereLight;
   sky: SkyScene;
+  lander: LanderScene;
   materials: TerrainMaterials;
   /** Unit vector toward the Sun (or the neutral light), local frame. */
   lightDirection: Vector3;
   requestRender(): void;
   applyLook(): void;
+  /** Rendered-ground height and normal under a local (x, z); null outside the footprint. */
+  groundAt(x: number, z: number): GroundSample | null;
+  beginLanding(): void;
+  /** Ends the landing showcase and gives the camera back. */
+  endLanding(): void;
 }
 
 type MeshStatus =
@@ -99,17 +124,18 @@ type MeshStatus =
   | { kind: 'error'; message: string };
 
 export function LunarViewer(props: LunarViewerProps) {
-  const { terrain, sites, selectedSiteId, observerHeightM, cameraMode, sun, earth, onSelectSite } = props;
+  const { terrain, sites, selectedSiteId, observerHeightM, cameraMode, sun, earth, onSelectSite, onPlayLanding, landingNote, landingSummary } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const safeRef = useRef<HTMLDivElement>(null);
   const compassRef = useRef<HTMLCanvasElement>(null);
   const readoutRef = useRef<HTMLDivElement>(null);
+  const scaleChipRef = useRef<HTMLSpanElement>(null);
   const runtimeRef = useRef<Runtime | null>(null);
   const terrainRef = useRef<TerrainObject | null>(null);
   const lookRef = useRef<Look>({ headingDeg: 0, pitchDeg: 3 });
   const palette = useRef<Palette>(DEFAULT_PALETTE);
-  const latest = useRef({ onSelectSite, sun, earth, cameraMode, observerHeightM });
-  latest.current = { onSelectSite, sun, earth, cameraMode, observerHeightM };
+  const latest = useRef({ onSelectSite, onPlayLanding, sun, earth, cameraMode, observerHeightM });
+  latest.current = { onSelectSite, onPlayLanding, sun, earth, cameraMode, observerHeightM };
   const [ready, setReady] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [loader, setLoader] = useState<TerrainMeshLoader | null>(null);
@@ -119,6 +145,10 @@ export function LunarViewer(props: LunarViewerProps) {
   const [quality, setQuality] = useState<TerrainMeshQuality>('balanced');
   const [reliefAid, setReliefAid] = useState(true);
   const [legendOpen, setLegendOpen] = useState(false);
+  const [landerReady, setLanderReady] = useState(false);
+  const [landingPhase, setLandingPhase] = useState<LandingPhase>('parked');
+  /** Incremented per Play so the showcase starts after the App's cursor move has rendered. */
+  const [landingRun, setLandingRun] = useState(0);
   const selectedSite = useMemo(() => sites.find((s) => s.id === selectedSiteId) ?? null, [sites, selectedSiteId]);
   const mesh = status.kind === 'ready' && status.siteId === selectedSiteId ? status.mesh : null;
   const readoutState = useRef({ mesh, selectedSite });
@@ -166,11 +196,19 @@ export function LunarViewer(props: LunarViewerProps) {
     scene.add(inspect, inspect.target, ambient);
     const sky = createSkyScene({ sun: palette.current.sun, earth: palette.current.earth });
     scene.add(sky.group, sky.directionLines);
+    const lander = createLanderScene({
+      modelUrl: LANDER_MODEL_URL,
+      colors: { sun: palette.current.sun, earth: palette.current.earth },
+      onLoaded: () => { setLanderReady(true); requestRender(); },
+      onError: (reason) => { console.warn('Lander model unavailable', reason); },
+      onPhase: setLandingPhase,
+    });
+    scene.add(lander.group);
     const materials = createTerrainMaterials();
     const controls = new OrbitControls(camera, canvas);
     controls.target.set(0, 0, 0);
     controls.minDistance = ORBIT_MIN_DISTANCE_M;
-    controls.maxDistance = 200_000;
+    controls.maxDistance = ORBIT_MAX_DISTANCE_M;
     controls.maxPolarAngle = (88 * Math.PI) / 180;
     controls.screenSpacePanning = true;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -183,13 +221,48 @@ export function LunarViewer(props: LunarViewerProps) {
     let lastShadowHalf = -1;
     let lastReadout = '';
     let lastCompass = '';
+    let lastScaleChip = '';
     const lightTarget = new Vector3();
-    const render = () => {
+    /** Camera state taken over by the showcase in Site overview; restored when it ends. */
+    let savedOrbit: { position: Vector3; target: Vector3; fov: number } | null = null;
+    let orbitHandedOver = false;
+    const render = (now: number) => {
       frame = 0;
       const mode = latest.current.cameraMode;
-      if (mode === 'orbital') controls.update();
+      const animating = lander.update(now);
+      const showcase = lander.phase !== 'parked';
+      if (showcase && mode === 'orbital') {
+        if (lander.view.scripted) {
+          camera.position.copy(lander.view.position);
+          if (camera.fov !== lander.view.fovDeg) { camera.fov = lander.view.fovDeg; camera.updateProjectionMatrix(); }
+          camera.up.set(0, 1, 0);
+          camera.lookAt(lander.view.target);
+        } else {
+          if (!orbitHandedOver) {
+            // The scripted move is over: the user may orbit around the landed craft.
+            orbitHandedOver = true;
+            camera.position.copy(lander.view.position);
+            if (camera.fov !== lander.view.fovDeg) { camera.fov = lander.view.fovDeg; camera.updateProjectionMatrix(); }
+            controls.target.copy(lander.view.target);
+            controls.enabled = true;
+          }
+          controls.update();
+        }
+      } else if (mode === 'orbital') {
+        controls.update();
+      } else if (lander.phase === 'descent') {
+        // Ground view: the eye stays put and follows the craft down.
+        const dx = lander.bodyCentre.x - camera.position.x, dy = lander.bodyCentre.y - camera.position.y, dz = lander.bodyCentre.z - camera.position.z;
+        lookRef.current.headingDeg = ((Math.atan2(dx, -dz) * 180) / Math.PI + 360) % 360;
+        lookRef.current.pitchDeg = Math.min(85, (Math.atan2(dy, Math.hypot(dx, dz)) * 180) / Math.PI);
+        camera.up.set(0, 1, 0);
+        camera.lookAt(lander.bodyCentre);
+      }
+      const landerScale = !showcase && mode === 'orbital' ? Math.max(1, camera.position.distanceTo(lander.home) * LANDER_SCALE_PER_M) : 1;
+      lander.setDisplayScale(landerScale);
       sky.group.position.copy(camera.position);
-      if (mode === 'orbital') lightTarget.copy(controls.target); else lightTarget.set(0, 0, 0);
+      if (showcase) lightTarget.copy(lander.home);
+      else if (mode === 'orbital') lightTarget.copy(controls.target); else lightTarget.set(0, 0, 0);
       sunLight.target.position.copy(lightTarget);
       sunLight.position.copy(lightTarget).addScaledVector(lightDirection, LIGHT_DISTANCE_M);
       // Inspection light from the viewer's front-left: azimuth follows the view heading.
@@ -204,7 +277,7 @@ export function LunarViewer(props: LunarViewerProps) {
         lightTarget.y + Math.sin(INSPECT_ELEVATION_RAD) * LIGHT_DISTANCE_M,
         lightTarget.z - inspectCos * Math.cos(inspectAz) * LIGHT_DISTANCE_M,
       );
-      const half = mode === 'surface' ? SURFACE_SHADOW_HALF_M : Math.min(ORBIT_SHADOW_HALF_MAX_M, Math.max(1_500, camera.position.distanceTo(controls.target) * 0.8));
+      const half = showcase ? SHOWCASE_SHADOW_HALF_M : mode === 'surface' ? SURFACE_SHADOW_HALF_M : Math.min(ORBIT_SHADOW_HALF_MAX_M, Math.max(1_500, camera.position.distanceTo(controls.target) * 0.8));
       if (Math.abs(half - lastShadowHalf) > 1) {
         lastShadowHalf = half;
         const shadowCamera = sunLight.shadow.camera;
@@ -216,6 +289,12 @@ export function LunarViewer(props: LunarViewerProps) {
       renderer.render(scene, camera);
       labelRenderer.render(scene, camera);
       drawOverlays();
+      const chip = scaleChipRef.current;
+      if (chip) {
+        const text = lander.group.visible && lander.loaded && landerScale > 1.05 ? `Lander enlarged ×${landerScale < 10 ? landerScale.toFixed(1) : Math.round(landerScale)} · not to scale` : '';
+        if (text !== lastScaleChip) { lastScaleChip = text; chip.textContent = text; chip.hidden = text === ''; }
+      }
+      if (animating) requestRender();
     };
     const requestRender = () => {
       if (frame === 0) frame = requestAnimationFrame(render);
@@ -251,10 +330,11 @@ export function LunarViewer(props: LunarViewerProps) {
       const compass = compassRef.current;
       if (compass && mode === 'surface') {
         const { sun: s, earth: e } = latest.current;
-        const key = [lookRef.current.headingDeg.toFixed(2), hfov.toFixed(4), canvas.clientWidth, compass.clientWidth, s?.azDeg, s?.visible, e?.azDeg, e?.visible].join('|');
+        const key = [lander.group.visible && lander.loaded, lander.home.x, lander.home.z, lookRef.current.headingDeg.toFixed(2), hfov.toFixed(4), canvas.clientWidth, compass.clientWidth, s?.azDeg, s?.visible, e?.azDeg, e?.visible].join('|');
         if (key !== lastCompass) {
           lastCompass = key;
           const markers: CompassMarker[] = [];
+          if (lander.group.visible && lander.loaded) markers.push({ azDeg: ((Math.atan2(lander.home.x, -lander.home.z) * 180) / Math.PI + 360) % 360, color: palette.current.accent, label: 'LANDER', hidden: false });
           if (s) markers.push({ azDeg: s.azDeg, color: palette.current.sun, label: 'SUN', hidden: s.visible === null ? null : !s.visible });
           if (e) markers.push({ azDeg: e.azDeg, color: palette.current.earth, label: 'EARTH', hidden: e.visible === null ? null : !e.visible });
           // The tape spans less than the canvas: give it the FOV its own width covers.
@@ -335,7 +415,46 @@ export function LunarViewer(props: LunarViewerProps) {
     canvas.addEventListener('keydown', onKey);
     reduceMotion.addEventListener('change', onMotionPreference);
 
-    runtimeRef.current = { renderer, labels: labelRenderer, scene, camera, controls, sunLight, inspect, ambient, sky, materials, lightDirection, requestRender, applyLook };
+    const raycaster = new Raycaster();
+    const rayOrigin = new Vector3();
+    const rayDown = new Vector3(0, -1, 0);
+    const groundAt = (x: number, z: number): GroundSample | null => {
+      const ground = terrainRef.current;
+      if (!ground) return null;
+      raycaster.set(rayOrigin.set(x, 500_000, z), rayDown);
+      const hit = raycaster.intersectObject(ground.group, true)[0];
+      return hit ? { y: hit.point.y, normal: hit.face ? hit.face.normal.clone() : null } : null;
+    };
+    const beginLanding = () => {
+      if (latest.current.cameraMode === 'orbital') {
+        savedOrbit = { position: camera.position.clone(), target: controls.target.clone(), fov: camera.fov };
+        orbitHandedOver = false;
+        controls.enabled = false;
+        controls.minDistance = SHOWCASE_MIN_DISTANCE_M;
+        controls.maxDistance = SHOWCASE_MAX_DISTANCE_M;
+      }
+      sky.setSunDisplayScale(SHOWCASE_SUN_SCALE);
+      lander.start({ reducedMotion: reduceMotion.matches, sun: latest.current.sun, earth: latest.current.earth, groundAt });
+      requestRender();
+    };
+    const endLanding = () => {
+      if (lander.phase === 'parked') return;
+      lander.stop();
+      sky.setSunDisplayScale(1);
+      if (savedOrbit) {
+        controls.minDistance = ORBIT_MIN_DISTANCE_M;
+        controls.maxDistance = ORBIT_MAX_DISTANCE_M;
+        camera.position.copy(savedOrbit.position);
+        controls.target.copy(savedOrbit.target);
+        camera.fov = savedOrbit.fov;
+        camera.updateProjectionMatrix();
+        controls.enabled = latest.current.cameraMode === 'orbital';
+        savedOrbit = null;
+      }
+      requestRender();
+    };
+
+    runtimeRef.current = { renderer, labels: labelRenderer, scene, camera, controls, sunLight, inspect, ambient, sky, lander, materials, lightDirection, requestRender, applyLook, groundAt, beginLanding, endLanding };
     resize();
     setReady(true);
 
@@ -355,6 +474,7 @@ export function LunarViewer(props: LunarViewerProps) {
       terrainRef.current?.dispose();
       terrainRef.current = null;
       sky.dispose();
+      lander.dispose();
       materials.relief.dispose();
       materials.elevation.dispose();
       sunLight.shadow.dispose();
@@ -446,6 +566,7 @@ export function LunarViewer(props: LunarViewerProps) {
     const runtime = runtimeRef.current;
     if (!runtime) return;
     runtime.sky.update(sun, earth);
+    runtime.lander.setBodies(sun, earth);
     const [x, y, z] = sun ? bodyDirectionLocal(sun.azDeg, sun.elDeg) : NEUTRAL_LIGHT;
     runtime.lightDirection.set(x, y, z);
     runtime.requestRender();
@@ -520,6 +641,34 @@ export function LunarViewer(props: LunarViewerProps) {
     return () => { for (const object of added) { object.removeFromParent(); object.element.remove(); } runtime.requestRender(); };
   }, [mesh, terrain, sites, selectedSiteId, cameraMode, labels, ready]);
 
+  // Lander: parked beside the site once its terrain and the model exist. Its azimuth is fixed
+  // per terrain build (from the Sun azimuth at that moment), not per time-cursor step.
+  useEffect(() => {
+    const runtime = runtimeRef.current;
+    if (!runtime) return undefined;
+    if (!mesh || !landerReady) { runtime.lander.setVisible(false); runtime.requestRender(); return undefined; }
+    const [x, , z] = bodyDirectionLocal((latest.current.sun?.azDeg ?? 200) + LANDER_AZIMUTH_FROM_SUN_DEG, 0);
+    const ground = runtime.groundAt(x * LANDER_OFFSET_M, z * LANDER_OFFSET_M);
+    runtime.lander.place(new Vector3(x * LANDER_OFFSET_M, ground?.y ?? 0, z * LANDER_OFFSET_M), ground?.normal ?? null);
+    runtime.lander.setVisible(true);
+    runtime.requestRender();
+    // A new terrain build or site ends any running showcase.
+    return () => { runtime.endLanding(); runtime.lander.setVisible(false); };
+  }, [mesh, landerReady, ready]);
+
+  // Switching camera mode ends the showcase before the camera is re-framed below.
+  useEffect(() => () => { runtimeRef.current?.endLanding(); }, [cameraMode]);
+
+  // Landing showcase: starts one render after Play, so a cursor move by the App is already in
+  // `sun` / `earth` when the camera is framed.
+  useEffect(() => {
+    if (landingRun === 0) return;
+    const runtime = runtimeRef.current;
+    if (!runtime || !runtime.lander.loaded || !runtime.lander.group.visible) return;
+    runtime.endLanding();
+    runtime.beginLanding();
+  }, [landingRun]);
+
   // 10. Camera framing on site/mode change. Camera state never changes scientific inputs.
   useEffect(() => {
     const runtime = runtimeRef.current;
@@ -566,6 +715,11 @@ export function LunarViewer(props: LunarViewerProps) {
   }, [cameraMode, ready]);
 
   const surface = cameraMode === 'surface';
+  const canLand = landerReady && mesh !== null && sun !== null;
+  const playLanding = () => {
+    latest.current.onPlayLanding?.();
+    setLandingRun((run) => run + 1);
+  };
   const mock = terrain?.provenance.kind === 'mock';
   const extentKm = mesh ? (mesh.maxRangeM / 1000).toFixed(0) : null;
   return (
@@ -574,7 +728,7 @@ export function LunarViewer(props: LunarViewerProps) {
       {/* Every overlay lives inside the App-provided safe insets (contract-2). */}
       <div ref={safeRef} className="lunar-viewer__safe">
         {surface && <canvas ref={compassRef} className="lunar-viewer__compass" aria-hidden="true" />}
-        <div className="lunar-viewer__sr" aria-live="polite">{describeBody('Sun', sun)}. {describeBody('Earth', earth)}.{!sun ? ' Lighting: neutral light (no Sun direction for this site yet).' : ''}</div>
+        <div className="lunar-viewer__sr" aria-live="polite">{describeBody('Sun', sun)}. {describeBody('Earth', earth)}.{!sun ? ' Lighting: neutral light (no Sun direction for this site yet).' : ''}{landingPhase === 'descent' ? ' Illustrative landing in progress.' : landingPhase === 'link' ? ' Lander has touched down; landing result shown.' : ''}</div>
         <div className="lunar-viewer__corner">
           {mock && <div className="lunar-viewer__mock" role="status">MOCK DATA · fictional terrain</div>}
           <div className="lunar-viewer__toolbar" role="toolbar" aria-label="3D view options">
@@ -587,6 +741,9 @@ export function LunarViewer(props: LunarViewerProps) {
             <button type="button" aria-pressed={quality === 'high'} onClick={() => setQuality((q) => (q === 'high' ? 'balanced' : 'high'))} title={quality === 'high' ? 'High detail (denser mesh, sharper shadows; slower)' : 'Balanced (default)'} aria-label="High detail rendering">HD</button>
             <button type="button" aria-expanded={legendOpen} aria-controls="lunar-viewer-legend" onClick={() => setLegendOpen((v) => !v)} title="Legend" aria-label="Legend">i</button>
           </div>
+          {canLand && landingPhase === 'parked' && <button type="button" className="lunar-viewer__landing-button" onClick={playLanding} title="Illustrative descent to this site, then the Sun ray and Earth link at the selected time">▶ Play landing</button>}
+          {landingPhase === 'descent' && <button type="button" className="lunar-viewer__landing-button" onClick={() => { runtimeRef.current?.lander.skip(); runtimeRef.current?.requestRender(); }}>⏭ Skip to touchdown</button>}
+          {landingPhase === 'link' && <button type="button" className="lunar-viewer__landing-button" data-active="true" onClick={() => runtimeRef.current?.endLanding()}>■ End landing view</button>}
           {legendOpen && (
             <div id="lunar-viewer-legend" className="lunar-viewer__legend">
               {surfaceMode === 'elevation' && mesh ? (
@@ -601,6 +758,7 @@ export function LunarViewer(props: LunarViewerProps) {
               {reliefAid && <div className="lunar-viewer__legend-meta">Fill: a cool inspection light from your front-left (moves with the view) plus faint ambient — a display aid, not sunlight, so slope shape reads at any Sun angle. Only the Sun casts shadows; switch Fill off to see Sun light alone.</div>}
               <div className="lunar-viewer__legend-meta">Local terrain around the selected site{extentKm ? ` to ${extentKm} km` : ''}, Moon curvature included; near detail is fine, distant terrain coarse. Beyond it nothing is drawn.</div>
               <div className="lunar-viewer__legend-meta">{surface ? 'Sun 0.53° and Earth 1.9° at true angular size. Stars and Earth texture are decorative.' : 'Lines point toward the Sun and Earth from the site.'}</div>
+              <div className="lunar-viewer__legend-meta">Lander and landing: an illustrative model {LANDER_OFFSET_M} m from the site point, enlarged in Site overview so it stays visible. Descent path, flame and dust are decorative. The Sun ray and Earth link show only whether each body's centre is above the terrain horizon at the selected time — not power or radio-link performance. During the landing view the Sun disc is drawn ×{SHOWCASE_SUN_SCALE}.</div>
               <div className="lunar-viewer__legend-meta">{surface ? 'Drag or arrow keys to look · wheel or ± to zoom.' : 'Drag to orbit · right-drag to pan · wheel to zoom · click a site.'}</div>
             </div>
           )}
@@ -610,7 +768,24 @@ export function LunarViewer(props: LunarViewerProps) {
           {status.kind === 'error' && <div className="lunar-viewer__error" role="alert">Terrain unavailable: {status.message}</div>}
           {status.kind === 'idle' && ready && !selectedSite && <div className="lunar-viewer__loading" role="status">Select a site to build its local terrain.</div>}
         </div>
+        {landingPhase === 'link' && (
+          <section className="lunar-viewer__landing-card" aria-label="Landing result">
+            <header><strong>{landingSummary?.title ?? 'Touchdown'}</strong><button type="button" onClick={() => runtimeRef.current?.endLanding()} aria-label="Close landing result">×</button></header>
+            {landingSummary && <p className="lunar-viewer__landing-meta">{landingSummary.meta}</p>}
+            {landingNote && <p className="lunar-viewer__landing-note">{landingNote}</p>}
+            <ul className="lunar-viewer__landing-now">
+              <li data-body="sun" data-state={sun ? visibleToState(sun.visible) : 'unknown'}>Sun {sun ? visibilityText(sun.visible) : 'direction unavailable'}</li>
+              <li data-body="earth" data-state={earth ? visibleToState(earth.visible) : 'unknown'}>Earth {earth ? visibilityText(earth.visible) : 'direction unavailable'}</li>
+            </ul>
+            {landingSummary && <dl>{landingSummary.rows.map((row) => <div key={row.label}><dt>{row.label}</dt><dd>{row.value}</dd></div>)}</dl>}
+            <p className="lunar-viewer__landing-foot">Centre visibility from the terrain horizon mask. Not power, radio-link performance or mission success. The descent is illustrative.</p>
+            <button type="button" className="lunar-viewer__landing-replay" onClick={playLanding}>Replay landing</button>
+          </section>
+        )}
         <div className="lunar-viewer__readout-row">
+          {landingPhase !== 'parked' && <span className="lunar-viewer__chip" role="status">Illustrative landing · display aid</span>}
+          {landingPhase !== 'parked' && <span className="lunar-viewer__chip">Sun enlarged ×{SHOWCASE_SUN_SCALE} · display aid</span>}
+          <span ref={scaleChipRef} className="lunar-viewer__chip" hidden />
           {mesh?.partialCoverage && <span className="lunar-viewer__chip" role="status">Partial footprint · coverage edge</span>}
           {!sun && ready && <span className="lunar-viewer__chip">Neutral light · no Sun direction yet</span>}
           {reliefAid && ready && <span className="lunar-viewer__chip" title="Cool inspection light from the view's front-left; not sunlight. Toggle with Fill.">Fill light · display aid</span>}

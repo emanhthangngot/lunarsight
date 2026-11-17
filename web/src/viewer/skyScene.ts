@@ -67,6 +67,8 @@ export interface SkyScene {
   earth: Mesh;
   update(sun: BodyDirection | null, earth: BodyDirection | null): void;
   setDirectionLinesVisible(visible: boolean): void;
+  /** Display aid: draws the Sun disc `scale` times its true angular size (1 = true size). */
+  setSunDisplayScale(scale: number): void;
   dispose(): void;
 }
 
@@ -160,6 +162,9 @@ export function createSkyScene(colors: { sun: string; earth: string }): SkyScene
     },
     setDirectionLinesVisible(visible) {
       directionLines.visible = visible;
+    },
+    setSunDisplayScale(scale) {
+      sun.scale.set(sunSize * scale, sunSize * scale, 1);
     },
     dispose() {
       group.removeFromParent();
