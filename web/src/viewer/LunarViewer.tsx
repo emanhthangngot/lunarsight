@@ -735,14 +735,23 @@ export function LunarViewer(props: LunarViewerProps) {
     latest.current.onPlayLanding?.();
     setLandingRun((run) => run + 1);
   };
-  // The App can start the landing view too (for example from its feature guide).
+  // The App can start the landing view too (feature guide). A request waits until the view can
+  // run (model, terrain and Sun ready) and is dropped if the site changes first.
   const handledRequest = useRef(landingRequest);
+  const requestSite = useRef(siteId);
   useEffect(() => {
-    if (landingRequest === handledRequest.current) return;
+    if (requestSite.current !== siteId) { requestSite.current = siteId; handledRequest.current = landingRequest; return; }
+    if (landingRequest === handledRequest.current || !canLand) return;
     handledRequest.current = landingRequest;
-    if (canLand) playLanding();
-    // Only a new request starts a run; readiness changes alone must not.
-  }, [landingRequest]); // eslint-disable-line react-hooks/exhaustive-deps
+    playLanding();
+  }, [landingRequest, canLand, siteId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const landingButtonRef = useRef<HTMLButtonElement>(null);
+  /** Closing from the card returns focus to the persistent landing button. */
+  const closeLanding = () => {
+    runtimeRef.current?.endLanding();
+    requestAnimationFrame(() => landingButtonRef.current?.focus());
+  };
 
   // One button for the whole showcase so keyboard focus survives the phase changes.
   const onLandingButton = () => {
@@ -773,7 +782,7 @@ export function LunarViewer(props: LunarViewerProps) {
             <button type="button" aria-expanded={legendOpen} aria-controls="lunar-viewer-legend" onClick={() => setLegendOpen((v) => !v)} title="Legend" aria-label="Legend">i</button>
           </div>
           {(canLand || landingPhase !== 'parked') && (
-            <button type="button" className="lunar-viewer__landing-button" onClick={onLandingButton} aria-label={landingPhase === 'parked' ? 'Play illustrative landing' : landingPhase === 'descent' ? 'Skip to touchdown' : 'End landing view'} title={landingPhase === 'parked' ? 'Illustrative descent to this site, then the Sun ray and Earth link at the selected time' : undefined}>
+            <button ref={landingButtonRef} type="button" className="lunar-viewer__landing-button" onClick={onLandingButton} aria-label={landingPhase === 'parked' ? 'Play illustrative landing' : landingPhase === 'descent' ? 'Skip to touchdown' : 'End landing view'} title={landingPhase === 'parked' ? 'Illustrative descent to this site, then the Sun ray and Earth link at the selected time' : undefined}>
               {landingPhase === 'parked' ? '▶ Play landing' : landingPhase === 'descent' ? '⏭ Skip to touchdown' : '■ End landing view'}
             </button>
           )}
@@ -803,12 +812,15 @@ export function LunarViewer(props: LunarViewerProps) {
         </div>
         {landingPhase !== 'parked' && (
           <section className="lunar-viewer__landing-card" aria-label="Landing status">
-            <header><strong>{landingPhase === 'descent' ? 'Landing' : 'Touchdown'}{landingSummary ? ` · ${landingSummary.title}` : ''}</strong><span><button type="button" onClick={playLanding} aria-label="Replay landing" title="Replay landing">↻</button><button type="button" onClick={() => runtimeRef.current?.endLanding()} aria-label="Close landing view" title="Close">×</button></span></header>
+            <header><strong>{landingPhase === 'descent' ? 'Landing' : 'Touchdown'}{landingSummary ? ` · ${landingSummary.title}` : ''}</strong><span>{landingPhase === 'descent'
+              ? <button type="button" onClick={onLandingButton} aria-label="Skip to touchdown" title="Skip to touchdown">⏭</button>
+              : <button type="button" onClick={playLanding} aria-label="Replay landing" title="Replay landing">↻</button>}<button type="button" onClick={closeLanding} aria-label="Close landing view" title="Close">×</button></span></header>
             <ul className="lunar-viewer__landing-now">
               <li data-body="sun" data-state={sun ? visibleToState(sun.visible) : 'unknown'}><strong>Sun</strong>{sun ? `${formatSigned(sun.elDeg)} · ${visibilityText(sun.visible)}` : 'direction unavailable'}</li>
               <li data-body="earth" data-state={earth ? visibleToState(earth.visible) : 'unknown'}><strong>Earth</strong>{earth ? `${formatSigned(earth.elDeg)} · ${visibilityText(earth.visible)}` : 'direction unavailable'}</li>
             </ul>
             {landingNote && <p className="lunar-viewer__landing-note">{landingNote}</p>}
+            {landingSummary?.notice && <p className="lunar-viewer__landing-stale" role="status">{landingSummary.notice}</p>}
             {landingSummary && <dl>{landingSummary.rows.map((row) => <div key={row.label}><dt>{row.label}</dt><dd>{row.value}</dd></div>)}</dl>}
             <p className="lunar-viewer__landing-foot">Terrain-horizon visibility only — not power or radio-link performance.</p>
             <details className="lunar-viewer__landing-about"><summary>About these values</summary>

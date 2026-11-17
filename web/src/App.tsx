@@ -70,7 +70,8 @@ export function App({ provider }: { provider: LunarDataProvider }) {
   const staleSummary = pending && !pendingOther;
   const landingSummary = useMemo<LandingSummary | null>(() => shown ? {
     title: shown.inputs.site.name,
-    meta: `${staleSummary ? `Recomputing — values are ${shown.id} until it finishes · ` : ''}${windowLabel(shown.inputs)} · ${sourceLabel(shown.ephemeris.provenance.kind)}`,
+    meta: `${windowLabel(shown.inputs)} · ${sourceLabel(shown.ephemeris.provenance.kind)}`,
+    ...(staleSummary ? { notice: `Recomputing — values from ${shown.id} until it finishes.` } : {}),
     rows: [
       { label: 'Sunlit', value: number(shown.analysis.metrics.sunlitHours, ' h') },
       { label: 'Longest darkness', value: number(shown.analysis.metrics.longestDarknessHours, ' h') },
@@ -144,7 +145,12 @@ export function App({ provider }: { provider: LunarDataProvider }) {
     else if (feature === 'horizon') setShowHorizon(true);
     else if (feature === 'summary') { setShowResults(true); if (compact) setShowInputs(false); }
     else if (feature === 'ground') dispatch({ type: 'camera', mode: 'surface' });
-    else if (feature === 'timeline') dispatch({ type: 'playing', playing: true });
+    else if (feature === 'timeline') {
+      // Same rules as the timeline's own Play: nothing while computing, restart from the window end.
+      if (!shown || pending) return;
+      if (cursorIndex === shown.ephemeris.timesUtcMs.length - 1) dispatch({ type: 'cursor', index: 0 });
+      dispatch({ type: 'playing', playing: true });
+    }
     else if (feature === 'landing') setLandingRequest((request) => request + 1);
   }
   function toggleMission() { setShowInputs((value) => !value); if (compact) setShowResults(false); }
@@ -184,7 +190,7 @@ export function App({ provider }: { provider: LunarDataProvider }) {
         <button className="icon-button" type="button" aria-label="Open provenance" aria-haspopup="dialog" title="Provenance & conventions" onClick={() => setProvenanceOpen(true)}><Info size={18} aria-hidden="true" /></button>
       </div>
       {dataBadge.kind !== 'processed' && <strong className="mock-badge" data-kind={dataBadge.kind}>{dataBadge.label}</strong>}
-      <button className="features-button" type="button" aria-haspopup="dialog" onClick={() => setFeaturesOpen(true)}><Sparkles size={16} aria-hidden="true" />Features</button>
+      <button className="features-button" type="button" aria-label="Features" title="What LunarSight does" aria-haspopup="dialog" onClick={() => setFeaturesOpen(true)}><Sparkles size={16} aria-hidden="true" /><span>Features</span></button>
     </header>
     <div id="workspace" className="result-status" data-status={pending ? 'pending' : state.error ? 'error' : 'ready'}>
       <span className="status-dot" aria-hidden="true" />

@@ -184,7 +184,7 @@ const SUN_TEXT: Record<VisibilityState, string> = {
   unknown: '? Sun ray · visibility unknown',
 };
 const EARTH_TEXT: Record<VisibilityState, string> = {
-  visible: 'Earth link · line of sight clear',
+  visible: 'Earth link · clear above terrain horizon',
   hidden: '✕ Earth link · blocked by terrain horizon',
   unknown: '? Earth link · visibility unknown',
 };
