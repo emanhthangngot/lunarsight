@@ -48,11 +48,13 @@ export function App({ provider }: { provider: LunarDataProvider }) {
     azDeg: shown.ephemeris.earthAzDeg[cursorIndex]!, elDeg: shown.ephemeris.earthElDeg[cursorIndex]!,
     visible: shown.analysis.earthVisible[cursorIndex] ?? null,
   } : null;
-  const [landingNote, setLandingNote] = useState<string | null>(null);
+  const [landingNote, setLandingNoteState] = useState<{ text: string; index: number; resultId: string } | null>(null);
   /** Landing showcase: move the time cursor to the first sample with both bodies visible, if any. */
   const playLanding = useCallback(() => {
-    if (!shown) { setLandingNote(null); return; }
+    if (!shown) { setLandingNoteState(null); return; }
     const index = firstBothVisibleIndex(shown.analysis.both);
+    // The note describes one cursor position of one result; it is dropped once either changes.
+    const setLandingNote = (text: string) => setLandingNoteState({ text, index: index !== null ? index : cursorIndex, resultId: shown.id });
     if (index === null) {
       setLandingNote(shown.mask === null
         ? 'Horizon mask unavailable: visibility is unknown, so the selected time was kept.'
@@ -62,7 +64,7 @@ export function App({ provider }: { provider: LunarDataProvider }) {
     } else {
       dispatch({ type: 'playing', playing: false });
       dispatch({ type: 'cursor', index });
-      setLandingNote(`Timeline moved to ${utc(shown.ephemeris.timesUtcMs[index])} UTC: the first sample in this window with the Sun and Earth both above the terrain horizon.`);
+      setLandingNote(`Timeline moved to ${utc(shown.ephemeris.timesUtcMs[index]).replace('Z', '')} UTC: the first sample in this window with the Sun and Earth both above the terrain horizon.`);
     }
   }, [shown, cursorIndex, dispatch]);
   const landingSummary = useMemo<LandingSummary | null>(() => shown ? {
@@ -153,7 +155,7 @@ export function App({ provider }: { provider: LunarDataProvider }) {
 
   return <main className="app-shell" data-compact={compact} style={appStyle}>
     <div className="viewer-stage">
-      <LunarViewer terrain={terrain} sites={viewerSites} selectedSiteId={displaySite?.id ?? null} observerHeightM={displayInputs?.observerHeightM ?? 0} cameraMode={state.cameraMode} sun={sun} earth={earth} onSelectSite={(id) => { const site = viewerSites.find((candidate) => candidate.id === id); if (site) selectSite(site); }} onPlayLanding={playLanding} landingNote={landingNote} landingSummary={landingSummary} />
+      <LunarViewer terrain={terrain} sites={viewerSites} selectedSiteId={displaySite?.id ?? null} observerHeightM={displayInputs?.observerHeightM ?? 0} cameraMode={state.cameraMode} sun={sun} earth={earth} onSelectSite={(id) => { const site = viewerSites.find((candidate) => candidate.id === id); if (site) selectSite(site); }} onPlayLanding={playLanding} landingNote={landingNote && shown && landingNote.resultId === shown.id && landingNote.index === cursorIndex ? landingNote.text : null} landingSummary={landingSummary} />
     </div>
     <header ref={commandRef} className="command-bar glass-surface">
       <a className="brand" href="#workspace" aria-label="LunarSight workspace"><Moon size={25} strokeWidth={1.3} aria-hidden="true" /><h1>LunarSight</h1></a>

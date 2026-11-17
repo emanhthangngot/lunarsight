@@ -64,9 +64,9 @@ const DUST_ALTITUDE_M = 20;
 const ENGINE_LIGHT_CD = 650;
 
 const RAY_LENGTH_M = 600;
-const RAY_RADIUS_M = 1.7;
+const RAY_RADIUS_M = 1.1;
 const BLOCKED_LENGTH_M = 60;
-const LABEL_DISTANCE_M = 16;
+const LABEL_DISTANCE_M = 7;
 const PULSE_COUNT = 6;
 const PULSE_SPAN_M = 220;
 const PULSE_SPEED_MPS = 70;
@@ -161,8 +161,9 @@ function createLabel(body: 'sun' | 'earth'): { label: CSS2DObject; text: HTMLSpa
   const text = document.createElement('span');
   element.append(text);
   const label = new CSS2DObject(element);
-  label.position.set(0, LABEL_DISTANCE_M, 0);
-  label.center.set(body === 'sun' ? 0 : 1, body === 'sun' ? 1 : 0);
+  // Different distances keep the two tags apart when the bodies lie in similar directions.
+  label.position.set(0, body === 'sun' ? LABEL_DISTANCE_M : LABEL_DISTANCE_M * 1.8, 0);
+  label.center.set(0.5, body === 'sun' ? 1.7 : -0.7);
   label.visible = false;
   return { label, text };
 }
@@ -238,14 +239,14 @@ export function createLanderScene(options: {
   const random = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
   for (let i = 0; i < DUST_COUNT; i++) {
     dustSeeds[i * 4] = random() * Math.PI * 2;
-    dustSeeds[i * 4 + 1] = 7 + random() * 19;
+    dustSeeds[i * 4 + 1] = 4 + random() * 10;
     dustSeeds[i * 4 + 2] = (2 + random() * 7) * (Math.PI / 180);
     dustSeeds[i * 4 + 3] = random();
   }
   const dustGeometry = track(new BufferGeometry());
   dustGeometry.setAttribute('position', dustPositions);
   dustGeometry.setAttribute('color', dustColors);
-  const dustMaterial = track(new PointsMaterial({ size: 1.1, sizeAttenuation: true, map: dotTexture, vertexColors: true, transparent: true, blending: AdditiveBlending, depthWrite: false }));
+  const dustMaterial = track(new PointsMaterial({ size: 0.55, sizeAttenuation: true, map: dotTexture, vertexColors: true, transparent: true, blending: AdditiveBlending, depthWrite: false }));
   const dust = new Points(dustGeometry, dustMaterial);
   dust.frustumCulled = false;
   dust.visible = false;
@@ -399,7 +400,7 @@ export function createLanderScene(options: {
     const sunClear = sunBeam.state === 'visible';
     const sunLength = sunClear ? RAY_LENGTH_M : BLOCKED_LENGTH_M;
     sunShaft.scale.set(RAY_RADIUS_M, sunLength, RAY_RADIUS_M);
-    sunShaftMaterial.opacity = (sunClear ? 0.17 : sunBeam.state === 'hidden' ? 0.05 : 0) * sunAlpha;
+    sunShaftMaterial.opacity = (sunClear ? 0.08 : sunBeam.state === 'hidden' ? 0.03 : 0) * sunAlpha;
     sunBeam.dashedMaterial.opacity = 0.9 * sunAlpha;
     pulses.visible = sunClear;
     pulseMaterial.opacity = 0.9 * sunAlpha;
@@ -469,7 +470,7 @@ export function createLanderScene(options: {
         const age = ((seconds / DUST_LIFE_S + offset) % 1) * DUST_LIFE_S;
         const range = 1.5 + speed * age;
         dustPositions.setXYZ(i, Math.cos(angle) * range, 0.15 + Math.sin(lift) * range, Math.sin(angle) * range);
-        const glow = 0.5 * strength * (1 - age / DUST_LIFE_S);
+        const glow = 0.3 * strength * (1 - age / DUST_LIFE_S);
         dustColors.setXYZ(i, glow, glow * 0.94, glow * 0.86);
       }
       dustPositions.needsUpdate = true;
@@ -544,7 +545,7 @@ export function createLanderScene(options: {
       view.position.copy(home).addScaledVector(cameraDirection, CAMERA_DISTANCE_M);
       const ground = start.groundAt(view.position.x, view.position.z);
       view.position.y = Math.max(ground?.y ?? home.y, home.y - 2) + CAMERA_HEIGHT_M;
-      linkTarget.copy(home).addScaledVector(UP, 3.2).addScaledVector(toward, 14);
+      linkTarget.copy(home).addScaledVector(UP, -3.5).addScaledVector(toward, 2);
       // Approach across the frame, braking with the body tilted back along the path.
       approach.crossVectors(UP, cameraDirection).normalize();
       tiltAxis.crossVectors(UP, approach).normalize();

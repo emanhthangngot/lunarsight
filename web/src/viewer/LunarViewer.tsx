@@ -681,7 +681,10 @@ export function LunarViewer(props: LunarViewerProps) {
       camera.fov = DEFAULT_FOV_DEG;
       camera.updateProjectionMatrix();
       camera.position.set(0, latest.current.observerHeightM, 0);
-      lookRef.current = { headingDeg: sunAz, pitchDeg: 3 };
+      // Open Ground view with the parked lander in frame (right of centre) when there is one.
+      const lander = runtime.lander;
+      const landerAz = ((Math.atan2(lander.home.x, -lander.home.z) * 180) / Math.PI + 360) % 360;
+      lookRef.current = { headingDeg: lander.group.visible && lander.loaded ? (landerAz - 15 + 360) % 360 : sunAz, pitchDeg: 3 };
       runtime.applyLook();
       return;
     }
@@ -770,16 +773,18 @@ export function LunarViewer(props: LunarViewerProps) {
         </div>
         {landingPhase === 'link' && (
           <section className="lunar-viewer__landing-card" aria-label="Landing result">
-            <header><strong>{landingSummary?.title ?? 'Touchdown'}</strong><button type="button" onClick={() => runtimeRef.current?.endLanding()} aria-label="Close landing result">×</button></header>
-            {landingSummary && <p className="lunar-viewer__landing-meta">{landingSummary.meta}</p>}
+            <header><strong>{landingSummary?.title ?? 'Touchdown'}</strong><span><button type="button" onClick={playLanding} aria-label="Replay landing" title="Replay landing">↻</button><button type="button" onClick={() => runtimeRef.current?.endLanding()} aria-label="Close landing result" title="Close">×</button></span></header>
+            <div className="lunar-viewer__landing-columns"><div>
             {landingNote && <p className="lunar-viewer__landing-note">{landingNote}</p>}
             <ul className="lunar-viewer__landing-now">
               <li data-body="sun" data-state={sun ? visibleToState(sun.visible) : 'unknown'}>Sun {sun ? visibilityText(sun.visible) : 'direction unavailable'}</li>
               <li data-body="earth" data-state={earth ? visibleToState(earth.visible) : 'unknown'}>Earth {earth ? visibilityText(earth.visible) : 'direction unavailable'}</li>
             </ul>
+            </div>
             {landingSummary && <dl>{landingSummary.rows.map((row) => <div key={row.label}><dt>{row.label}</dt><dd>{row.value}</dd></div>)}</dl>}
+            </div>
+            {landingSummary && <p className="lunar-viewer__landing-meta">{landingSummary.meta}</p>}
             <p className="lunar-viewer__landing-foot">Centre visibility from the terrain horizon mask. Not power, radio-link performance or mission success. The descent is illustrative.</p>
-            <button type="button" className="lunar-viewer__landing-replay" onClick={playLanding}>Replay landing</button>
           </section>
         )}
         <div className="lunar-viewer__readout-row">
