@@ -179,7 +179,7 @@
 .lunar-viewer__landing-card header span { display: flex; flex: none; }
 .lunar-viewer__landing-card header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .lunar-viewer__landing-card header strong { font-size: 15px; }
-.lunar-viewer__landing-card header button { min-width: 28px; min-height: 28px; border: 0; border-radius: 999px; background: transparent; color: var(--lv-muted); font-size: 18px; line-height: 1; cursor: pointer; }
+.lunar-viewer__landing-card header button { display: inline-grid; place-items: center; min-width: 28px; min-height: 28px; border: 0; border-radius: 999px; background: transparent; color: var(--lv-muted); font-size: 18px; line-height: 1; cursor: pointer; }
 .lunar-viewer__landing-card header button:hover { color: var(--lv-text); background: rgba(255, 255, 255, 0.07); }
 .lunar-viewer__landing-card p { margin: 6px 0 0; }
 .lunar-viewer__landing-foot, .lunar-viewer__landing-about { color: var(--lv-muted); font-size: 12px; }
@@ -223,3 +223,10 @@
   /* While the landing view is open the layer toolbar and readout make room for it. */
   .lunar-viewer:not([data-landing='parked']) :is(.lunar-viewer__toolbar, .lunar-viewer__readout, .lunar-viewer__legend) { display: none; }
 }
+
+/* Folded status card: title row plus one Sun/Earth line, so the scene stays in view. */
+.lunar-viewer__landing-card[data-collapsed='true'] { width: auto; max-width: min(400px, calc(100% - 24px)); padding-block: 6px; }
+.lunar-viewer__landing-brief { display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 2px 0 0; font-size: 13px; font-weight: 600; }
+.lunar-viewer__landing-brief [data-body='sun'] { color: var(--lv-sun); }
+.lunar-viewer__landing-brief [data-body='earth'] { color: var(--lv-earth); }
+.lunar-viewer__landing-brief [data-state='hidden'], .lunar-viewer__landing-brief [data-state='unknown'] { text-decoration: underline dashed; text-underline-offset: 3px; }
