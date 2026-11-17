@@ -24,6 +24,8 @@ export interface LunarViewerProps {
    * (the new `sun` / `earth` arrive as props) and explain it in `landingNote`.
    */
   onPlayLanding?(): void;
+  /** Increment to start the landing view from outside the viewer (ignored until it can run). */
+  landingRequest?: number;
   /** What the App did to the time cursor for the showcase, in plain words. */
   landingNote?: string | null;
   /** Already-computed site metrics shown after touchdown; null = no applied result. */
@@ -32,6 +34,7 @@ export interface LunarViewerProps {
 
 /** Preformatted by the App so the viewer never formats or derives scientific values. */
 export interface LandingSummary {
+  /** Site name. */
   title: string;
   meta: string;
   rows: { label: string; value: string }[];

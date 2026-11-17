@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { Activity, ArrowLeftRight, ChevronDown, Clock3, Info, MapPin, Moon, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, ScanLine, X } from 'lucide-react';
+import { Activity, ArrowLeftRight, ChevronDown, Clock3, Info, MapPin, Moon, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, ScanLine, Sparkles, X } from 'lucide-react';
 import type { LunarDataProvider, SiteSummary } from './data/contract';
 import { LunarViewer, type BodyDirection, type LandingSummary } from './viewer/LunarViewer';
 import { SkyHorizonView } from './viewer/SkyHorizonView';
@@ -14,6 +14,7 @@ import { TimelinePanel } from './panels/TimelinePanel';
 import { ProvenancePanel } from './panels/ProvenancePanel';
 import { OverlayDialog } from './components/OverlayDialog';
 import { SiteCommand } from './components/SiteCommand';
+import { FeatureGuide, type FeatureId } from './components/FeatureGuide';
 import { number, sourceLabel, utc, windowLabel } from './panels/format';
 import { planLandingMoment } from './analysis/landingMoment';
 
@@ -68,13 +69,13 @@ export function App({ provider }: { provider: LunarDataProvider }) {
   }, [shown, cursorIndex, dispatch]);
   const staleSummary = pending && !pendingOther;
   const landingSummary = useMemo<LandingSummary | null>(() => shown ? {
-    title: `Touchdown · ${shown.inputs.site.name}`,
+    title: shown.inputs.site.name,
     meta: `${staleSummary ? `Recomputing — values are ${shown.id} until it finishes · ` : ''}${windowLabel(shown.inputs)} · ${sourceLabel(shown.ephemeris.provenance.kind)}`,
     rows: [
-      { label: 'Sunlit time', value: number(shown.analysis.metrics.sunlitHours, ' h') },
+      { label: 'Sunlit', value: number(shown.analysis.metrics.sunlitHours, ' h') },
       { label: 'Longest darkness', value: number(shown.analysis.metrics.longestDarknessHours, ' h') },
-      { label: 'Earth-visible time', value: number(shown.analysis.metrics.earthVisibleHours, ' h') },
-      { label: 'Sun and Earth both visible', value: number(shown.analysis.metrics.bothHours, ' h') },
+      { label: 'Earth visible', value: number(shown.analysis.metrics.earthVisibleHours, ' h') },
+      { label: 'Both visible', value: number(shown.analysis.metrics.bothHours, ' h') },
     ],
   } : null, [shown, staleSummary]);
   const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 1199px)').matches);
@@ -84,6 +85,8 @@ export function App({ provider }: { provider: LunarDataProvider }) {
   const [commandOpen, setCommandOpen] = useState(false);
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [provenanceOpen, setProvenanceOpen] = useState(false);
+  const [featuresOpen, setFeaturesOpen] = useState(false);
+  const [landingRequest, setLandingRequest] = useState(0);
   const [insets, setInsets] = useState({ instrumentTop: 88, top: 120, bottom: 320 });
   const commandRef = useRef<HTMLElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
@@ -132,6 +135,18 @@ export function App({ provider }: { provider: LunarDataProvider }) {
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
   }, [openCommands]);
+  /** Feature guide: close it and open the chosen feature straight away. */
+  function openFeature(feature: FeatureId) {
+    setFeaturesOpen(false);
+    if (feature === 'sites') openCommands();
+    else if (feature === 'compare') openComparison();
+    else if (feature === 'provenance') setProvenanceOpen(true);
+    else if (feature === 'horizon') setShowHorizon(true);
+    else if (feature === 'summary') { setShowResults(true); if (compact) setShowInputs(false); }
+    else if (feature === 'ground') dispatch({ type: 'camera', mode: 'surface' });
+    else if (feature === 'timeline') dispatch({ type: 'playing', playing: true });
+    else if (feature === 'landing') setLandingRequest((request) => request + 1);
+  }
   function toggleMission() { setShowInputs((value) => !value); if (compact) setShowResults(false); }
   function toggleInspector() { setShowResults((value) => !value); if (compact) setShowInputs(false); }
   const dataBadge = (() => {
@@ -155,7 +170,7 @@ export function App({ provider }: { provider: LunarDataProvider }) {
 
   return <main className="app-shell" data-compact={compact} style={appStyle}>
     <div className="viewer-stage">
-      <LunarViewer terrain={terrain} sites={viewerSites} selectedSiteId={displaySite?.id ?? null} observerHeightM={displayInputs?.observerHeightM ?? 0} cameraMode={state.cameraMode} sun={sun} earth={earth} onSelectSite={(id) => { const site = viewerSites.find((candidate) => candidate.id === id); if (site) selectSite(site); }} onPlayLanding={playLanding} landingNote={landingNote && shown && landingNote.resultId === shown.id && landingNote.index === cursorIndex ? landingNote.text : null} landingSummary={landingSummary} />
+      <LunarViewer terrain={terrain} sites={viewerSites} selectedSiteId={displaySite?.id ?? null} observerHeightM={displayInputs?.observerHeightM ?? 0} cameraMode={state.cameraMode} sun={sun} earth={earth} onSelectSite={(id) => { const site = viewerSites.find((candidate) => candidate.id === id); if (site) selectSite(site); }} onPlayLanding={() => { playLanding(); if (compact) { setShowInputs(false); setShowResults(false); } }} landingRequest={landingRequest} landingNote={landingNote && shown && landingNote.resultId === shown.id && landingNote.index === cursorIndex ? landingNote.text : null} landingSummary={landingSummary} />
     </div>
     <header ref={commandRef} className="command-bar glass-surface">
       <a className="brand" href="#workspace" aria-label="LunarSight workspace"><Moon size={25} strokeWidth={1.3} aria-hidden="true" /><h1>LunarSight</h1></a>
@@ -168,7 +183,8 @@ export function App({ provider }: { provider: LunarDataProvider }) {
         <button className="icon-button" type="button" aria-label="Compare two sites" aria-haspopup="dialog" title="Compare two sites" onClick={openComparison}><ArrowLeftRight size={18} aria-hidden="true" /></button>
         <button className="icon-button" type="button" aria-label="Open provenance" aria-haspopup="dialog" title="Provenance & conventions" onClick={() => setProvenanceOpen(true)}><Info size={18} aria-hidden="true" /></button>
       </div>
-      <strong className="mock-badge" data-kind={dataBadge.kind}>{dataBadge.label}</strong>
+      {dataBadge.kind !== 'processed' && <strong className="mock-badge" data-kind={dataBadge.kind}>{dataBadge.label}</strong>}
+      <button className="features-button" type="button" aria-haspopup="dialog" onClick={() => setFeaturesOpen(true)}><Sparkles size={16} aria-hidden="true" />Features</button>
     </header>
     <div id="workspace" className="result-status" data-status={pending ? 'pending' : state.error ? 'error' : 'ready'}>
       <span className="status-dot" aria-hidden="true" />
@@ -200,6 +216,7 @@ export function App({ provider }: { provider: LunarDataProvider }) {
     <OverlayDialog open={comparisonOpen} onClose={() => setComparisonOpen(false)} title="Compare two sites" description="Same UTC window, step and observer height for both sites; only the site differs." className="comparison-dialog">
       <ComparisonPanel sites={viewerSites} shortlist={shortlist} siteA={comparison.siteA} siteB={comparison.siteB} onSiteA={setSiteAId} onSiteB={setSiteBId} settings={comparison.settings} running={comparison.running} outcome={comparison.outcome} />
     </OverlayDialog>
+    <OverlayDialog open={featuresOpen} onClose={() => setFeaturesOpen(false)} title="What LunarSight does" description="Tap any item to open it." className="features-dialog"><FeatureGuide onOpen={openFeature} /></OverlayDialog>
     <OverlayDialog open={provenanceOpen} onClose={() => setProvenanceOpen(false)} title="Data provenance" description="Data sources, scientific conventions and finite-range limitations." className="provenance-dialog"><ProvenancePanel kind={provider.kind} terrain={terrain} result={shown} /></OverlayDialog>
   </main>;
 }

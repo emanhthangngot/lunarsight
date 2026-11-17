@@ -546,7 +546,8 @@ export function createLanderScene(options: {
       view.position.copy(home).addScaledVector(cameraDirection, CAMERA_DISTANCE_M);
       const ground = start.groundAt(view.position.x, view.position.z);
       view.position.y = Math.max(ground?.y ?? home.y, home.y - 2) + CAMERA_HEIGHT_M;
-      linkTarget.copy(home).addScaledVector(UP, -3.5).addScaledVector(toward, 2);
+      // Aim above the craft so it sits in the lower part of the frame, clear of the status card.
+      linkTarget.copy(home).addScaledVector(UP, 5).addScaledVector(toward, 2);
       // Approach across the frame, braking with the body tilted back along the path.
       approach.crossVectors(UP, cameraDirection).normalize();
       tiltAxis.crossVectors(UP, approach).normalize();

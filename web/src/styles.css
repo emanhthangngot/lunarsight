@@ -314,3 +314,35 @@ td.cell-unknown, td.cell-pending { color: var(--ls-text-muted); font-family: var
    quiet/inspector buttons) so an unavailable control never looks available. */
 .app-shell :is(button, input, select):disabled { color: var(--ls-text-disabled); background: var(--ls-disabled-surface); border-color: var(--ls-border); box-shadow: none; cursor: not-allowed; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto; } }
+
+/* Feature guide: header entry point and a short, tappable list. */
+.features-button { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; min-height: 36px; padding: 6px 12px; border-radius: 8px; color: var(--ls-bg); background: var(--ls-accent); border-color: transparent; font-size: var(--ls-type-sm); font-weight: 600; }
+.features-button:hover { background: var(--ls-text); }
+.features-dialog { width: min(520px, calc(100vw - 32px)); }
+.feature-guide { list-style: none; margin: 0; padding: 0 12px 12px; display: grid; gap: 4px; }
+.feature-guide button { display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: 100%; min-height: 52px; padding: 8px 12px; text-align: left; background: transparent; border-color: transparent; border-radius: 8px; }
+.feature-guide button:hover { background: var(--ls-control); }
+.feature-guide svg { flex: none; color: var(--ls-accent); }
+.feature-guide span { display: grid; gap: 1px; min-width: 0; }
+.feature-guide small { color: var(--ls-text-muted); font-size: var(--ls-type-xs); }
+@media (max-width: 1199px) { .features-button { order: 3; margin-left: auto; } }
+
+/* Compact timeline dock for mouse and trackpad: the 3D view gets the height. Touch keeps the
+   44 px targets above. */
+@media (pointer: fine) and (min-width: 601px) {
+  .dock-toolbar { min-height: 30px; }
+  .dock-toolbar > button { min-height: 28px; padding-block: 2px; font-size: var(--ls-type-xs); }
+  .timeline-panel { padding: 2px 16px 6px; }
+  .timeline-controls > button, .timeline-controls select { min-height: 32px; }
+  .timeline-controls .icon-button { width: 34px; min-width: 34px; }
+  .timeline-controls .play-button { padding-inline: 12px; }
+  .timeline-notes { min-height: 0; line-height: 1.3; }
+  .timeline-notes:empty { display: none; }
+  .scrubber-label { height: 22px; }
+  .scrubber-label input[type="range"] { min-height: 22px; }
+  .tracks { gap: 3px; }
+  .timeline-extent { margin-top: 3px; }
+  .timeline-method { margin-top: -18px; }
+  .timeline-method summary { min-height: 20px; width: fit-content; margin-inline: auto; padding: 0 8px; line-height: 20px; }
+  .timeline-method[open] { margin-top: 0; }
+}
