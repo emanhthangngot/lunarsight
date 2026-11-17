@@ -6,7 +6,9 @@ Anonymous production browser checks observed completed Site04 metrics, actual te
 
 Rollback candidate: previous mock deployment `dpl_DKV8zVX7bhtk6XHL7AZv1K7BbhkA`; rollback itself is untested. The older deployment and merge-pending statements below are historical, superseded by this record. Git auto-deploy remains disabled. Final round42 local acceptance and its lost-log/reused-evidence qualifications remain applicable.
 
-**Lander, landing view and UI polish — 17 November 2026 (user instruction, issue #14, branch `feat/lander-landing-showcase`):**
+**Production update — 17 November 2026:** PR #17 merged as `b081e4ba036468e1b118ae3393f37145714e5e84` and deployed to https://lunarsight.vercel.app as `dpl_3CrSgS2xn66HMXettGPLfWPB4Qv3` (READY, production alias). Same clean-archive route of committed `web/` (`.env.example` excluded, static pilot assets, no backend); configuration SHA-256 unchanged (`f374277c…a916`). A fresh anonymous headless-Chrome run on the alias loaded terrain, played the landing (cursor moved to 2027-01-10 09:00 UTC, both links clear, status card metrics shown) and recorded 0 console or page errors. Rollback candidate: `dpl_BEdESpGFuzepH8WX39u2UAFXnNdy` (untested rollback).
+
+**Lander, landing view and UI polish — 17 November 2026 (user instruction, issue #14, PR #17):**
 
 - An original, script-generated lander model ([build script](../../web/scripts/build-lander-model.mjs), `pnpm build:lander`, deterministic 200,508-byte GLB) parks 30 m from the selected site. Site overview enlarges it with a "not to scale" chip; Ground view shows true size.
 - "Play landing" runs an illustrative descent (flame, dust, Skip, reduced-motion fallback). The App first moves the time cursor to the first sample where the Sun and Earth are both above the terrain horizon, or keeps it and says why. A Sun ray and an Earth link show exactly the analysis `visible` state (clear / blocked / unknown). A top-left status card shows the live Sun/Earth state and the already-computed window metrics. The Sun disc is drawn ×4 during the view, labelled as a display aid. Details: [viewer notes](../../web/src/viewer/README.md#lander-and-landing-showcase-display-aid).
