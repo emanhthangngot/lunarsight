@@ -1,6 +1,6 @@
 # Current project state
 
-Updated after **final round42 bounded acceptance**. This is the concise starting point for the team and agents.
+**Production update — 15 November 2026:** PR13 is merged and source `5a34363` is deployed at https://lunarsight.vercel.app using retained static pilot assets, without a hosted backend. Anonymous terrain/Ground and completed two-site comparison checks passed; deployment identity and rollback candidate are in [the current handoff](handoffs/current.md). Older mock-deployment and merge-pending statements below describe the preceding acceptance snapshot, not the current deployment.
 
 ## Established facts
 
