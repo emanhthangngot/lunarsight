@@ -151,7 +151,8 @@ export function App({ provider }: { provider: LunarDataProvider }) {
       if (cursorIndex === shown.ephemeris.timesUtcMs.length - 1) dispatch({ type: 'cursor', index: 0 });
       dispatch({ type: 'playing', playing: true });
     }
-    else if (feature === 'landing') setLandingRequest((request) => request + 1);
+    // Only for a settled result: a request must not fire later against a different result.
+    else if (feature === 'landing') { if (shown && !pending) setLandingRequest((request) => request + 1); }
   }
   function toggleMission() { setShowInputs((value) => !value); if (compact) setShowResults(false); }
   function toggleInspector() { setShowResults((value) => !value); if (compact) setShowInputs(false); }

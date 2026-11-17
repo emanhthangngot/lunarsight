@@ -168,7 +168,13 @@
 @container (max-width: 720px) {
   .lunar-viewer:not([data-landing='parked']) .lunar-viewer__landing-button { display: none; }
   .lunar-viewer[data-camera-mode] .lunar-viewer__landing-card { top: 104px; max-height: calc(100% - 194px); }
-  .lunar-viewer[data-camera-mode='surface'] .lunar-viewer__landing-card { top: 130px; max-height: calc(100% - 220px); }
+  .lunar-viewer[data-camera-mode='surface'] .lunar-viewer__landing-card { top: 150px; max-height: calc(100% - 240px); }
+}
+/* Larger toolbar buttons (touch or ≤900 px) push the Ground-view corner stack further down. */
+@media (pointer: coarse), (max-width: 900px) {
+  @container (max-width: 720px) {
+    .lunar-viewer[data-camera-mode='surface'] .lunar-viewer__landing-card { top: 166px; max-height: calc(100% - 256px); }
+  }
 }
 .lunar-viewer__landing-card header span { display: flex; flex: none; }
 .lunar-viewer__landing-card header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
@@ -211,6 +217,8 @@
   /* Phones: the toolbar and compass give way during the view; only a data badge stays above. */
   .lunar-viewer[data-camera-mode] .lunar-viewer__landing-card { top: 40px; max-height: calc(100% - 130px); }
   .lunar-viewer:not([data-landing='parked']) .lunar-viewer__compass { display: none; }
+  /* With the compass gone the corner (data badge) moves back to the top, above the card. */
+  .lunar-viewer:not([data-landing='parked']) .lunar-viewer__corner { margin-top: 0; }
   .lunar-viewer__landing-card header strong { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   /* While the landing view is open the layer toolbar and readout make room for it. */
   .lunar-viewer:not([data-landing='parked']) :is(.lunar-viewer__toolbar, .lunar-viewer__readout, .lunar-viewer__legend) { display: none; }

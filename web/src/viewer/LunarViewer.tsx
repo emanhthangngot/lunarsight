@@ -753,8 +753,14 @@ export function LunarViewer(props: LunarViewerProps) {
     requestAnimationFrame(() => landingButtonRef.current?.focus());
   };
 
+  // A tap meant for Skip must not become Replay when touchdown happens under the finger.
+  const phaseChangedAt = useRef(0);
+  useEffect(() => { phaseChangedAt.current = performance.now(); }, [landingPhase]);
+  const settled = () => performance.now() - phaseChangedAt.current > 350;
+
   // One button for the whole showcase so keyboard focus survives the phase changes.
   const onLandingButton = () => {
+    if (!settled()) return;
     const runtime = runtimeRef.current;
     if (landingPhase === 'parked') playLanding();
     else if (landingPhase === 'descent') { runtime?.lander.skip(); runtime?.requestRender(); }
@@ -814,7 +820,7 @@ export function LunarViewer(props: LunarViewerProps) {
           <section className="lunar-viewer__landing-card" aria-label="Landing status">
             <header><strong>{landingPhase === 'descent' ? 'Landing' : 'Touchdown'}{landingSummary ? ` · ${landingSummary.title}` : ''}</strong><span>{landingPhase === 'descent'
               ? <button type="button" onClick={onLandingButton} aria-label="Skip to touchdown" title="Skip to touchdown">⏭</button>
-              : <button type="button" onClick={playLanding} aria-label="Replay landing" title="Replay landing">↻</button>}<button type="button" onClick={closeLanding} aria-label="Close landing view" title="Close">×</button></span></header>
+              : <button type="button" onClick={() => { if (settled()) playLanding(); }} aria-label="Replay landing" title="Replay landing">↻</button>}<button type="button" onClick={closeLanding} aria-label="Close landing view" title="Close">×</button></span></header>
             <ul className="lunar-viewer__landing-now">
               <li data-body="sun" data-state={sun ? visibleToState(sun.visible) : 'unknown'}><strong>Sun</strong>{sun ? `${formatSigned(sun.elDeg)} · ${visibilityText(sun.visible)}` : 'direction unavailable'}</li>
               <li data-body="earth" data-state={earth ? visibleToState(earth.visible) : 'unknown'}><strong>Earth</strong>{earth ? `${formatSigned(earth.elDeg)} · ${visibilityText(earth.visible)}` : 'direction unavailable'}</li>
