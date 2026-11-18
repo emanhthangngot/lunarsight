@@ -1,5 +1,8 @@
 # LunarSight
 
+### Introduction
+We were awarded the Best Mission Concept prize for our work on this project. This achievement was made possible by the dedicated contributions of Huỳnh Cung, Tchen Phi Tân, Ngọc Anh, Hoàng Thy, Xuân Trí, and Anh Tuấn.
+
 ### Lunar Landing Site Explorer & Mission Planner
 
 LunarSight is a proposed application for exploring lunar landing locations and understanding how terrain, sunlight, Earth visibility, and mission assumptions affect a preliminary assessment.
